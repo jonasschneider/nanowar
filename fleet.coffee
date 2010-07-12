@@ -1,4 +1,4 @@
-Log: window.console.log
+Log: NanoWar.Log
 
 class NanoWar.Fleet
   constructor: (game, from, to) ->

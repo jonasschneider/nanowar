@@ -1,4 +1,4 @@
-Log: window.console.log
+Log: NanoWar.Log
 
 class NanoWar.Cell
   constructor: (x, y, size, owner) -> 

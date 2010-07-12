@@ -1,7 +1,10 @@
 window.NanoWar: {}
 NanoWar: window.NanoWar
 $: window.$
-Log: window.console.log
+Log: NanoWar.Log: (msg) ->
+  if window? && window.console?
+    window.console.log(msg)
+
 
 NanoWar.uniqueIdCount: 1
 
@@ -61,7 +64,7 @@ class NanoWar.Game
       ctx: backbuf.getContext('2d');  
       
       ctx.fillStyle: "white"
-      ctx.fillRect(0,0,700,500); # clear canvas  
+      ctx.fillRect(0,0,700,500); # clear canvas
       ctx.fillStyle: "black"
       
       ctx.strokeStyle: "black"
@@ -69,11 +72,8 @@ class NanoWar.Game
       
       @tick()
       
-      #ctx.fillRect(30,30,@ticks*@ticks,50);
+      
       fleet.update() for fleet in @fleets
-      
-      #cell.update() for cell in @cells
-      
       @cleanup()
       
       fleet.draw(ctx) for fleet in @fleets
@@ -112,7 +112,7 @@ class NanoWar.Game
         cell.handle_click(event)
         inside = cell
         break
-    if !inside
+    if !inside # deselect
       @selection: null
  
 
