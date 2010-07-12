@@ -17,6 +17,8 @@
     </script>
 
     <script src="/game.js"></script>
+    <script src="/cell.js"></script>
+    <script src="/fleet.js"></script>
     <script>
       $(document).ready(function() {
         game = new NanoWar.Game("nanowar-game");
@@ -35,8 +37,6 @@
   <body>
     <h2>Nano War</h2>
     
-    <div id="nanowar-game">
-      <div class="fps"></div>
-    </div>
+    <canvas id="nanowar-game" width="700" height="500"></canvas>
   </body>
 </html>
