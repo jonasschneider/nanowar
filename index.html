@@ -3,9 +3,34 @@
   <head>
     <title>Nano War</title>
     <link rel="stylesheet" href="/game.css" type="text/css" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+    <script>
+      jQuery.fn.uniqueId = function(suffix, clobber) {
+        if ( suffix == null )
+          suffix = "UniqueId";
+        return this.each(function(){
+          if ( !this.id || clobber )
+            this.id = "n"+ (++jQuery.fn.uniqueId.index) + suffix;
+        });
+      };
+      jQuery.fn.uniqueId.index = 0;
+    </script>
+
+    <script src="/game.js"></script>
+    <script>
+      $(document).ready(function() {
+        game = new NanoWar.Game("nanowar-game");
+        game.add_cell(new NanoWar.Cell(300, 300, 50));
+        game.run();
+      });
+    </script>
   </head>
   
   <body>
-    o hai
+    <h2>Nano War</h2>
+    
+    <div id="nanowar-game">
+
+    </div>
   </body>
 </html>
