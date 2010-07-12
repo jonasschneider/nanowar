@@ -38,7 +38,7 @@ class NanoWar.Game
   schedule: ->
     window.setTimeout =>
       @update()
-    , 50
+    , 20
   
   tick: ->
     @ticks++
@@ -55,19 +55,29 @@ class NanoWar.Game
   
   update: ->
     try
-      ctx: @container.get(0).getContext('2d');  
-      
-      ctx.clearRect(0,0,700,500); # clear canvas  
+      backbuf: $("#nanowar-backbuf")[0]
+      ctx: backbuf.getContext('2d');  
+      ctx.fillStyle: "white"
+      ctx.fillRect(0,0,700,500); # clear canvas  
+      ctx.fillStyle: "black"
+      ctx.strokeStyle: "black"
       ctx.strokeText(@fps_info(), 50, 100) # draw fps
       
       @tick()
       
       #ctx.fillRect(30,30,@ticks*@ticks,50);
+      fleet.update() for fleet in @fleets
       
       #cell.update() for cell in @cells
-      #fleet.update() for fleet in @fleets
+      
+      @cleanup()
+      
+      fleet.draw(ctx) for fleet in @fleets
       cell.draw(ctx) for cell in @cells
       
+      
+      
+      @container[0].getContext('2d').drawImage(backbuf, 0, 0)
     catch error
       Log error
     @schedule()
@@ -82,7 +92,12 @@ class NanoWar.Game
     @fleets.push new NanoWar.Fleet this, @selection, target
     @selection: null
     
-
+  cleanup: ->
+    for fleet, i in @fleets
+      if fleet.delete_me
+        @fleets.splice(i,1)
+        @cleanup()
+        break
   handle_click: (event) ->
     offset = @container.offset()
     x = event.clientX - offset.left

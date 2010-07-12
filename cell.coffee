@@ -20,8 +20,8 @@ class NanoWar.Cell
     @owner == @game.human_player
   
   handle_incoming_fleet: (fleet) ->
-    Log "OMG! " + @id() + " receives fleet of " + fleet.size
     if fleet.attacker == @owner # friendly fleet
+      Log "Friendly fleet of ${fleet.size} arrived at $@id"
       @change_units(fleet.size)
     else # hostile fleet
       @change_units(-fleet.size)
@@ -49,11 +49,20 @@ class NanoWar.Cell
     #@celldata.html(@units());
     if @game.selection == this
       ctx.fillStyle: "orange"
+      ctx.strokeStyle: "black"
+    else
+      ctx.fillStyle: "black"
+      ctx.strokeStyle: "white"
+    
     ctx.beginPath()
     ctx.arc(@x, @y, @size, 0, 2*Math.PI, false)
     ctx.fill();
     ctx.fillStyle: "black"
     
+    ctx.strokeText(@units(), @x, @y)
+    
+    ctx.fillStyle: "black"
+    ctx.strokeStyle: "white"
     
   unit_growth: ->
     return 0 unless @owner # neutral cells don't produce

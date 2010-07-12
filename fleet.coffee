@@ -11,6 +11,7 @@ class NanoWar.Fleet
     
     @elem: null
     @launch_ticks: @game.ticks
+    @delete_me: false
     
   attacker: ->
     @from.owner
@@ -21,7 +22,7 @@ class NanoWar.Fleet
   
   
   fraction_done: ->
-    (@game.ticks - @launch_ticks) / 30
+    (@game.ticks - @launch_ticks) / 100
     
   position: ->
     posx: @from.x + (@to.x - @from.x) * @fraction_done()
@@ -32,12 +33,15 @@ class NanoWar.Fleet
     for fleet, i in @game.fleets
       @game.fleets.splice(i,1) if fleet is this
   
-  update: ->
-    @create() unless @elem
-    Log "Fleet ("+@size+" units, "+ @fraction_done() +" done) is runnin from " + @from.id() + " to " + @to.id()
+  draw: (ctx) ->
+    ctx.beginPath()
     pos = @position()
-    @elem.css({"left": pos[0], "top": pos[1]})
+    ctx.arc(pos[0], pos[1], @size, 0, 2*Math.PI, false)
+    ctx.fill();
+    ctx.fillStyle: "black"
+    
+  update: ->
     if @fraction_done() >= 1
       Log "Fleet has arrived"
       @to.handle_incoming_fleet this
-      @destroy()
+      @delete_me: true
