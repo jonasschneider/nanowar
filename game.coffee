@@ -93,7 +93,8 @@ class NanoWar.Game
   send_fleet: (target) ->
     return unless @selection
     Log "Cell ${@selection.id} sends to cell ${target.id}"
-    @fleets.push new NanoWar.Fleet this, @selection, target
+    fleet = new NanoWar.Fleet this, @selection, target
+    @fleets.push fleet if fleet.is_valid()
     
   cleanup: ->
     for fleet, i in @fleets

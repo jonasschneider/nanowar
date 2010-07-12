@@ -8,11 +8,16 @@ class NanoWar.Fleet
     @owner: @from.owner
     
     @size: Math.round(@from.units() / 2)
-    @from.change_units(-@size)
+    
+    if @is_valid()
+      @from.change_units(-@size)
     
     @launch_ticks: @game.ticks
     @delete_me: false
-    
+  
+  is_valid: ->
+    @from != @to and @size != 0
+  
   fraction_done: ->
     (@game.ticks - @launch_ticks) / 100
     
