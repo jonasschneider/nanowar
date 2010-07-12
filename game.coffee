@@ -38,7 +38,7 @@ class NanoWar.Game
     @running: true
     Log "GOGOGOG"
     $(@container).click (event) =>
-      @handle_click(event)
+      @human_player.handle_click(event)
     @schedule()
     
   schedule: ->
@@ -73,7 +73,6 @@ class NanoWar.Game
       
       @tick()
       
-      
       fleet.update() for fleet in @fleets
       @cleanup()
       
@@ -87,10 +86,6 @@ class NanoWar.Game
     catch error
       Log error
     @schedule() unless @halt
-    
-  select: (cell) ->
-    @selection: cell
-    Log "Cell ${cell.id} selected"
   
   check_for_end: ->
     owners = []
@@ -103,10 +98,9 @@ class NanoWar.Game
         alert("You lose...")
       @halt: true
     
-  send_fleet: (target) ->
-    return unless @selection
-    Log "Cell ${@selection.id} sends to cell ${target.id}"
-    fleet = new NanoWar.Fleet this, @selection, target
+  send_fleet: (from, to) ->
+    Log "Cell ${from.id} sends to cell ${to.id}"
+    fleet = new NanoWar.Fleet this, from, to
     @fleets.push fleet if fleet.is_valid()
     
   cleanup: ->
@@ -115,25 +109,3 @@ class NanoWar.Game
         @fleets.splice(i,1)
         @cleanup()
         break
-  
-  handle_click: (event) ->
-    offset = @container.offset()
-    x = event.clientX - offset.left
-    y = event.clientY - offset.top
-    for cell in @cells
-      if cell.is_inside(x, y)
-        Log "Click on cell ${cell.id}"
-        cell.handle_click(event)
-        inside = cell
-        break
-    if !inside # deselect
-      @selection: null
- 
-
-class NanoWar.Player
-  constructor: (name) ->
-    @name: name
-    @color: null
-  
-  set_game: (game) ->
-    @game: game

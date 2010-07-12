@@ -19,11 +19,12 @@
     <script src="/game.js"></script>
     <script src="/cell.js"></script>
     <script src="/fleet.js"></script>
+    <script src="/player.js"></script>
     <script>
       $(document).ready(function() {
         game = new NanoWar.Game("nanowar-game");
         
-        me = new NanoWar.Player("Joonas");
+        me = new NanoWar.HumanPlayer("Joonas");
         pc = new NanoWar.Player("Fiz");
         
         game.add_player(me);

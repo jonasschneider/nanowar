@@ -33,14 +33,6 @@ class NanoWar.Cell
         @owner: fleet.owner
         @set_units(-@units())
         Log "$@id overtaken by $fleet.owner.name"
-      
-    
-  handle_click: (event) ->
-    if @game.selection
-      @game.send_fleet(this)
-    else
-      @game.select(this)
-      
   
   is_inside: (x, y) ->
     x = Math.abs(x-@x)
@@ -49,7 +41,7 @@ class NanoWar.Cell
     return dist < @size
   
   draw: (ctx)->
-    if @game.selection == this
+    if @game.human_player.selection == this
       ctx.fillStyle: "orange"
       ctx.strokeStyle: "black"
     else
