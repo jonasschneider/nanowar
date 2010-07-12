@@ -24,11 +24,15 @@
         game = new NanoWar.Game("nanowar-game");
         
         me = new NanoWar.Player("Joonas");
+        pc = new NanoWar.Player("Fiz");
+        
         game.add_player(me);
+        game.add_player(pc);
         game.set_human_player(me);
         
-        game.add_cell(new NanoWar.Cell(200, 150, 50));
-        game.add_cell(new NanoWar.Cell(600, 300, 100, me));
+        game.add_cell(new NanoWar.Cell(350, 150, 50));
+        game.add_cell(new NanoWar.Cell(550, 300, 100, me));
+        game.add_cell(new NanoWar.Cell(200, 300, 100, pc));
         game.run();
       });
     </script>

@@ -18,6 +18,7 @@ class NanoWar.Game
     @fleets: []
     @human_player: null
     @selection: null
+    @halt: false
     
   add_cell: (cell) ->
     @cells.push cell
@@ -79,17 +80,29 @@ class NanoWar.Game
       fleet.draw(ctx) for fleet in @fleets
       cell.draw(ctx) for cell in @cells
       
-      
       # draw backbuf on real screen
       @container[0].getContext('2d').drawImage(backbuf, 0, 0)
+      
+      @check_for_end()
     catch error
       Log error
-    @schedule()
+    @schedule() unless @halt
     
   select: (cell) ->
     @selection: cell
     Log "Cell ${cell.id} selected"
   
+  check_for_end: ->
+    owners = []
+    for cell in @cells
+      owners.push(cell.owner) if cell.owner && owners.indexOf(cell.owner) == -1
+    if(owners.length == 1)
+      if owners[0] == @human_player
+        alert("You win!")
+      else
+        alert("You lose...")
+      @halt: true
+    
   send_fleet: (target) ->
     return unless @selection
     Log "Cell ${@selection.id} sends to cell ${target.id}"
