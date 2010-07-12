@@ -107,7 +107,7 @@ class NanoWar.Game
     x = event.clientX - offset.left
     y = event.clientY - offset.top
     for cell in @cells
-      if cell.is_click_inside(x, y)
+      if cell.is_inside(x, y)
         Log "Click on cell ${cell.id}"
         cell.handle_click(event)
         inside = cell

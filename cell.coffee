@@ -42,15 +42,13 @@ class NanoWar.Cell
       @game.select(this)
       
   
-  is_click_inside: (x, y) ->
+  is_inside: (x, y) ->
     x = Math.abs(x-@x)
     y = Math.abs(y-@y)
     dist = Math.sqrt(x*x+y*y)
     return dist < @size
   
   draw: (ctx)->
-    #@create() unless @elem
-    #@celldata.html(@units());
     if @game.selection == this
       ctx.fillStyle: "orange"
       ctx.strokeStyle: "black"
@@ -59,7 +57,6 @@ class NanoWar.Cell
         ctx.fillStyle: @owner.color
       else
         ctx.fillStyle: "grey"
-      #
       ctx.strokeStyle: "white"
     
     ctx.beginPath()
@@ -68,9 +65,6 @@ class NanoWar.Cell
     ctx.fillStyle: "black"
     
     ctx.strokeText(@units(), @x, @y)
-    
-    ctx.fillStyle: "black"
-    ctx.strokeStyle: "white"
     
   unit_growth: ->
     return 0 unless @owner # neutral cells don't produce
