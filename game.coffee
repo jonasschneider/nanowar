@@ -46,15 +46,17 @@ class NanoWar.Game
     @container.find(".fps").html(Math.round(fps) + "fps (" + tick_time + "ms)")
   
   update: ->
-    #Log "Updating"
-    
-    @show_fps() if @ticks > 0 && @ticks % 5 == 0
-    
-    @tick()
-    
-    cell.update() for cell in @cells
-    fleet.update() for fleet in @fleets
-    
+    Log "Updating"
+    try
+      @show_fps() if @ticks > 0 && @ticks % 5 == 0
+      
+      @tick()
+      
+      cell.update() for cell in @cells
+      fleet.update() for fleet in @fleets
+      
+    catch error
+      Log error
     @schedule()
     
   select: (cell) ->
@@ -63,50 +65,53 @@ class NanoWar.Game
   
   attack: (target) ->
     return unless @selection
-    fleet: new NanoWar.Fleet this, @selection, target, =>
-      Log "arrived"
-    fleet.launch()
-    @fleets.push fleet
-    
-    Log "Attack launched"
+    @fleets.push new NanoWar.Fleet this, @selection, target
     @selection: null
     
 
+
+
 class NanoWar.Fleet
-  constructor: (game, from, to, onArrive) ->
+  constructor: (game, from, to) ->
     @game: game
     @from: from
     @to: to
-    @onArrive: onArrive
-    @size: Math.round(@from.contents() / 2)
-    @elem: null
-    @launch_ticks: 0
     
+    @size: Math.round(@from.units() / 2)
+    @from.change_units(-@size)
+    
+    @elem: null
+    @launch_ticks: @game.ticks
+    
+  attacker: ->
+    @from.owner
+  
   create: ->
     @elem: $("<div class='fleet'></div>").uniqueId("NWFleet").appendTo(@game.container)
     @elem.html(@size)
   
-  launch: ->
-    @launch_ticks: @game.ticks
   
   fraction_done: ->
-    (@game.ticks - @launch_ticks) / 100
+    (@game.ticks - @launch_ticks) / 30
     
   position: ->
     posx: @from.x + (@to.x - @from.x) * @fraction_done()
     posy: @from.y + (@to.y - @from.y) * @fraction_done()
     [posx, posy]
-    
+  
+  destroy: ->
+    for fleet, i in @game.fleets
+      @game.fleets.splice(i,1) if fleet is this
+  
   update: ->
     @create() unless @elem
     Log "Fleet ("+@size+" units, "+ @fraction_done() +" done) is runnin from " + @from.id() + " to " + @to.id()
     pos = @position()
     @elem.css({"left": pos[0], "top": pos[1]})
-    if @fraction_done() == 1
+    if @fraction_done() >= 1
       Log "Fleet has arrived"
-      @game.fleets
-      for fleet, i in @game.fleets
-        @game.fleets.splice(i,1) if fleet is this
+      @to.handle_incoming_fleet this
+      @destroy()
     
 
 class NanoWar.Player
@@ -125,6 +130,9 @@ class NanoWar.Cell
     
     @game: null
     @elem: null
+    
+    @last_absolute_units: 0
+    @last_absolute_ticks: 0
   
   set_game: (game) ->
     @game: game
@@ -141,7 +149,20 @@ class NanoWar.Cell
     
     $(@elem).click =>
       @handle_click(arguments)
+  
+  handle_incoming_fleet: (fleet) ->
+    Log "OMG! " + @id() + " receives fleet of " + fleet.size
+    if fleet.attacker == @owner # friendly fleet
+      @change_units(fleet.size)
+    else # hostile fleet
+      @change_units(-fleet.size)
+      if @units() == 0
+        @owner: null
+      else if @units() < 0
+        @owner: fleet.attacker()
+        @set_units(-@units())
       
+    
   handle_click: (event) ->
     if @is_friendly()
       Log "selecting me"
@@ -151,7 +172,18 @@ class NanoWar.Cell
   
   update: ->
     @create() unless @elem
-    @celldata.html(@contents());
+    @celldata.html(@units());
     
-  contents: ->
-    Math.floor(@game.ticks / 1000 * @size * 2)
+  unit_growth: ->
+    return 0 unless @owner # neutral cells don't produce
+    Math.floor((@game.ticks - @last_absolute_ticks) / 1000 * @size * 2)
+    
+  units: ->
+    @last_absolute_units + @unit_growth()
+    
+  set_units: (num) ->
+    @last_absolute_units: num
+    @last_absolute_ticks: @game.ticks
+  
+  change_units: (delta) ->
+    @set_units @units() + delta
