@@ -7,6 +7,7 @@ class NanoWar.Game
   constructor: (container_id) ->
     @container: $("#"+container_id)
     @ticks: 0
+    @last_tick: 0
     @cells: []
     
   add_cell: (cell) ->
@@ -22,11 +23,23 @@ class NanoWar.Game
   schedule: ->
     window.setTimeout =>
       @update()
-    , 50
+    , 20
+  
+  tick: ->
+    @ticks++
+    @last_tick: new Date().getTime()
+  
+  show_fps: ->
+    tick_time = new Date().getTime() - @last_tick
+    fps = 1000 / tick_time
+    @container.find(".fps").html(Math.round(fps) + "fps (" + tick_time + "ms)")
   
   update: ->
     Log "Updating"
-    @ticks++
+    
+    @show_fps() if @ticks > 0 && @ticks % 5 == 0
+    
+    @tick()
     cell.update(this) for cell in @cells
     @schedule()
       
