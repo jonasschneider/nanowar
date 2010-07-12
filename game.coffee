@@ -21,8 +21,10 @@ class NanoWar.Game
     cell.set_game this
     
   add_player: (player) ->
+    colors = ["red", "blue", "green", "yellow"]
     @players.push player
     player.set_game this
+    player.color = colors[@players.length-1]
     
   set_human_player: (player) ->
     @human_player: player
@@ -57,9 +59,11 @@ class NanoWar.Game
     try
       backbuf: $("#nanowar-backbuf")[0]
       ctx: backbuf.getContext('2d');  
+      
       ctx.fillStyle: "white"
       ctx.fillRect(0,0,700,500); # clear canvas  
       ctx.fillStyle: "black"
+      
       ctx.strokeStyle: "black"
       ctx.strokeText(@fps_info(), 50, 100) # draw fps
       
@@ -76,7 +80,7 @@ class NanoWar.Game
       cell.draw(ctx) for cell in @cells
       
       
-      
+      # draw backbuf on real screen
       @container[0].getContext('2d').drawImage(backbuf, 0, 0)
     catch error
       Log error
@@ -86,11 +90,10 @@ class NanoWar.Game
     @selection: cell
     Log "Cell ${cell.id} selected"
   
-  attack: (target) ->
+  send_fleet: (target) ->
     return unless @selection
-    Log "Cell ${@selection.id} attacks cell ${target.id}"
+    Log "Cell ${@selection.id} sends to cell ${target.id}"
     @fleets.push new NanoWar.Fleet this, @selection, target
-    @selection: null
     
   cleanup: ->
     for fleet, i in @fleets
@@ -98,6 +101,7 @@ class NanoWar.Game
         @fleets.splice(i,1)
         @cleanup()
         break
+  
   handle_click: (event) ->
     offset = @container.offset()
     x = event.clientX - offset.left
@@ -106,11 +110,16 @@ class NanoWar.Game
       if cell.is_click_inside(x, y)
         Log "Click on cell ${cell.id}"
         cell.handle_click(event)
+        inside = cell
+        break
+    if !inside
+      @selection: null
  
 
 class NanoWar.Player
   constructor: (name) ->
     @name: name
+    @color: null
   
   set_game: (game) ->
     @game: game

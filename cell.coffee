@@ -20,23 +20,27 @@ class NanoWar.Cell
     @owner == @game.human_player
   
   handle_incoming_fleet: (fleet) ->
-    if fleet.attacker == @owner # friendly fleet
-      Log "Friendly fleet of ${fleet.size} arrived at $@id"
+    if fleet.owner == @owner # friendly fleet
+      Log "Friendly fleet of $fleet.size arrived at $@id"
       @change_units(fleet.size)
     else # hostile fleet
+      Log "Hostile fleet of $fleet.size arrived at $@id"
       @change_units(-fleet.size)
       if @units() == 0
         @owner: null
+        Log "$@id changed to neutral"
       else if @units() < 0
-        @owner: fleet.attacker()
+        @owner: fleet.owner
         @set_units(-@units())
+        Log "$@id overtaken by $fleet.owner.name"
       
     
   handle_click: (event) ->
-    if @is_friendly()
-      @game.select(this)
+    if @game.selection
+      @game.send_fleet(this)
     else
-      @game.attack(this)
+      @game.select(this)
+      
   
   is_click_inside: (x, y) ->
     x = Math.abs(x-@x)
@@ -51,7 +55,11 @@ class NanoWar.Cell
       ctx.fillStyle: "orange"
       ctx.strokeStyle: "black"
     else
-      ctx.fillStyle: "black"
+      if @owner? && @owner.color
+        ctx.fillStyle: @owner.color
+      else
+        ctx.fillStyle: "grey"
+      #
       ctx.strokeStyle: "white"
     
     ctx.beginPath()
