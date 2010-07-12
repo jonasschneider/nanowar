@@ -17,7 +17,6 @@ class NanoWar.Game
     return if @running
     @running: true
     Log "GOGOGOG"
-    cell.create(this) for cell in @cells
     @schedule()
     
   schedule: ->
@@ -29,7 +28,7 @@ class NanoWar.Game
     Log "Updating"
     @ticks++
     cell.update(this) for cell in @cells
-    true
+    @schedule()
       
 
 class NanoWar.Cell
@@ -44,8 +43,15 @@ class NanoWar.Cell
   set_game: (game) ->
     @game: game
   
-  create: ->
-    @elem: $("<div>this div will get an id</div>").uniqueId("NWCell").appendTo(@game.container)
   
+  create: ->
+    @elem: $("<div class='cell'><span class='celldata'></span></div>").uniqueId("NWCell").css({"width": @size*2, "height": @size*2, "left": @x-@size, "top": @y-@size}).appendTo(@game.container)
+    @celldata: @elem.find(".celldata")
+      
   update: ->
-    Log "Updating cell of size " + @size + ", id is " + @dom_id
+    @create() unless @elem
+    Log "Updating cell with id " + @elem.attr("id")
+    @celldata.html(@contents());
+    
+  contents: ->
+    Math.floor(@game.ticks / 1000 * @size * 2)
