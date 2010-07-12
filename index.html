@@ -20,8 +20,13 @@
     <script>
       $(document).ready(function() {
         game = new NanoWar.Game("nanowar-game");
+        
+        me = new NanoWar.Player("Joonas");
+        game.add_player(me);
+        game.set_human_player(me);
+        
         game.add_cell(new NanoWar.Cell(300, 300, 50));
-        game.add_cell(new NanoWar.Cell(600, 300, 100));
+        game.add_cell(new NanoWar.Cell(600, 300, 100, me));
         game.run();
       });
     </script>
