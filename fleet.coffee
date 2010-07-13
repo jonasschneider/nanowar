@@ -20,9 +20,7 @@ class NanoWar.Fleet
   
   fraction_done: ->
     (@game.ticks - @launch_ticks) / 30
-    
-
-    
+  
   start_position: ->
     @from.nearest_border({x: @to.x, y: @to.y})
   
@@ -37,12 +35,12 @@ class NanoWar.Fleet
     { x: posx, y: posy }
   
   draw: (ctx) ->
+    ctx.fillStyle: "black"
     ctx.beginPath()
     pos = @position()
     ctx.arc(pos.x, pos.y, @size, 0, 2*Math.PI, false)
     ctx.fill();
-    ctx.fillStyle: "purple"
-    
+  
   update: ->
     if @fraction_done() >= 1
       @to.handle_incoming_fleet this

@@ -9,8 +9,8 @@ class NanoWar.Player
     @game: game
     
 class NanoWar.HumanPlayer extends NanoWar.Player
-  constructor: ->
-    @me: "lol"
+  constructor: (name) ->
+    @name: name
     
   handle_click: (event) ->
     offset = @game.container.offset()
@@ -29,6 +29,4 @@ class NanoWar.HumanPlayer extends NanoWar.Player
         break
     if !match # deselect
       @selection: null
-      
-      
     return unless @selection
