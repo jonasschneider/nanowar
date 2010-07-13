@@ -48,6 +48,7 @@ class NanoWar.Fleet
     ctx.beginPath()
     pos = @position()
     ctx.arc(pos.x, pos.y, @size(), 0, 2*Math.PI, false)
+    ctx.closePath()
     ctx.fill();
   
   update: ->

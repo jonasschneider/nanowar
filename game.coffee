@@ -76,7 +76,6 @@ class NanoWar.Game
       fleet.update() for fleet in @fleets
       @cleanup()
       
-      
       cell.draw(ctx) for cell in @cells
       fleet.draw(ctx) for fleet in @fleets
       

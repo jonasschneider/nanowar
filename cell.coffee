@@ -73,6 +73,7 @@ class NanoWar.Cell
     
     ctx.beginPath()
     ctx.arc(@x, @y, @size, 0, 2*Math.PI, false)
+    ctx.closePath()
     ctx.fill();
     ctx.fillStyle: "black"
     
