@@ -40,6 +40,26 @@ class NanoWar.Cell
     dist = Math.sqrt(x*x+y*y)
     return dist < @size
   
+  nearest_border: (pos) ->
+    dx = pos.x - @x
+    dy = @y - pos.y
+    
+    alpha = Math.atan(dy/dx)
+    
+    x = Math.cos(alpha)*@size
+    y = Math.sin(alpha)*@size
+    
+    # trial and error
+    if(@x > pos.x || @y < pos.y)
+      x = x * -1 
+      y = y * -1
+      
+    if(@x <= pos.x && @y < pos.y)
+      x = x * -1 
+      y = y * -1
+    
+    return { x: @x+x, y: @y-y}
+    
   draw: (ctx)->
     if @game.human_player.selection == this
       ctx.fillStyle: "orange"
