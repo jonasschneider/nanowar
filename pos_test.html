@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Nano War</title>
+    <link rel="stylesheet" href="/game.css" type="text/css" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript" charset="utf-8">
+      function closest_point(basex, basey, baserad, pointx, pointy) {
+        dx = pointx - basex
+        dy = basey - pointy
+        console.log("D: " + dx + "/" + dy)
+        
+        alpha = Math.atan(dy/dx)
+        console.log("Alpha: " + alpha * (180/Math.PI))
+        
+        x = Math.sin(alpha)*baserad
+        y = Math.cos(alpha)*baserad
+        
+        if(basex > pointx) {
+          x *= -1 
+          y *= -1
+        }
+        return { x: basex+y, y: basey-x}
+      }
+      
+      $(document).ready(function() {
+        
+        
+        draw = function() {
+          var ctx = $("#test")[0].getContext('2d');
+          ctx.clearRect(0,0,700,600)
+          ctx.beginPath()
+          ctx.arc(from.x, from.y, from.size, 0, 2*Math.PI, false)
+          ctx.fill();
+          ctx.fillStyle = "black"
+            
+          ctx.beginPath()
+          ctx.arc(to.x, to.y, to.size, 0, 2*Math.PI, false)
+          ctx.fill();
+          ctx.fillStyle = "black"
+          
+          pos = closest_point(from.x, from.y, from.size, to.x, to.y)
+        
+        
+          ctx.beginPath();  
+          ctx.strokeStyle = "yellow"
+          ctx.moveTo(from.x, from.y)
+          ctx.lineTo(pos.x, pos.y)
+          ctx.stroke();
+          
+        }
+        from = { x: 0, y: 300, size: 40 }
+        
+        
+        to = { x: 700, y: 600, size: 50 }
+        
+        i = 0
+        setInterval(function() {
+          i++
+          to.y = 600 - (-2*(i*i) / 2 + 40*i)
+          to.x -= 20
+          from.x += 10
+          draw()
+        }, 20)
+        
+        
+      })
+    </script>
+  </head>
+  <body>
+    <canvas id="test" width="700" height="600"></canvas>
+  </body>
+</html>

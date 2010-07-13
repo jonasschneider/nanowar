@@ -31,9 +31,13 @@
         game.add_player(pc);
         game.set_human_player(me);
         
-        game.add_cell(new NanoWar.Cell(350, 150, 50));
-        game.add_cell(new NanoWar.Cell(550, 300, 100, me));
-        game.add_cell(new NanoWar.Cell(200, 300, 100, pc));
+        game.add_cell(new NanoWar.Cell(350, 100, 50));
+        game.add_cell(new NanoWar.Cell(350, 300, 100, me));
+        game.add_cell(new NanoWar.Cell(100, 200, 50))
+        game.add_cell(new NanoWar.Cell(500, 200, 50))
+        
+        
+        game.add_cell(new NanoWar.Cell(550, 100, 10, pc));
         game.run();
       });
     </script>
