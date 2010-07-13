@@ -21,11 +21,11 @@ class NanoWar.Cell
   
   handle_incoming_fleet: (fleet) ->
     if fleet.owner == @owner # friendly fleet
-      Log "Friendly fleet of $fleet.size arrived at $@id"
-      @change_units(fleet.size)
+      Log "Friendly fleet of $fleet.strength arrived at $@id"
+      @change_units(fleet.strength)
     else # hostile fleet
-      Log "Hostile fleet of $fleet.size arrived at $@id"
-      @change_units(-fleet.size)
+      Log "Hostile fleet of $fleet.strength arrived at $@id"
+      @change_units(-fleet.strength)
       if @units() == 0
         @owner: null
         Log "$@id changed to neutral"

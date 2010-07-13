@@ -7,12 +7,12 @@ class NanoWar.Fleet
     @to: to
     @owner: @from.owner
     
-    @size: Math.round(@from.units() / 2)
+    @strength: Math.round(@from.units() / 2)
     
     if @is_valid()
-      @from.change_units(-@size)
+      @from.change_units(-@strength)
+      @launch_ticks: @game.ticks
     
-    @launch_ticks: @game.ticks
     @delete_me: false
   
   is_valid: ->
@@ -27,6 +27,15 @@ class NanoWar.Fleet
   end_position: ->
     @to.nearest_border({x: @from.x, y: @from.y})
   
+  size: ->
+    rad: (size) ->
+      -0.0005*size^2+0.3*size
+    
+    if @strength < 200
+      rad(@strength)
+    else
+      rad(200)
+  
   position: ->
     startpos = @start_position()
     endpos = @end_position()
@@ -38,7 +47,7 @@ class NanoWar.Fleet
     ctx.fillStyle: "black"
     ctx.beginPath()
     pos = @position()
-    ctx.arc(pos.x, pos.y, @size, 0, 2*Math.PI, false)
+    ctx.arc(pos.x, pos.y, @size(), 0, 2*Math.PI, false)
     ctx.fill();
   
   update: ->
