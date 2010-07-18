@@ -37,6 +37,7 @@ class NanoWar.Game
     return if @running
     @running: true
     Log "GOGOGOG"
+    cell.setup(this) for cell in @cells
     $(@container).click (event) =>
       @human_player.handle_click(event)
     @schedule()
@@ -61,26 +62,27 @@ class NanoWar.Game
   
   update: ->
     try
-      backbuf: $("#nanowar-backbuf")[0]
-      ctx: backbuf.getContext('2d');  
+      #backbuf: $("#nanowar-backbuf")[0]
+      #ctx: backbuf.getContext('2d');  
       
-      ctx.fillStyle: "white"
-      ctx.fillRect(0,0,700,500); # clear canvas
-      ctx.fillStyle: "black"
+      #ctx.fillStyle: "white"
+      #ctx.fillRect(0,0,700,500); # clear canvas
+      #ctx.fillStyle: "black"
       
-      ctx.strokeStyle: "black"
-      ctx.strokeText(@fps_info(), 50, 100) # draw fps
+      #ctx.strokeStyle: "black"
+      #ctx.strokeText(@fps_info(), 50, 100) # draw fps
       
       @tick()
       
       fleet.update() for fleet in @fleets
       @cleanup()
       
-      cell.draw(ctx) for cell in @cells
-      fleet.draw(ctx) for fleet in @fleets
+      
+      #fleet.draw(ctx) for fleet in @fleets
+      cell.draw() for cell in @cells
       
       # draw backbuf on real screen
-      @container[0].getContext('2d').drawImage(backbuf, 0, 0)
+      #@container[0].getContext('2d').drawImage(backbuf, 0, 0)
       
       @check_for_end()
     catch error

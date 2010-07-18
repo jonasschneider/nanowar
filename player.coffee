@@ -16,17 +16,12 @@ class NanoWar.HumanPlayer extends NanoWar.Player
     offset = @game.container.offset()
     x = event.clientX - offset.left
     y = event.clientY - offset.top
-    match: false
-    for cell in @game.cells
-      if cell.is_inside(x, y)
+    
+    if cell: event.originalTarget.nw_cell
         Log "Click on cell ${cell.id}"
         if @selection
           @game.send_fleet(@selection, cell)
         else
           @selection: cell if cell.owner == this
-        
-        match: true
-        break
-    if !match # deselect
+    else
       @selection: null
-    return unless @selection

@@ -9,6 +9,7 @@ use Rack::Coffee, {
     :urls => ['/']
 }
 
+#Rack::Mime::MIME_TYPES.merge!(".html" => "text/xhtml+xml")
 
 puts ">>> Serving: #{Dir.pwd}"
 run Rack::Directory.new(Dir.pwd)

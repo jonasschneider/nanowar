@@ -33,13 +33,7 @@ class NanoWar.Cell
         @owner: fleet.owner
         @set_units(-@units())
         Log "$@id overtaken by $fleet.owner.name"
-  
-  is_inside: (x, y) ->
-    x = Math.abs(x-@x)
-    y = Math.abs(y-@y)
-    dist = Math.sqrt(x*x+y*y)
-    return dist < @size
-  
+    
   nearest_border: (pos) ->
     dx = pos.x - @x
     dy = @y - pos.y
@@ -59,26 +53,30 @@ class NanoWar.Cell
       y = y * -1
     
     return { x: @x+x, y: @y-y}
+  
+  setup: (game) ->
+    @game: game
     
-  draw: (ctx)->
+    @elem: document.createElementNS( "http://www.w3.org/2000/svg", "circle" )
+    @elem.nw_cell: this
+    @elem.setAttribute("cx", @x)
+    @elem.setAttribute("cy", @y)
+    @elem.setAttribute("r", @size)
+    @elem.setAttribute("stroke", "black")
+    
+    @game.container[0].appendChild(@elem)
+    
+  draw: ->
     if @game.human_player.selection == this
-      ctx.fillStyle: "orange"
-      ctx.strokeStyle: "black"
+      @elem.setAttribute "fill", 'orange'
+      @elem.setAttribute "stroke", 'black'
     else
       if @owner? && @owner.color
-        ctx.fillStyle: @owner.color
+        @elem.setAttribute "fill", @owner.color
       else
-        ctx.fillStyle: "grey"
-      ctx.strokeStyle: "white"
-    
-    ctx.beginPath()
-    ctx.arc(@x, @y, @size, 0, 2*Math.PI, false)
-    ctx.closePath()
-    ctx.fill();
-    ctx.fillStyle: "black"
-    
-    ctx.strokeText(@units(), @x, @y)
-    
+        @elem.setAttribute "fill", "grey"
+      @elem.setAttribute "stroke", "white"
+   
   unit_growth: ->
     return 0 unless @owner # neutral cells don't produce
     Math.floor((@game.ticks - @last_absolute_ticks) / 1000 * @size * 2)
