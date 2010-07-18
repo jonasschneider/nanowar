@@ -9,14 +9,15 @@ class NanoWar.Fleet
     
     @strength: Math.round(@from.units() / 2)
     
-    if @is_valid()
-      @from.change_units(-@strength)
-      @launch_ticks: @game.ticks
-    
     @delete_me: false
   
   is_valid: ->
     @from != @to and @size != 0
+  
+  launch: ->
+    @from.change_units(-@strength)
+    @launch_ticks: @game.ticks
+    @setup()
   
   fraction_done: ->
     (@game.ticks - @launch_ticks) / 30
@@ -36,6 +37,17 @@ class NanoWar.Fleet
     else
       rad(200)
   
+  setup: ->
+    @elem: document.createElementNS( "http://www.w3.org/2000/svg", "circle" )
+    @elem.nw_fleet: this
+    @elem.setAttribute("r", @size())
+    @elem.setAttribute("stroke", "none")
+    
+    @elem.setAttribute("cx", @start_position().x)
+    @elem.setAttribute("cy", @start_position().y)
+    
+    @game.container[0].appendChild(@elem)
+  
   position: ->
     startpos = @start_position()
     endpos = @end_position()
@@ -43,15 +55,16 @@ class NanoWar.Fleet
     posy: startpos.y + (endpos.y - startpos.y) * @fraction_done()
     { x: posx, y: posy }
   
-  draw: (ctx) ->
-    ctx.fillStyle: "black"
-    ctx.beginPath()
+  draw: ->
     pos = @position()
-    ctx.arc(pos.x, pos.y, @size(), 0, 2*Math.PI, false)
-    ctx.closePath()
-    ctx.fill();
+    @elem.setAttribute("cx", pos.x)
+    @elem.setAttribute("cy", pos.y)
   
   update: ->
     if @fraction_done() >= 1
       @to.handle_incoming_fleet this
       @delete_me: true
+  
+  destroy: ->
+    Log "destroying"
+    @game.container[0].removeChild(@elem)

@@ -67,16 +67,22 @@ class NanoWar.Cell
     @game.container[0].appendChild(@elem)
     
   draw: ->
+    @elem.setAttribute("stroke", @stroke_color())
+    @elem.setAttribute("fill", @fill_color())
+  
+  fill_color: ->
     if @game.human_player.selection == this
-      @elem.setAttribute "fill", 'orange'
-      @elem.setAttribute "stroke", 'black'
+      "orange"
     else
-      if @owner? && @owner.color
-        @elem.setAttribute "fill", @owner.color
-      else
-        @elem.setAttribute "fill", "grey"
-      @elem.setAttribute "stroke", "white"
-   
+      return @owner.color if @owner? && @owner.color
+      "grey"
+  
+  stroke_color: ->
+    if @game.human_player.selection == this
+      "black"
+    else
+      "white"
+  
   unit_growth: ->
     return 0 unless @owner # neutral cells don't produce
     Math.floor((@game.ticks - @last_absolute_ticks) / 1000 * @size * 2)

@@ -75,10 +75,10 @@ class NanoWar.Game
       @tick()
       
       fleet.update() for fleet in @fleets
-      @cleanup()
+      @cleanup_fleets()
       
       
-      #fleet.draw(ctx) for fleet in @fleets
+      fleet.draw() for fleet in @fleets
       cell.draw() for cell in @cells
       
       # draw backbuf on real screen
@@ -103,11 +103,14 @@ class NanoWar.Game
   send_fleet: (from, to) ->
     Log "Cell ${from.id} sends to cell ${to.id}"
     fleet = new NanoWar.Fleet this, from, to
-    @fleets.push fleet if fleet.is_valid()
+    if fleet.is_valid()
+      fleet.launch()
+      @fleets.push fleet
     
-  cleanup: ->
+  cleanup_fleets: ->
     for fleet, i in @fleets
       if fleet.delete_me
+        fleet.destroy()
         @fleets.splice(i,1)
-        @cleanup()
+        @cleanup_fleets()
         break
