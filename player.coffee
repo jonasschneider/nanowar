@@ -23,10 +23,6 @@ class NanoWar.HumanPlayer extends NanoWar.Player
       @selection: null
   
   handle_click: (event) ->
-    offset = @game.container.offset()
-    x = event.clientX - offset.left
-    y = event.clientY - offset.top
-    Log event
     if cell: event.originalTarget.nw_cell
       Log "Click on cell ${cell.id}"
       if @selection

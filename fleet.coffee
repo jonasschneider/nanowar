@@ -1,11 +1,12 @@
 Log: NanoWar.Log
 
-class NanoWar.Fleet
+class NanoWar.Fleet extends NanoWar.Object
   constructor: (game, from, to) ->
     @game: game
     @from: from
     @to: to
     @owner: @from.owner
+    @type: "fleet"
     
     @strength: Math.round(@from.units / 2)
     

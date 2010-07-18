@@ -13,17 +13,17 @@ class NanoWar.Game
     @container: $("#"+container_id)
     @ticks: 0
     @last_tick: 0
-    @cells: []
     @players: []
-    @fleets: []
     @events: []
+    @objects: []
+    
     @human_player: null
     @selection: null
     @halt: false
     @desired_tick_length: 1000/30
     
-  add_cell: (cell) ->
-    @cells.push cell
+  add: (object) ->
+    @objects.push object
     
   add_player: (player) ->
     colors = ["red", "blue", "green", "yellow"]
@@ -38,7 +38,7 @@ class NanoWar.Game
     return if @running
     @running: true
     Log "GOGOGOG"
-    cell.setup(this) for cell in @cells
+    object.setup(this) for object in @objects
     
     @fps_container: document.createElementNS( "http://www.w3.org/2000/svg", "text" )
     @fps_container.setAttribute("x", 700-200)
@@ -64,32 +64,30 @@ class NanoWar.Game
     @last_tick_length = new Date().getTime() - @last_tick
     fps = Math.round(1000 / @last_tick_length)
     
-    num_cells = @cells.length
-    num_fleets = @fleets.length
-    
-    "$fps fps ($@last_tick_length ms/frame) ${num_cells}/${num_fleets}"
+    "$fps fps ($@last_tick_length ms/frame) ${@objects.length}"
   
   update: ->
     try
+      # Update FPS
       @fps_text.nodeValue: @fps_info()
+      
+      # Tick
       @tick()
       
+      # Process events
       while event: @events.pop()
         @human_player.handle_click(event)
       
+      # Update objects
+      object.update() for object in @objects
       
-      fleet.update() for fleet in @fleets
-      cell.update() for cell in @cells
+      # Remove deleted objects
+      @cleanup_objects()
       
-      @cleanup_fleets()
+      # Draw objects
+      object.draw() for object in @objects
       
-      
-      fleet.draw() for fleet in @fleets
-      cell.draw() for cell in @cells
-      
-      # draw backbuf on real screen
-      #@container[0].getContext('2d').drawImage(backbuf, 0, 0)
-      
+      # End game if conditions are met
       @check_for_end()
     catch error
       Log error
@@ -97,8 +95,8 @@ class NanoWar.Game
   
   check_for_end: ->
     owners = []
-    for cell in @cells
-      owners.push(cell.owner) if cell.owner && owners.indexOf(cell.owner) == -1
+    for object in @objects
+      owners.push(object.owner) if object.type == "cell" && object.owner && owners.indexOf(object.owner) == -1
     if(owners.length == 1)
       if owners[0] == @human_player
         alert("You win!")
@@ -111,12 +109,12 @@ class NanoWar.Game
     fleet = new NanoWar.Fleet this, from, to
     if fleet.is_valid()
       fleet.launch()
-      @fleets.push fleet
+      @objects.push fleet
     
-  cleanup_fleets: ->
-    for fleet, i in @fleets
-      if fleet.delete_me
-        fleet.destroy()
-        @fleets.splice(i,1)
-        @cleanup_fleets()
+  cleanup_objects: ->
+    for object, i in @objects
+      if object.delete_me
+        object.destroy()
+        @objects.splice(i,1)
+        @cleanup_objects()
         break

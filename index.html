@@ -18,6 +18,7 @@
 
     <script src="/util.js"></script>
     <script src="/game.js"></script>
+    <script src="/object.js"></script>
     <script src="/cell.js"></script>
     <script src="/fleet.js"></script>
     <script src="/player.js"></script>
@@ -32,13 +33,13 @@
         game.add_player(pc);
         game.set_human_player(me);
         
-        game.add_cell(new NanoWar.Cell(350, 100, 50));
-        game.add_cell(new NanoWar.Cell(350, 300, 50, me));
-        game.add_cell(new NanoWar.Cell(100, 200, 50))
-        game.add_cell(new NanoWar.Cell(500, 200, 50))
+        game.add(new NanoWar.Cell(350, 100, 50));
+        game.add(new NanoWar.Cell(350, 300, 50, me));
+        game.add(new NanoWar.Cell(100, 200, 50))
+        game.add(new NanoWar.Cell(500, 200, 50))
         
         
-        game.add_cell(new NanoWar.Cell(550, 100, 10, pc));
+        game.add(new NanoWar.Cell(550, 100, 10, pc));
         game.run();
       });
     </script>

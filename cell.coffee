@@ -1,11 +1,12 @@
 Log: NanoWar.Log
 
-class NanoWar.Cell
+class NanoWar.Cell extends NanoWar.Object
   constructor: (x, y, size, owner) -> 
     @x: x
     @y: y
     @size: size
     @owner: owner
+    @type: "cell"
     
     @game: null
     @id: NanoWar.uniqueIdCount++
