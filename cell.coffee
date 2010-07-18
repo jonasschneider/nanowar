@@ -2,17 +2,16 @@ Log: NanoWar.Log
 
 class NanoWar.Cell extends NanoWar.Object
   constructor: (x, y, size, owner) -> 
+    @type: "cell"
+    
     @x: x
     @y: y
     @size: size
     @owner: owner
-    @type: "cell"
     
-    @game: null
     @id: NanoWar.uniqueIdCount++
     
     @units: 0
-    @exact_units: 0
     
   set_owner: (new_owner) ->
     @owner: new_owner
@@ -59,10 +58,11 @@ class NanoWar.Cell extends NanoWar.Object
     
     return { x: @x+x, y: @y-y}
   
-  setup: (game) ->
-    @game: game
-    
-    
+  units_per_tick: ->
+    return 0 unless @owner # neutral cells don't produce
+    @size * @game.desired_tick_length / 8000
+  
+  setup: ->
     @elem: document.createElementNS( "http://www.w3.org/2000/svg", "circle" )
     @elem.nw_cell: this
     @elem.setAttributes {
@@ -74,29 +74,9 @@ class NanoWar.Cell extends NanoWar.Object
     
     @set_owner @owner
     
-    
-    @unit_container: document.createElementNS( "http://www.w3.org/2000/svg", "text" )
-    @unit_container.nw_cell: this
-    @unit_container.setAttributes {
-      x: @x
-      y: @y
-      transform: "translate(0,5)"
-      "class": "cell-data"
-    }
-    
-    @unit_text: document.createTextNode("0")
-    @unit_container.appendChild(@unit_text)
-    
-    
     @game.container[0].appendChild(@elem)
-    @game.container[0].appendChild(@unit_container)
+    
+    @game.add new NanoWar.CellData(this)
   
   update: ->
     @units += @units_per_tick()
-    
-  draw: ->
-    @unit_text.nodeValue: Math.floor @units
-  
-  units_per_tick: ->
-    return 0 unless @owner # neutral cells don't produce
-    @size * @game.desired_tick_length / 8000

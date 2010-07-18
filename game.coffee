@@ -19,11 +19,15 @@ class NanoWar.Game
     
     @human_player: null
     @selection: null
+    
+    @running: false
     @halt: false
     @desired_tick_length: 1000/30
     
   add: (object) ->
     @objects.push object
+    object.set_game this
+    object.setup() if @running
     
   add_player: (player) ->
     colors = ["red", "blue", "green", "yellow"]
