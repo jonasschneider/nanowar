@@ -2,19 +2,12 @@
   :border 1px solid #333
   
   .fleet
-    :position absolute
   
   .cell
-    :border 1px solid black
-    :-moz-border-radius 100%
+    :stroke none
     
-    :vertical-align middle
-    :text-align center
-    :position absolute
-    :display table
-
-
-    span
-      :height inherit
-      :line-height 50px
-      :display block
+    &.neutral
+      :fill grey
+    &.selected
+      :fill orange
+      :stroke black

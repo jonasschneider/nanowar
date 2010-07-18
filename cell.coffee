@@ -13,11 +13,14 @@ class NanoWar.Cell
     @last_absolute_units: 0
     @last_absolute_ticks: 0
   
-  set_game: (game) ->
-    @game: game
-  
-  is_friendly: ->
-    @owner == @game.human_player
+  set_owner: (new_owner) ->
+    @owner: new_owner
+    if new_owner && new_owner.color
+      @elem.setAttribute("fill", new_owner.color)
+      @elem.removeClass("neutral")
+    else
+      @elem.setAttribute("fill", null)
+      @elem.addClass("neutral")
   
   handle_incoming_fleet: (fleet) ->
     if fleet.owner == @owner # friendly fleet
@@ -30,7 +33,7 @@ class NanoWar.Cell
         @owner: null
         Log "$@id changed to neutral"
       else if @units() < 0
-        @owner: fleet.owner
+        @set_owner fleet.owner
         @set_units(-@units())
         Log "$@id overtaken by $fleet.owner.name"
     
@@ -57,15 +60,31 @@ class NanoWar.Cell
   setup: (game) ->
     @game: game
     
+    
     @elem: document.createElementNS( "http://www.w3.org/2000/svg", "circle" )
     @elem.nw_cell: this
     @elem.setAttribute("cx", @x)
     @elem.setAttribute("cy", @y)
     @elem.setAttribute("r", @size)
-    @elem.setAttribute("stroke", "black")
+    
+    @elem.setAttribute("class", "cell")
+    
+    @set_owner @owner
+    
+    
+    @unit_container: document.createElementNS( "http://www.w3.org/2000/svg", "text" )
+    @unit_container.setAttribute("text-anchor", "middle" )
+    @unit_container.setAttribute("fill", "black" )
+    @unit_container.setAttribute("stroke", "black" )
+    @unit_container.setAttribute("dominant-baseline", "mathematical" )
+    @unit_text: document.createTextNode("0")
+    @unit_container.appendChild(@unit_text)
+    @elem.appendChild(@unit_container)
     
     @game.container[0].appendChild(@elem)
   
+  draw: ->
+    @unit_text.nodeValue: @units()
   
   unit_growth: ->
     return 0 unless @owner # neutral cells don't produce

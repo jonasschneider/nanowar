@@ -22,7 +22,6 @@ class NanoWar.Game
     
   add_cell: (cell) ->
     @cells.push cell
-    cell.set_game this
     
   add_player: (player) ->
     colors = ["red", "blue", "green", "yellow"]
@@ -38,6 +37,14 @@ class NanoWar.Game
     @running: true
     Log "GOGOGOG"
     cell.setup(this) for cell in @cells
+    
+    @fps_container: document.createElementNS( "http://www.w3.org/2000/svg", "text" )
+    @fps_container.setAttribute("x", 700-200)
+    @fps_container.setAttribute("y", 500-480)
+    @fps_text: document.createTextNode("asdf")
+    @fps_container.appendChild(@fps_text)
+    @container[0].appendChild(@fps_container)
+
     $(@container).click (event) =>
       @human_player.handle_click(event)
     @schedule()
@@ -45,7 +52,7 @@ class NanoWar.Game
   schedule: ->
     window.setTimeout =>
       @update()
-    , 20
+    , 1
   
   tick: ->
     @ticks++
@@ -71,7 +78,7 @@ class NanoWar.Game
       
       #ctx.strokeStyle: "black"
       #ctx.strokeText(@fps_info(), 50, 100) # draw fps
-      
+      @fps_text.nodeValue: @fps_info()
       @tick()
       
       fleet.update() for fleet in @fleets
@@ -79,7 +86,7 @@ class NanoWar.Game
       
       
       fleet.draw() for fleet in @fleets
-      #cell.draw() for cell in @cells
+      cell.draw() for cell in @cells
       
       # draw backbuf on real screen
       #@container[0].getContext('2d').drawImage(backbuf, 0, 0)

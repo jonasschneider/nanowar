@@ -42,7 +42,6 @@ class NanoWar.Fleet
     @elem.nw_fleet: this
     @elem.setAttribute("r", @size())
     @elem.setAttribute("stroke", "none")
-    @elem.setAttribute("class", "cell")
     
     @elem.setAttribute("cx", @start_position().x)
     @elem.setAttribute("cy", @start_position().y)
