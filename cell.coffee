@@ -63,25 +63,31 @@ class NanoWar.Cell
     
     @elem: document.createElementNS( "http://www.w3.org/2000/svg", "circle" )
     @elem.nw_cell: this
-    @elem.setAttribute("cx", @x)
-    @elem.setAttribute("cy", @y)
-    @elem.setAttribute("r", @size)
-    
-    @elem.setAttribute("class", "cell")
+    @elem.setAttributes {
+      cx: @x
+      cy: @y
+      r: @size
+      "class": "cell"
+    }
     
     @set_owner @owner
     
     
     @unit_container: document.createElementNS( "http://www.w3.org/2000/svg", "text" )
-    @unit_container.setAttribute("text-anchor", "middle" )
-    @unit_container.setAttribute("fill", "black" )
-    @unit_container.setAttribute("stroke", "black" )
-    @unit_container.setAttribute("dominant-baseline", "mathematical" )
+    @unit_container.nw_cell: this
+    @unit_container.setAttributes {
+      x: @x
+      y: @y
+      transform: "translate(0,5)"
+      "class": "cell-data"
+    }
+    
     @unit_text: document.createTextNode("0")
     @unit_container.appendChild(@unit_text)
-    @elem.appendChild(@unit_container)
+    
     
     @game.container[0].appendChild(@elem)
+    @game.container[0].appendChild(@unit_container)
   
   draw: ->
     @unit_text.nodeValue: @units()

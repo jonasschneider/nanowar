@@ -66,5 +66,4 @@ class NanoWar.Fleet
       @delete_me: true
   
   destroy: ->
-    Log "destroying"
     @game.container[0].removeChild(@elem)
