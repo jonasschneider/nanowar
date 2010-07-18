@@ -16,9 +16,11 @@ class NanoWar.Game
     @cells: []
     @players: []
     @fleets: []
+    @events: []
     @human_player: null
     @selection: null
     @halt: false
+    @desired_tick_length: 1000/30
     
   add_cell: (cell) ->
     @cells.push cell
@@ -46,42 +48,39 @@ class NanoWar.Game
     @container[0].appendChild(@fps_container)
 
     $(@container).click (event) =>
-      @human_player.handle_click(event)
+      @events.unshift event
     @schedule()
     
   schedule: ->
     window.setTimeout =>
       @update()
-    , 1
+    , @desired_tick_length
   
   tick: ->
     @ticks++
     @last_tick: new Date().getTime()
   
   fps_info: ->
-    tick_time = new Date().getTime() - @last_tick
-    fps = Math.round(1000 / tick_time)
+    @last_tick_length = new Date().getTime() - @last_tick
+    fps = Math.round(1000 / @last_tick_length)
     
     num_cells = @cells.length
     num_fleets = @fleets.length
     
-    "$fps fps ($tick_time ms/frame) ${num_cells}/${num_fleets}"
+    "$fps fps ($@last_tick_length ms/frame) ${num_cells}/${num_fleets}"
   
   update: ->
     try
-      #backbuf: $("#nanowar-backbuf")[0]
-      #ctx: backbuf.getContext('2d');  
-      
-      #ctx.fillStyle: "white"
-      #ctx.fillRect(0,0,700,500); # clear canvas
-      #ctx.fillStyle: "black"
-      
-      #ctx.strokeStyle: "black"
-      #ctx.strokeText(@fps_info(), 50, 100) # draw fps
       @fps_text.nodeValue: @fps_info()
       @tick()
       
+      while event: @events.pop()
+        @human_player.handle_click(event)
+      
+      
       fleet.update() for fleet in @fleets
+      cell.update() for cell in @cells
+      
       @cleanup_fleets()
       
       

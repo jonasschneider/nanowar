@@ -10,9 +10,9 @@ class NanoWar.Cell
     @game: null
     @id: NanoWar.uniqueIdCount++
     
-    @last_absolute_units: 0
-    @last_absolute_ticks: 0
-  
+    @units: 0
+    @exact_units: 0
+    
   set_owner: (new_owner) ->
     @owner: new_owner
     if new_owner && new_owner.color
@@ -25,16 +25,17 @@ class NanoWar.Cell
   handle_incoming_fleet: (fleet) ->
     if fleet.owner == @owner # friendly fleet
       Log "Friendly fleet of $fleet.strength arrived at $@id"
-      @change_units(fleet.strength)
+      @units += fleet.strength
     else # hostile fleet
       Log "Hostile fleet of $fleet.strength arrived at $@id"
-      @change_units(-fleet.strength)
-      if @units() == 0
+      @units -= fleet.strength
+      if Math.floor(@units) == 0
         @owner: null
+        @units: 0
         Log "$@id changed to neutral"
-      else if @units() < 0
+      else if @units < 0
         @set_owner fleet.owner
-        @set_units(-@units())
+        @units: -@units
         Log "$@id overtaken by $fleet.owner.name"
     
   nearest_border: (pos) ->
@@ -89,19 +90,12 @@ class NanoWar.Cell
     @game.container[0].appendChild(@elem)
     @game.container[0].appendChild(@unit_container)
   
+  update: ->
+    @units += @units_per_tick()
+    
   draw: ->
-    @unit_text.nodeValue: @units()
+    @unit_text.nodeValue: Math.floor @units
   
-  unit_growth: ->
+  units_per_tick: ->
     return 0 unless @owner # neutral cells don't produce
-    Math.floor((@game.ticks - @last_absolute_ticks) / 1000 * @size * 2)
-    
-  units: ->
-    @last_absolute_units + @unit_growth()
-    
-  set_units: (num) ->
-    @last_absolute_units: num
-    @last_absolute_ticks: @game.ticks
-  
-  change_units: (delta) ->
-    @set_units @units() + delta
+    @size * @game.desired_tick_length / 8000

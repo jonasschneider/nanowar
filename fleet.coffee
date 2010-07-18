@@ -7,7 +7,7 @@ class NanoWar.Fleet
     @to: to
     @owner: @from.owner
     
-    @strength: Math.round(@from.units() / 2)
+    @strength: Math.round(@from.units / 2)
     
     @delete_me: false
   
@@ -15,7 +15,7 @@ class NanoWar.Fleet
     @from != @to and @size != 0
   
   launch: ->
-    @from.change_units(-@strength)
+    @from.units -= @strength
     @launch_ticks: @game.ticks
     @setup()
   
