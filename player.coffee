@@ -12,6 +12,16 @@ class NanoWar.HumanPlayer extends NanoWar.Player
   constructor: (name) ->
     @name: name
     
+  
+  select: (cell) ->
+    @selection: cell
+    cell.elem.addClass "selected"
+  
+  deselect: ->
+    if @selection
+      @selection.elem.removeClass("selected")
+      @selection: null
+  
   handle_click: (event) ->
     offset = @game.container.offset()
     x = event.clientX - offset.left
@@ -22,6 +32,6 @@ class NanoWar.HumanPlayer extends NanoWar.Player
         if @selection
           @game.send_fleet(@selection, cell)
         else
-          @selection: cell if cell.owner == this
+          @select(cell) if cell.owner == this
     else
-      @selection: null
+      @deselect()

@@ -79,7 +79,7 @@ class NanoWar.Game
       
       
       fleet.draw() for fleet in @fleets
-      cell.draw() for cell in @cells
+      #cell.draw() for cell in @cells
       
       # draw backbuf on real screen
       #@container[0].getContext('2d').drawImage(backbuf, 0, 0)
