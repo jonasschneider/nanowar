@@ -1,25 +1,11 @@
-var coffee  = require('coffee-script'),
-    express = require('express'),
-    io      = require('socket.io'),
-    
-    yoke    = require('./lib/yoke.js')
+var socketio= require('socket.io')
 
-
-var app = express.createServer();
-
-app.use(express.static(__dirname + '/client/public'));
-
-app.get('/code/application.js', function(req, res){
-  res.contentType('application.js');
-  res.send(coffee.compile(yoke.processFile('client/src/application.coffee')))
-});
-
+var server = require('./client/webserver').app
 var port = process.env.PORT || 2000;
-app.listen(port);
 
+server.listen(port);
 
-
-io.listen(app);
+var io = socketio.listen(server);
 
 io.sockets.on('connection', function(client) {
     client.send('Please enter a user name ...');
@@ -53,4 +39,4 @@ io.sockets.on('connection', function(client) {
     });
 });
 
-console.log("running")
+console.log("Server running at port " + port)

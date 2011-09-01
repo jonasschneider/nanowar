@@ -1,0 +1,21 @@
+!!! 5
+%html
+  %head
+    %title Nano War
+    %link{ href: "/game.css", rel: "stylesheet", type: "text/css"}
+    %script{ src: "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js", type: "text/javascript"}
+    :javascript
+      jQuery.fn.uniqueId = function(suffix, clobber) {
+        if ( suffix == null )
+          suffix = "UniqueId";
+        return this.each(function(){
+          if ( !this.id || clobber )
+            this.id = "n"+ (++jQuery.fn.uniqueId.index) + suffix;
+        });
+      };
+      jQuery.fn.uniqueId.index = 0;
+    - each script in global_scripts()
+      %script{ src: script }
+  %body
+    %h2 Nano War
+    %svg#nanowar{ height: "500", width:  "700" }
