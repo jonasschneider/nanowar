@@ -5,6 +5,7 @@
     "coffee-script": "1.1.2",
     "express": "2.2.0",
     "socket.io": "0.8.2",
-    "hamljs": "0.5.1"
+    "hamljs": "0.5.1",
+    "glob": "2.0.8"
   }
 }
