@@ -48,18 +48,27 @@ app.set('view options', {
 app.get(/(\/app\/.*)/, function(req, res){
   if(req.params[0].indexOf('..') == -1) {
     res.contentType('client.js');
-    var coffeeFile = req.params[0].substring(1).replace('.js', '.coffee')
+    var jsFile = req.params[0].substring(1)
     
-    if(process.env.NODE_ENV == 'production')
-      res.send(yokeCoffeescript(coffeeFile))
-    else {
-      if (path.existsSync(coffeeFile) && fs.statSync(coffeeFile).isFile()) {
-        fs.readFile(coffeeFile, function (err, data) {
-          if (err) throw err;
-          res.send(coffee.compile(data.toString()))
-        });
-      } else
-        res.send("file not found", 404)
+    if(path.existsSync(jsFile)&& fs.statSync(jsFile).isFile()) {
+      fs.readFile(jsFile, function (err, data) {
+        if (err) throw err;
+        res.send(data)
+      });
+    } else {
+      var coffeeFile = jsFile.replace('.js', '.coffee')
+      
+      if(process.env.NODE_ENV == 'production')
+        res.send(yokeCoffeescript(coffeeFile))
+      else {
+        if (path.existsSync(coffeeFile) && fs.statSync(coffeeFile).isFile()) {
+          fs.readFile(coffeeFile, function (err, data) {
+            if (err) throw err;
+            res.send(coffee.compile(data.toString()))
+          });
+        } else
+          res.send("file not found", 404)
+      }
     }
   } else
     res.send("no.")
