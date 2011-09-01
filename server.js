@@ -1,16 +1,20 @@
-var static = require("node-static"), http = require("http");
-var clientFiles = new static.Server('./client');
+var static = require("node-static"), http = require("http"), yoke = require('./yoke.js'), coffee = require('coffee-script');
 
-var httpServer = http.createServer(function(request, response) {
-    request.addListener('end', function () {
-        clientFiles.serve(request, response);
-    });
+var express = require('express');
+
+var app = express.createServer();
+  
+app.use(express.static(__dirname + '/client/public'));
+
+app.get('/code/application.js', function(req, res){
+  res.contentType('application.js');
+  res.send(coffee.compile(yoke.processFile('application.coffee')))
 });
 
 var port = process.env.PORT || 2000;
-httpServer.listen(port);
+app.listen(port);
 
-var io = require('socket.io').listen(httpServer);
+var io = require('socket.io').listen(app);
 
 io.sockets.on('connection', function(client) {
     console.log("new client")
