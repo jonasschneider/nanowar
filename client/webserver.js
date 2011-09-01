@@ -10,6 +10,8 @@ exports.app = app = express.createServer();
 
 app.register('.haml', haml);
 
+console.log(__dirname)
+
 app.use(express.static(__dirname + '/public'));
 
 
