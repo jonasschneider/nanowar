@@ -4,44 +4,103 @@
     <title>Nano War</title>
     <link rel="stylesheet" href="/game.css" type="text/css" />
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+    <script src="jquery.easing.js"></script>
     <script type="text/javascript" charset="utf-8">
-      $(document).ready(function() {
+      Function.prototype.bind = function(scope) {
+        var _function = this;
         
-        
-        draw = function(size) {
-          var ctx = $("#test")[0].getContext('2d');
-          ctx.clearRect(0,0,700,600)
-          
-          ctx.fillStyle = "black"
-          ctx.beginPath()
-          
-          function rad(size) {
-            return -0.0005*size^2+0.1*size+4
-          }
-          
-          if(size < 200)
-            radius = rad(size)
-          else
-            radius = rad(200)
-          
-          ctx.arc(100, 100, radius, 0, 2*Math.PI, false)
-          ctx.fill();
-          
-          ctx.strokeText(size, 50, 100)
+        return function() {
+          return _function.apply(scope, arguments);
         }
-        from = { x: 0, y: 300, size: 40 }
-        to = { x: 700, y: 600, size: 50 }
+      }
+      
+      function Pulse(applier, factor) {
+        this.i = 0
+        this.applier = applier
+        this.tick()
+        if(!factor) factor = 1
+        this.factor = factor
+      }
+      
+      Pulse.prototype.tick = function() {
+        this.i++
+        rad = 20*this.i*(Math.PI/180)-(Math.PI/2)
+        op = (Math.sin(rad) + 1) / 2 * this.factor
+        if(isNaN(op)) op = 0
+        this.applier(op)
         
-        size = 0
-        setInterval(function() {
-          draw(size++)
-        }, 50)
-        
-        
+        if(op > 0 || this.i == 1)
+          window.setTimeout(this.tick.bind(this), 100)
+      }
+      
+      function Animation(from, to, duration, stepfunc, options) {
+        if(!options) options = {}
+        options.step = stepfunc
+        options.duration = duration
+        $( "<div></div>" )
+          .css({left: from})
+          .animate({left: to}, options);
+      }
+      
+      
+      $(document).ready(function() {
+        window.setTimeout(function() {
+          elems = $(".seg")
+          i = 0
+          
+          $("#spinner").fadeOut('fast', function() {
+            new Animation(0, 70, 1000, function(a) {
+              $("#pulse-stop")[0].setAttribute("offset", a+"%")
+            }, {easing: 'easeOutQuart', complete: function() {
+              $("#logo").fadeIn()
+            }})
+              
+            i = -1
+            function showNext(){
+              var elem, reverse, from, to
+              i++
+              elem = elems[i%elems.length]
+              reverse = i < elems.length ? false : true
+              from = reverse ? 1 : 0
+              to = reverse ? 0 : 1
+              new Animation(from, to, 1000, function(a) {
+                window.console.log("opac: "+a)
+                elem.setAttribute("opacity", a)
+              })
+              if(i <= (elems.length-1)*2) {
+                window.setTimeout(showNext, 2000)
+              }
+            }
+            showNext()
+            
+          })
+          
+          
+        }, 3000)
       })
     </script>
   </head>
   <body>
-    <canvas id="test" width="700" height="600"></canvas>
+    <svg width="700" height="500" id="test">
+      
+      <defs>
+      <radialGradient id="vignette" cx="50%" cy="50%" r="50%"      fx="50%" fy="50%">
+        <stop offset="0%" style="stop-opacity:0"/>
+        <stop id="pulse-stop" offset="0%" style="stop-opacity:0"/>
+        <stop offset="100%" style="stop-opacity:1"/>
+      </radialGradient>
+      </defs>
+      <image x="0" y="0" width="700" height="500" xlink:href="media/menu-bg/normal.jpg" />
+      <image class="seg" x="0" y="0" width="700" height="500" opacity="0" xlink:href="media/menu-bg/seg1.png" />
+      <image class="seg" x="0" y="0" width="700" height="500" opacity="0" xlink:href="media/menu-bg/seg2.png" />
+      <image class="seg" x="0" y="0" width="700" height="500" opacity="0" xlink:href="media/menu-bg/seg3.png" />
+      <image class="seg" x="0" y="0" width="700" height="500" opacity="0" xlink:href="media/menu-bg/seg4.png" />
+      <image class="seg" x="0" y="0" width="700" height="500" opacity="0" xlink:href="media/menu-bg/seg5.png" />
+      
+      <rect x="0" y="0" width="700" height="500" fill="url(#vignette)" />
+      <image id="logo" x="177" y="50" width="346" height="86" opacity="1" xlink:href="media/logo.png" />
+      
+      <image id="spinner" x="240" y="241" width="220" height="19" xlink:href="media/spinner.gif" />
+    </svg>
   </body>
 </html>

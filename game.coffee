@@ -1,28 +1,29 @@
-window.NanoWar: {}
-NanoWar: window.NanoWar
-$: window.$
-Log: NanoWar.Log: (msg) ->
+window.NanoWar = {}
+  
+NanoWar = window.NanoWar
+$ = window.$
+Log = NanoWar.Log = (msg) ->
   if window? && window.console?
     window.console.log(msg)
 
 
-NanoWar.uniqueIdCount: 1
+NanoWar.uniqueIdCount = 1
 
 class NanoWar.Game
   constructor: (container_id) ->
-    @container: $("#"+container_id)
-    @ticks: 0
-    @last_tick: 0
-    @players: []
-    @events: []
-    @objects: []
+    @container = $("#"+container_id)
+    @ticks = 0
+    @last_tick = 0
+    @players = []
+    @events = []
+    @objects = []
     
-    @human_player: null
-    @selection: null
+    @human_player = null
+    @selection = null
     
-    @running: false
-    @halt: false
-    @desired_tick_length: 1000/30
+    @running = false
+    @halt = false
+    @desired_tick_length = 1000/30
     
   add: (object) ->
     @objects.push object
@@ -36,22 +37,23 @@ class NanoWar.Game
     player.color = colors[@players.length-1]
     
   set_human_player: (player) ->
-    @human_player: player
+    @human_player = player
   
   run: ->
     return if @running
-    @running: true
+    @running = true
     Log "GOGOGOG"
     object.setup(this) for object in @objects
     
-    @fps_container: document.createElementNS( "http://www.w3.org/2000/svg", "text" )
+    @fps_container = document.createElementNS( "http://www.w3.org/2000/svg", "text" )
     @fps_container.setAttribute("x", 700-200)
     @fps_container.setAttribute("y", 500-480)
-    @fps_text: document.createTextNode("asdf")
+    @fps_text = document.createTextNode("asdf")
     @fps_container.appendChild(@fps_text)
     @container[0].appendChild(@fps_container)
 
     $(@container).click (event) =>
+      window.console.log("click event")
       @events.unshift event
     @schedule()
     
@@ -62,24 +64,24 @@ class NanoWar.Game
   
   tick: ->
     @ticks++
-    @last_tick: new Date().getTime()
+    @last_tick = new Date().getTime()
   
   fps_info: ->
     @last_tick_length = new Date().getTime() - @last_tick
     fps = Math.round(1000 / @last_tick_length)
     
-    "$fps fps ($@last_tick_length ms/frame) ${@objects.length}"
+    "#{fps} fps (#{@last_tick_length} ms/frame) #{@objects.length}"
   
   update: ->
     try
       # Update FPS
-      @fps_text.nodeValue: @fps_info()
+      @fps_text.nodeValue = @fps_info()
       
       # Tick
       @tick()
       
       # Process events
-      while event: @events.pop()
+      while event = @events.pop()
         @human_player.handle_click(event)
       
       # Update objects
@@ -106,10 +108,10 @@ class NanoWar.Game
         alert("You win!")
       else
         alert("You lose...")
-      @halt: true
+      @halt = true
     
   send_fleet: (from, to) ->
-    Log "Cell ${from.id} sends to cell ${to.id}"
+    #Log "Cell ${from.id} sends to cell ${to.id}"
     fleet = new NanoWar.Fleet this, from, to
     if fleet.is_valid()
       fleet.launch()

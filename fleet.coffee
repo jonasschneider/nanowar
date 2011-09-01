@@ -1,22 +1,22 @@
-Log: NanoWar.Log
+Log = NanoWar.Log
 
 class NanoWar.Fleet extends NanoWar.Object
   constructor: (game, from, to) ->
-    @type: "fleet"
+    @type = "fleet"
     
-    @game: game
-    @from: from
-    @to: to
+    @game = game
+    @from = from
+    @to = to
     
-    @owner: @from.owner
-    @strength: Math.round(@from.units / 2)
+    @owner = @from.owner
+    @strength = Math.round(@from.units / 2)
   
   is_valid: ->
     @from != @to and @size != 0
   
   launch: ->
     @from.units -= @strength
-    @launch_ticks: @game.ticks
+    @launch_ticks = @game.ticks
     @setup()
   
   fraction_done: ->
@@ -29,7 +29,7 @@ class NanoWar.Fleet extends NanoWar.Object
     @to.nearest_border({x: @from.x, y: @from.y})
   
   size: ->
-    rad: (size) ->
+    rad = (size) ->
       -0.0005*size^2+0.3*size
     
     if @strength < 200
@@ -38,8 +38,8 @@ class NanoWar.Fleet extends NanoWar.Object
       rad(200)
   
   setup: ->
-    @elem: document.createElementNS( "http://www.w3.org/2000/svg", "circle" )
-    @elem.nw_fleet: this
+    @elem = document.createElementNS( "http://www.w3.org/2000/svg", "circle" )
+    @elem.nw_fleet = this
     @elem.setAttribute("r", @size())
     @elem.setAttribute("stroke", "none")
     
@@ -51,8 +51,8 @@ class NanoWar.Fleet extends NanoWar.Object
   position: ->
     startpos = @start_position()
     endpos = @end_position()
-    posx: startpos.x + (endpos.x - startpos.x) * @fraction_done()
-    posy: startpos.y + (endpos.y - startpos.y) * @fraction_done()
+    posx = startpos.x + (endpos.x - startpos.x) * @fraction_done()
+    posy = startpos.y + (endpos.y - startpos.y) * @fraction_done()
     { x: posx, y: posy }
   
   draw: ->
@@ -63,7 +63,7 @@ class NanoWar.Fleet extends NanoWar.Object
   update: ->
     if @fraction_done() >= 1
       @to.handle_incoming_fleet this
-      @delete_me: true
+      @delete_me = true
   
   destroy: ->
     @game.container[0].removeChild(@elem)

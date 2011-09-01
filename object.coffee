@@ -1,12 +1,12 @@
-Log: NanoWar.Log
+Log = NanoWar.Log
 
 class NanoWar.Object
   constructor: ->
-    @delete_me: false
-    @type: "ABSTRACT"
+    @delete_me = false
+    @type = "ABSTRACT"
   
   set_game: (game) ->
-    @game: game
+    @game = game
   
   setup: ->
   
