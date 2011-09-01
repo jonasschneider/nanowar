@@ -1,3 +1,5 @@
+#= require <models/game>
+
 Log = NanoWar.Log
 
 class NanoWar.Fleet extends NanoWar.Object

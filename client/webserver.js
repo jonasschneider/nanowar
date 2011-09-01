@@ -14,7 +14,10 @@ console.log(__dirname)
 
 app.use(express.static(__dirname + '/public'));
 
+yoke.options.directories = ['app']
+
 function yokeCoffeescript(filename, options) {
+
   options || (options = {});
   options.bodyProcessor = function(lines) {
     return coffee.compile(lines);
