@@ -1,5 +1,5 @@
-window.NanoWar = {}
-  
+#= require <nanowar>
+
 NanoWar = window.NanoWar
 $ = window.$
 Log = NanoWar.Log = (msg) ->
