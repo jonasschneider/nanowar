@@ -1,7 +1,9 @@
-var http    = require("http"),
-    yoke    = require('./lib/yoke.js'),
-    coffee  = require('coffee-script'),
-    express = require('express')
+var coffee  = require('coffee-script'),
+    express = require('express'),
+    io      = require('socket.io'),
+    
+    yoke    = require('./lib/yoke.js')
+
 
 var app = express.createServer();
 
@@ -17,7 +19,7 @@ app.listen(port);
 
 
 
-var io = require('socket.io').listen(app);
+io.listen(app);
 
 io.sockets.on('connection', function(client) {
     client.send('Please enter a user name ...');
