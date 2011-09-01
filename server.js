@@ -8,7 +8,7 @@ app.use(express.static(__dirname + '/client/public'));
 
 app.get('/code/application.js', function(req, res){
   res.contentType('application.js');
-  res.send(coffee.compile(yoke.processFile('application.coffee')))
+  res.send(coffee.compile(yoke.processFile('client/src/application.coffee')))
 });
 
 var port = process.env.PORT || 2000;
