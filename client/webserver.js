@@ -14,15 +14,23 @@ console.log(__dirname)
 
 app.use(express.static(__dirname + '/public'));
 
+function yokeCoffeescript(filename, options) {
+  options || (options = {});
+  options.bodyProcessor = function(lines) {
+    return coffee.compile(lines);
+  }
+  return yoke.processFile(filename, null, null, options);
+}
+
 
 app.helpers({
   global_scripts: function() {
     if(process.env.NODE_ENV == 'production')
-      return ['code/bundle.js']
+      return ['/app/client.js']
     else {
       var script_paths = []
-      yoke.processFile('client/src/application.coffee', null, null, {dryRun: true}).forEach(function(dirty) {
-        script_paths.push(dirty.replace('client/src', 'code').replace('.coffee', '.js'))
+      yoke.processFile('app/client.coffee', null, null, {dryRun: true}).forEach(function(dirty) {
+        script_paths.push(dirty.replace('.coffee', '.js'))
       });
       return script_paths;
     }
@@ -34,26 +42,26 @@ app.set('view options', {
   layout: false
 });
 
-app.get('/code/bundle.js', function(req, res){
-  res.contentType('bundle.js');
-  
-  if(process.env.NODE_ENV == 'production')
-    res.send(coffee.compile(yoke.processFile('client/src/application.coffee')))
-  else
-    res.send('alert("nope")')
+app.get(/(\/app\/.*)/, function(req, res){
+  if(req.params[0].indexOf('..') == -1) {
+    res.contentType('client.js');
+    var coffeeFile = req.params[0].substring(1).replace('.js', '.coffee')
+    
+    if(process.env.NODE_ENV == 'production')
+      res.send(yokeCoffeescript(coffeeFile))
+    else {
+      if (path.existsSync(coffeeFile) && fs.statSync(coffeeFile).isFile()) {
+        fs.readFile(coffeeFile, function (err, data) {
+          if (err) throw err;
+          res.send(coffee.compile(data.toString()))
+        });
+      } else
+        res.send("file not found", 404)
+    }
+  } else
+    res.send("no.")
 });
 
-app.get('/code/:file', function(req, res) {
-  if(process.env.ENVIRONMENT != 'production') {
-    res.contentType('bundle.js');
-    var coffeeFile = req.params.file.replace('.js', '.coffee')
-    
-    fs.readFile('client/src/'+coffeeFile, function (err, data) { // SECURITY HOLE!!
-      if (err) throw err;
-      res.send(coffee.compile(data.toString()))
-    });
-  }
-});
 
 app.get('/', function(req, res) {
   res.render('index.haml');

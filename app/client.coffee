@@ -1,3 +1,7 @@
+#= require_tree models
+#= require_tree views
+#= require_tree helpers
+
 $(document).ready ->
   game =  new NanoWar.Game("nanowar")
   me = new NanoWar.HumanPlayer("Joonas")

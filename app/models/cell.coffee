@@ -1,4 +1,5 @@
 #= require "object"
+
 Log = NanoWar.Log
 
 class NanoWar.Cell extends NanoWar.Object
