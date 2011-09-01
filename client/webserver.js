@@ -15,7 +15,7 @@ app.use(express.static(__dirname + '/public'));
 
 app.helpers({
   global_scripts: function() {
-    if(process.env.ENVIRONMENT == 'production')
+    if(process.env.NODE_ENV == 'production')
       return ['code/bundle.js']
     else {
       var script_paths = []
@@ -35,7 +35,7 @@ app.set('view options', {
 app.get('/code/bundle.js', function(req, res){
   res.contentType('bundle.js');
   
-  if(process.env.ENVIRONMENT == 'production')
+  if(process.env.NODE_ENV == 'production')
     res.send(coffee.compile(yoke.processFile('client/src/application.coffee')))
   else
     res.send('alert("nope")')
