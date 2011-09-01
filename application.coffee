@@ -1,2 +1,3 @@
-//= require "game"
-//= require_tree .
+#= require "game"
+#= require "util"
+#= require_tree .
