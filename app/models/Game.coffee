@@ -48,13 +48,6 @@ class root.Game extends Backbone.Model
       @fleets.trigger 'update', e.fleets if e.fleets?
       @run() if e == 'start'
     
-    
-    @bind 'tick', =>
-      @cells.each (cell) =>
-        cell.trigger 'tick', @ticks
-      @fleets.each (fleet) =>
-        fleet.trigger 'tick', @ticks
-    
     @bind 'start', =>
       @trigger 'publish', 'start'
 
@@ -72,12 +65,10 @@ class root.Game extends Backbone.Model
       alert("Game over")
       @trigger 'end'
   
-  
   run: ->
     console.log "GOGOGOG"
     
     @trigger 'start'
-    #object.setup(this) for object in @objects
     
     @schedule()
     

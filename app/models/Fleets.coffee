@@ -28,6 +28,5 @@ class root.Fleets extends Nanowar.IdentifyingCollection
       
     @bind 'update', (data) =>
       if data.add
-        console.log 'i see dat fleet: ' + JSON.stringify data.add
         data.add.game = @game
         @add data.add
