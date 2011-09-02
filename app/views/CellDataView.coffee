@@ -17,7 +17,9 @@ class Nanowar.views.CellDataView extends Backbone.View
     
     @text = document.createTextNode("0")
     @el.appendChild(@text)
+    
+    setInterval _(@render).bind(this), 500
   
   render: ->
-    @text.nodeValue = @model.get 'units'
+    @text.nodeValue = @model.getCurrentStrength()
     this

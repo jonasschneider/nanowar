@@ -7,10 +7,8 @@ class Nanowar.models.Fleet extends Backbone.Model
       owner: @get('from').get 'owner'
     @get('game').bind 'tick', @update, this
     
-    @strength = Math.round(@get('from').get('units') / 2)
+    @strength = Math.round(@get('from').getCurrentStrength() / 2)
     
-    @bind 'change', ->
-      console.log("fleet changed")
     @launched_at = null
   
   is_valid: ->
@@ -18,8 +16,7 @@ class Nanowar.models.Fleet extends Backbone.Model
   
   launch: ->
     console.log "Fleet of #{@strength} launching from #{@get('from').cid} to #{@get('to').cid}"
-    @get('from').set 
-      units: @get('from').get('units') - @strength
+    @get('from').changeCurrentStrengthBy -@strength
     @launched_at = @get('game').ticks
   
   
@@ -36,8 +33,6 @@ class Nanowar.models.Fleet extends Backbone.Model
       rad(200)
   
   update: ->
-    @trigger 'change'
-    
     if @fraction_done() >= 1
       @trigger 'arrive'
       @get('to').handle_incoming_fleet this

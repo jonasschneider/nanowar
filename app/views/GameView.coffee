@@ -23,7 +23,14 @@ class Nanowar.views.GameView extends Backbone.View
     @selectedCell = null
     
     
+    @objects = new Backbone.Collection
+    @objects.bind 'change', @updateObjects, this
+    
     @desired_tick_length = 1000/10
+  
+  updateObjects: ->
+    console.log 'update call'
+    console.log(arguments)
   
   fps_info: ->
     @last_tick_length = new Date().getTime() - @last_tick
@@ -38,6 +45,7 @@ class Nanowar.views.GameView extends Backbone.View
     this
   
   addCell: (cell) ->
+    @objects.add cell
     view = new Nanowar.views.CellView({model: cell, gameView: this})
     @el.appendChild(view.render().el)
     @el.appendChild(new Nanowar.views.CellDataView({model: cell}).render().el)
@@ -68,6 +76,8 @@ class Nanowar.views.GameView extends Backbone.View
       from: from
       to: to
       game: this.model
+      
+    @objects.add fleet
     
     if fleet.is_valid()
       fleet.launch()

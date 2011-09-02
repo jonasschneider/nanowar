@@ -3,12 +3,14 @@
 
 Log = NanoWar.Log
 
+# Game game
 class Nanowar.models.Cell extends Backbone.Model
   defaults:
-    units: 0
+    knownStrength: 0
+    knownStrengthAtTick: 0
   
   initialize: -> 
-    @get('game').bind 'tick', @produce, this
+    @setCurrentStrength(0)
     
   position: ->
     x: @get 'x'
@@ -17,21 +19,21 @@ class Nanowar.models.Cell extends Backbone.Model
   handle_incoming_fleet: (fleet) ->
     if fleet.get('owner') == @get('owner') # friendly fleet
       Log "Friendly fleet of #{fleet.strength} arrived at #{@cid}"
-      @set
-        units: @get('units') + fleet.strength
+      @changeCurrentStrengthBy fleet.strength
     else # hostile fleet
       Log "Hostile fleet of #{fleet.strength} arrived at #{@cid}"
-      @set
-        units: @get('units') - fleet.strength
-      if Math.floor(@get('units')) == 0
+      @changeCurrentStrengthBy -fleet.strength
+      
+      if @getCurrentStrength() == 0
         @set
           owner: null
-          units: 0
+        
         Log "#{@cid} changed to neutral"
-      else if @get('units') < 0
+      else if @getCurrentStrength() < 0
         @set
           owner: fleet.get('owner')
-          units: -@get('units')
+        @setCurrentStrength -@getCurrentStrength()
+        
         Log "#{@cid} overtaken by #{fleet.get('owner').name}"
   
   units_per_tick: ->
@@ -41,8 +43,13 @@ class Nanowar.models.Cell extends Backbone.Model
   setup: ->
     @set_owner @owner
   
-  produce: ->
-    #console.log(@attributes.units)
-    #console.log 'producing. - ' + @units_per_tick()
+  getCurrentStrength: ->
+    @get('knownStrength') + Math.round((@get('game').ticks - @get('knownStrengthAtTick')) * @units_per_tick())
+    
+  setCurrentStrength: (newStrength) ->
     @set
-      units: @get('units') + Math.ceil(@units_per_tick())
+      knownStrengthAtTick : @get('game').ticks
+      knownStrength       : newStrength
+  
+  changeCurrentStrengthBy: (delta) ->
+    @setCurrentStrength @getCurrentStrength() + delta

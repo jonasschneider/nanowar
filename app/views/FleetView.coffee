@@ -14,6 +14,8 @@ class Nanowar.views.FleetView extends Backbone.View
     
     @el.setAttribute("cx", @start_position().x)
     @el.setAttribute("cy", @start_position().y)
+    
+    setInterval _(@render).bind(this), 500
   
   start_position: ->
     Nanowar.util.nearest_border(@model.get('from').position(), @model.get('from').get('size'), @model.get('to').position())
