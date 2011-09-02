@@ -15,8 +15,12 @@
     %button{ onclick: "window.game.tick();"  } Tick!
     %ul#log
     
-    :javascript
-      console.log = function(text) {
-        
-        $("#log").append($('<li>').text(text))
-      }
+    %script
+      :plain
+        console.log = function(text) {
+          var ticks = ''
+          if(window.App && window.App.game)
+            ticks = '<b>'+window.App.game.ticks+':</b> '
+          
+          $("#log").append($('<li>').html(ticks+text))
+        }
