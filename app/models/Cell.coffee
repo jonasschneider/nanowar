@@ -4,63 +4,45 @@
 Log = NanoWar.Log
 
 class Nanowar.models.Cell extends Backbone.Model
-  initialize: (x, y, size, owner) -> 
-    @type = "cell"
+  defaults:
+    units: 0
+  
+  initialize: -> 
+    @get('game').bind 'tick', @produce, this
     
-    @x = x
-    @y = y
-    @size = size
-    @owner = owner
-    
-    @id = NanoWar.uniqueIdCount++
-    
-    @units = 0
-    
-  set_owner: (new_owner) ->
-    @owner = new_owner
+  position: ->
+    x: @get 'x'
+    y: @get 'y'
   
   handle_incoming_fleet: (fleet) ->
-    if fleet.owner == @owner # friendly fleet
-      Log "Friendly fleet of $fleet.strength arrived at $@id"
-      @units += fleet.strength
+    if fleet.get('owner') == @get('owner') # friendly fleet
+      Log "Friendly fleet of #{fleet.strength} arrived at #{@cid}"
+      @set
+        units: @get('units') + fleet.strength
     else # hostile fleet
-      Log "Hostile fleet of $fleet.strength arrived at $@id"
-      @units -= fleet.strength
-      if Math.floor(@units) == 0
-        @owner = null
-        @units = 0
-        Log "$@id changed to neutral"
-      else if @units < 0
-        @set_owner fleet.owner
-        @units = -@units
-        Log "$@id overtaken by $fleet.owner.name"
-  
-  nearest_border: (pos) ->
-    dx = pos.x - @x
-    dy = @y - pos.y
-    
-    alpha = Math.atan(dy/dx)
-    
-    x = Math.cos(alpha)*@size
-    y = Math.sin(alpha)*@size
-    
-    # trial and error
-    if(@x > pos.x || @y < pos.y)
-      x = x * -1 
-      y = y * -1
-      
-    if(@x <= pos.x && @y < pos.y)
-      x = x * -1 
-      y = y * -1
-    
-    return { x: @x+x, y: @y-y}
+      Log "Hostile fleet of #{fleet.strength} arrived at #{@cid}"
+      @set
+        units: @get('units') - fleet.strength
+      if Math.floor(@get('units')) == 0
+        @set
+          owner: null
+          units: 0
+        Log "#{@cid} changed to neutral"
+      else if @get('units') < 0
+        @set
+          owner: fleet.get('owner')
+          units: -@get('units')
+        Log "#{@cid} overtaken by #{fleet.get('owner').name}"
   
   units_per_tick: ->
-    return 0 unless @owner # neutral cells don't produce
-    @size * @game.desired_tick_length / 8000
+    return 0 unless @get 'owner' # neutral cells don't produce
+    @get('size') * @get('game').get 'timeFactor'
   
   setup: ->
     @set_owner @owner
   
-  update: ->
-    @units += @units_per_tick()
+  produce: ->
+    #console.log(@attributes.units)
+    #console.log 'producing. - ' + @units_per_tick()
+    @set
+      units: @get('units') + Math.ceil(@units_per_tick())

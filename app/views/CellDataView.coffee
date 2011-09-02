@@ -4,6 +4,9 @@ Nanowar = window.Nanowar
 
 class Nanowar.views.CellDataView extends Backbone.View
   initialize: ->
+    
+    @model.bind 'change', @render, this
+    
     @el = document.createElementNS( "http://www.w3.org/2000/svg", "text" )
     
     @el.setAttributes
@@ -16,5 +19,5 @@ class Nanowar.views.CellDataView extends Backbone.View
     @el.appendChild(@text)
   
   render: ->
-    @text.nodeValue = Math.floor @model.units
+    @text.nodeValue = @model.get 'units'
     this

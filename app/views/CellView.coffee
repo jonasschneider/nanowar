@@ -6,7 +6,8 @@ class Nanowar.views.CellView extends Backbone.View
   initialize: (options) ->
     @gameView = options.gameView
     
-    @gameView.bind 'select', @render, this
+    @gameView.bind  'select', @render, this
+    @model.bind     'change', @render, this
     
     #@game.add new NanoWar.CellData(this)
     
@@ -15,7 +16,7 @@ class Nanowar.views.CellView extends Backbone.View
       
     
     
-    $(@el).click _(@selectMe).bind(this)
+    $(@el).click _(@trigger).bind(this, 'click')
     
   render: ->
     if @gameView.selectedCell == this
@@ -36,6 +37,3 @@ class Nanowar.views.CellView extends Backbone.View
       @el.addClass("neutral")
     
     this
-  
-  selectMe: ->
-    @gameView.select this
