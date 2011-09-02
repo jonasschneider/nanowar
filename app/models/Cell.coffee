@@ -55,7 +55,7 @@ class root.Cell extends Backbone.Model
           owner: fleet.get('owner')
         @setCurrentStrength -@getCurrentStrength()
         
-        console.log "#{@cid} overtaken by #{fleet.get('owner').name}"
+        console.log "#{@cid} overtaken by #{fleet.get('owner').get('name')}"
   
   units_per_tick: ->
     return 0 unless @get 'owner' # neutral cells don't produce
