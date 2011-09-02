@@ -52,7 +52,13 @@ class Match
       new Cell {x: 550, y: 100, size: 10, game: @game, owner: @game.players.last()}
     ]
     
-    
+    @game.bind 'end', (result) =>
+      result.winner.socket.emit 'log', 'You win!'
+      result.winner.socket.broadcast.emit 'log', "You lose. :'("
+      
+      _(@players).each (player) -> # potential problem since we don't use @game.players
+        player.socket.emit 'log', 'Bye.'
+        player.socket.disconnect()
     
     @game.cells.add cells
     

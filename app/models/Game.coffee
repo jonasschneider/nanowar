@@ -64,7 +64,7 @@ class root.Game extends Backbone.Model
     if owners.length == 1
       console.log "Game over"
       @halt()
-      #@trigger 'end'
+      @trigger 'end', winner: owners[0]
   
   run: ->
     console.log "GOGOGOG"
