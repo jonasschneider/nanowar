@@ -7,13 +7,12 @@ class Nanowar.views.GameView extends Backbone.View
     'click': 'handleClickInGameArea'
   
   initialize: ->
-    @model.cells.bind 'add', @addCell, this
+    @model.cells.bind   'add', @addCell,  this
+    @model.fleets.bind  'add', @addFleet, this
     @model.bind       'end', @halt, this
     
     @selectedCell = null
     
-    #@objects = new Backbone.Collection
-    #@objects.bind 'change', @updateObjects, this
   
   updateObjects: ->
     console.log 'update call'
@@ -26,6 +25,9 @@ class Nanowar.views.GameView extends Backbone.View
     @el.appendChild(new Nanowar.views.CellDataView({model: cell}).render().el)
     
     view.bind 'click', _.bind(@handleClickOnCellView, this, view)
+    
+  addFleet: (fleet) ->
+    @el.appendChild(new Nanowar.views.FleetView({model: fleet}).render().el)
   
   handleClickInGameArea: ->
     unless @currentClickIsInCell
@@ -52,5 +54,3 @@ class Nanowar.views.GameView extends Backbone.View
       game: @model
       
     @model.fleets.add fleet
-    
-    @el.appendChild(new Nanowar.views.FleetView({model: fleet}).render().el)

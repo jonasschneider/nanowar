@@ -21,6 +21,7 @@ class Match
     clientSocket.emit 'log', 'You are: ' + JSON.stringify(player)
     
     clientSocket.on 'update', (e) =>
+      player.socket.broadcast.emit 'update', e # security?
       @app.trigger 'update', e
     
     if @players.length == 2
