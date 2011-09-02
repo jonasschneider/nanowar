@@ -53,7 +53,7 @@ class root.Game extends Backbone.Model
 
     @ticks = 0
     @running = false
-    @halt = false
+    @stopping = false
   
   check_for_end: ->
     owners = []
@@ -63,7 +63,8 @@ class root.Game extends Backbone.Model
     
     if owners.length == 1
       console.log "Game over"
-      @trigger 'end'
+      @halt()
+      #@trigger 'end'
   
   run: ->
     console.log "GOGOGOG"
@@ -78,12 +79,10 @@ class root.Game extends Backbone.Model
     , @get 'tickLength'
   
   halt: ->
-    @halt = true
+    @stopping = true
   
   tick: ->
     @ticks++
-    
     @trigger 'tick'
-    
     @check_for_end()
-    @schedule() unless @halt
+    @schedule() unless @stopping
