@@ -1,7 +1,18 @@
 #= require <nanowar>
 
+if exports?
+  onServer = true
+  Backbone = require('backbone')
+  
+  root = exports
+  Nanowar = {}
+else
+  Backbone  = window.Backbone
+  Nanowar   = window.Nanowar
+  root = Nanowar
+
 # attributes: Cell from, Cell to, Game game, Player owner
-class Nanowar.Fleet extends Backbone.Model
+class root.Fleet extends Backbone.Model
   initialize: ->
     @set
       owner: @get('from').get 'owner'

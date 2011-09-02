@@ -1,9 +1,19 @@
 #= require <nanowar>
 #= require "Player"
 
-Nanowar = window.Nanowar
+if exports?
+  onServer = true
+  Backbone = require('backbone')
+  
+  root = exports
+  Nanowar = {}
+  Nanowar.Player = require('./Player')
+else
+  Backbone  = window.Backbone
+  Nanowar   = window.Nanowar
+  root      = Nanowar
 
-class Nanowar.Players extends Backbone.Collection
+class root.Players extends Backbone.Collection
   model: Nanowar.Player
   
   add: (player) ->

@@ -2,21 +2,43 @@
 #= require "Cells"
 #= require "Players"
 
-Nanowar = window.Nanowar
+if exports?
+  onServer = true
+  Backbone = require('backbone')
+  
+  root = exports
+  Nanowar = {}
+  Nanowar.Cell = require('./Cell').Cell
+  Nanowar.Cells = require('./Cells').Cells
+  Nanowar.Players = require('./Players').Players
+else
+  Backbone  = window.Backbone
+  Nanowar   = window.Nanowar
+  root = Nanowar
 
-Nanowar.uniqueIdCount = 1
-
-class Nanowar.Game extends Backbone.Model
+class root.Game extends Backbone.Model
   defaults:
     tickLength: 1000 / 10
-    cellProductionMultiplier: 1 / 100
-    
-    cells:  new Nanowar.Cells
-    players:  new Nanowar.Players
   
-  initialize: () ->
-    @cells = @get 'cells'
-    @players = @get 'players'
+  initialize: ->
+    console.log("making game")
+    
+    @cells =  new Nanowar.Cells
+    @players =   new Nanowar.Players
+    
+    @cells.bind 'publish', (e) =>
+      @trigger 'publish',
+        cells: e
+    
+    @bind 'update', (e) =>
+      @cells.trigger 'update', e.cells if e.cells?
+      @players.trigger 'update', e.players if e.players?
+    
+    
+    @bind 'tick', ->
+      _(@cells).each (cell) ->
+        cell.trigger 'tick', @ticks
+    , this
 
     @ticks = 0
     

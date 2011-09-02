@@ -3,23 +3,41 @@
 #= require_tree helpers
 
 $(document).ready ->
-  window.game =  game = new Nanowar.Game()
-  gameDisplay = new Nanowar.views.GameView({model: game, el: $("#nanowar")[0]})
+  socket = io.connect('http://'+location.hostname)
+
+  Backbone.sync = (method, model, options) ->
+    socket.emit method, model.url(), (data) ->
+      options.success(data)
   
-  me = new Nanowar.Player { name: "Joonas" }
-  pc = new Nanowar.Player { name: "Fiz" }
+  socket.on 'update', (e) ->
+    window.App.trigger 'update', e
   
-  game.players.add me
-  game.players.add pc
-  
-  console.log game.cells
-  
-  game.cells.add {x: 350, y: 100, size: 50, game: game}
-  game.cells.add {x: 350, y: 300, size: 50, owner: me, game: game}
-  game.cells.add {x: 100, y: 200, size: 50, game: game}
-  game.cells.add {x: 500, y: 200, size: 50, game: game}
-  game.cells.add {x: 550, y: 100, size: 10, owner: pc, game: game}
-  
-  gameDisplay.render()
-  
-  gameDisplay.run()
+  socket.on 'connect', ->
+    console.log 'connected to server'
+    
+    window.App = new Nanowar.App()
+    #window.App.fetch success: ->
+    #a = ->
+    #  console.log "fetched the app:"
+    #  console.log(window.App)
+    game = window.App.game
+    
+    gameDisplay = new Nanowar.views.GameView({model: game, el: $("#nanowar")[0]})
+    ###
+    me = new Nanowar.Player { name: "Joonas" }
+    pc = new Nanowar.Player { name: "Fiz" }
+    
+    game.players.add me
+    game.players.add pc
+    
+    console.log game.cells
+    
+    game.cells.add {x: 350, y: 100, size: 50}
+    game.cells.add {x: 350, y: 300, size: 50, owner: me}
+    game.cells.add {x: 100, y: 200, size: 50}
+    game.cells.add {x: 500, y: 200, size: 50}
+    game.cells.add {x: 550, y: 100, size: 10, owner: pc}
+    ###
+    gameDisplay.render()
+    
+    gameDisplay.run()###

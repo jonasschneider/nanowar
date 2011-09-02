@@ -1,19 +1,36 @@
 #= require <nanowar>
 
-class Nanowar.Cell extends Backbone.Model
+if exports?
+  onServer = true
+  Backbone = require('backbone')
+  
+  root = exports
+  Nanowar = {}
+else
+  Backbone  = window.Backbone
+  Nanowar   = window.Nanowar
+  root = Nanowar
+
+class root.Cell extends Backbone.Model
   defaults:
     x:      0
     y:      0
     size:   0
-    game:   null
     owner:  null
+    productionMultiplier: 1 / 100
     
     knownStrength:        0
     knownStrengthAtTick:  0
   
   initialize: -> 
     @setCurrentStrength(0)
+    console.log 'CELL COLLECTION'
+    console.log(@collection)
     
+    @bind 'tick', (ticks) =>
+      @ticks = ticks
+  
+  
   position: ->
     x: @get 'x'
     y: @get 'y'
@@ -40,17 +57,17 @@ class Nanowar.Cell extends Backbone.Model
   
   units_per_tick: ->
     return 0 unless @get 'owner' # neutral cells don't produce
-    @get('size') * @get('game').get 'cellProductionMultiplier'
+    @get('size') * @get 'productionMultiplier'
   
   setup: ->
     @set_owner @owner
   
   getCurrentStrength: ->
-    @get('knownStrength') + Math.round((@get('game').ticks - @get('knownStrengthAtTick')) * @units_per_tick())
+    @get('knownStrength') + Math.round((@ticks - @get('knownStrengthAtTick')) * @units_per_tick())
     
   setCurrentStrength: (newStrength) ->
     @set
-      knownStrengthAtTick : @get('game').ticks
+      knownStrengthAtTick : @ticks
       knownStrength       : newStrength
   
   changeCurrentStrengthBy: (delta) ->

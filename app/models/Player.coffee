@@ -1,8 +1,16 @@
 #= require <nanowar>
 
-Nanowar = window.Nanowar
+if exports?
+  onServer = true
+  Backbone = require('backbone')
+  
+  root = exports
+  Nanowar = {}
+else
+  Backbone  = window.Backbone
+  Nanowar   = window.Nanowar
+  root = Nanowar
 
-# String name
-class Nanowar.Player extends Backbone.Model
+class root.Player extends Backbone.Model
   defaults:
     name: 'anonymous coward'

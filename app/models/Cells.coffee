@@ -1,7 +1,24 @@
 #= require <nanowar>
 #= require "Cell"
 
-Nanowar = window.Nanowar
+if exports?
+  onServer = true
+  Backbone = require('backbone')
+  
+  root = exports
+  Nanowar = {}
+  Nanowar.Cell = require('./Cell')
+else
+  Backbone  = window.Backbone
+  Nanowar   = window.Nanowar
+  root = Nanowar
 
-class Nanowar.Cells extends Backbone.Collection
+class root.Cells extends Backbone.Collection
   model: Nanowar.Cell
+  
+  initialize: ->
+    @bind 'add', (cell) =>
+      @trigger 'publish', { add: cell }
+      
+    @bind 'update', (data) =>
+      @add data.add if data.add
