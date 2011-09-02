@@ -1,12 +1,16 @@
 App     = require('./models/App').App
 Player  = require('./models/Player').Player
+IdentifyingCollection  = require('./helpers/IdentifyingCollection').IdentifyingCollection
 Cell    = require('./models/Cell').Cell
 util    = require 'util'
 _       = require 'underscore'
 
-class exports.Server
+class exports.ClientHandler
   constructor: (clientSocket) ->
     console.log "making new server"
+    
+    knownPlayers = new IdentifyingCollection()
+    
     app = new App
     
     game = app.game
@@ -17,6 +21,9 @@ class exports.Server
     
     me = new Player name: "Joonas"
     pc = new Player name: "Fiz"
+    
+    knownPlayers.add me
+    knownPlayers.add pc
     
     game.players.add me
     game.players.add pc
