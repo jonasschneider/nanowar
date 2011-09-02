@@ -19,8 +19,11 @@ yoke.options.directories = ['app']
 function yokeCoffeescript(filename, options) {
 
   options || (options = {});
-  options.bodyProcessor = function(lines) {
-    return coffee.compile(lines);
+  options.bodyProcessor = function(lines, filename) {
+    if(path.extname(filename) == '.coffee')
+      return coffee.compile(lines);
+    else
+      return lines;
   }
   return yoke.processFile(filename, null, null, options);
 }
