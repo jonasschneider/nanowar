@@ -1,7 +1,7 @@
 #= require <nanowar>
 
 # attributes: Cell from, Cell to, Game game, Player owner
-class Nanowar.models.Fleet extends Backbone.Model
+class Nanowar.Fleet extends Backbone.Model
   initialize: ->
     @set
       owner: @get('from').get 'owner'

@@ -61,7 +61,7 @@ class Nanowar.views.GameView extends Backbone.View
     @trigger 'select'
   
   send_fleet: (from, to) ->
-    fleet = new Nanowar.models.Fleet 
+    fleet = new Nanowar.Fleet 
       from: from
       to: to
       game: this.model

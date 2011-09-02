@@ -6,11 +6,14 @@ $(document).ready ->
   window.game =  game = new Nanowar.Game()
   gameDisplay = new Nanowar.views.GameView({model: game, el: $("#nanowar")[0]})
   
-  me = new NanoWar.HumanPlayer("Joonas")
-  pc = new NanoWar.Player("Fiz")
-  game.add_player(me)
-  game.add_player(pc)
-  game.set_human_player(me)
+  me = new Nanowar.Player { name: "Joonas" }
+  pc = new Nanowar.Player { name: "Fiz" }
+  
+  game.players.add me
+  game.players.add pc
+  
+  console.log game.cells
+  
   game.cells.add {x: 350, y: 100, size: 50, game: game}
   game.cells.add {x: 350, y: 300, size: 50, owner: me, game: game}
   game.cells.add {x: 100, y: 200, size: 50, game: game}

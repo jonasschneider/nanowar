@@ -1,10 +1,9 @@
 #= require <nanowar>
-#= require <models/object>
 
 Log = NanoWar.Log
 
 # Game game
-class Nanowar.models.Cell extends Backbone.Model
+class Nanowar.Cell extends Backbone.Model
   defaults:
     knownStrength: 0
     knownStrengthAtTick: 0

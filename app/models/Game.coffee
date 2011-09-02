@@ -1,4 +1,6 @@
 #= require <nanowar>
+#= require "Cells"
+#= require "Players"
 
 Nanowar = window.Nanowar
 Log = Nanowar.Log
@@ -10,27 +12,16 @@ class Nanowar.Game extends Backbone.Model
   defaults:
     tickLength: 1000 / 10
     cellProductionMultiplier: 1 / 100
+    
+    cells:  new Nanowar.Cells
+    players:  new Nanowar.Players
   
   initialize: () ->
-    @cells = new Nanowar.models.CellCollection
+    @cells = @get 'cells'
+    @players = @get 'players'
 
     @ticks = 0
-    @last_tick = 0
-    @players = []
-    @events = []
     
-    @human_player = null
-    
-    
-  add_player: (player) ->
-    colors = ["red", "blue", "green", "yellow"]
-    @players.push player
-    player.set_game this
-    player.color = colors[@players.length-1]
-    
-  set_human_player: (player) ->
-    @human_player = player
-  
   tick: ->
     @ticks++
     
