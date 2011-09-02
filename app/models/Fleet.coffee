@@ -17,23 +17,18 @@ class root.Fleet extends Backbone.Model
   initialize: ->
     @game = @get('game')
     @set game: undefined
+    throw "Fleet needs game" unless @game
     
     if @get('from') && @get('from') not instanceof Nanowar.Cell
-      if @get('from').id
-        @set
-          from: @game.cells.get(@get('from').id)
-      else
-        console.log "looks like a strange cell."
-        @set
-          from: new Nanowar.Cell(@get('from'))
+      throw "Not instantiating new cell here" unless @get('from').id
+      @set
+        from: @game.cells.get(@get('from').id)
     
     if @get('to') && @get('to') not instanceof Nanowar.Cell
-      if @get('to').id
-        @set
-          to: @game.cells.get(@get('to').id)
-      else
-        @set
-          to: new Nanowar.Cell(@get('to'))
+      throw "Not instantiating new cell here" unless @get('to').id
+      @set
+        to: @game.cells.get(@get('to').id)
+    
     @set
       owner: @get('from').get 'owner'
     
@@ -68,7 +63,3 @@ class root.Fleet extends Backbone.Model
       @trigger 'arrive'
       @get('to').handle_incoming_fleet this
       @destroy()
-      
-  destroy: ->
-    @trigger 'destroy'
-    @get('game').unbind 'tick', @update
