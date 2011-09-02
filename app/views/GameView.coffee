@@ -7,32 +7,17 @@ class Nanowar.views.GameView extends Backbone.View
     'click': 'handleClickInGameArea'
   
   initialize: ->
-    console.log("hello thar")
-    console.log(@model.cells)
-    
     @model.cells.bind 'add', @addCell, this
     @model.bind       'end', @halt, this
-
     
-    @running = false
-    @halt = false
     @selectedCell = null
-    
     
     @objects = new Backbone.Collection
     @objects.bind 'change', @updateObjects, this
-    
-    @tick_length = 1000/10
   
   updateObjects: ->
     console.log 'update call'
     console.log(arguments)
-  
-  render: ->
-    console.log("rendering game")
-    
-    #@fps_text.nodeValue = @fps_info()
-    this
   
   addCell: (cell) ->
     @objects.add cell
@@ -72,28 +57,3 @@ class Nanowar.views.GameView extends Backbone.View
       fleet.launch()
       fleetView = new Nanowar.views.FleetView({model: fleet})
       @el.appendChild(fleetView.render().el)
-  
-  run: ->
-    return if @running
-    @running = true
-    console.log "GOGOGOG"
-    #object.setup(this) for object in @objects
-    
-
-    @schedule()
-    
-  schedule: ->
-    window.setTimeout =>
-      @tick()
-    , @model.get 'tickLength'
-  
-  halt: ->
-    @halt = true
-  
-  tick: ->
-    #console.log "tick"
-    #try
-    @model.tick()
-    #catch error
-    #console.log error
-    @schedule() unless @halt

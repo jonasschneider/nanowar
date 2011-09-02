@@ -8,9 +8,10 @@ if exports?
   
   root = exports
   Nanowar = {}
-  Nanowar.Cell = require('./Cell').Cell
-  Nanowar.Cells = require('./Cells').Cells
+  Nanowar.Cell    = require('./Cell').Cell
+  Nanowar.Cells   = require('./Cells').Cells
   Nanowar.Players = require('./Players').Players
+  _               = require 'underscore'
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
@@ -24,7 +25,7 @@ class root.Game extends Backbone.Model
     console.log("making game")
     
     @cells =  new Nanowar.Cells
-    @players =   new Nanowar.Players
+    @players =  new Nanowar.Players
     
     @cells.bind 'publish', (e) =>
       @trigger 'publish',
@@ -37,21 +38,19 @@ class root.Game extends Backbone.Model
     @bind 'update', (e) =>
       @cells.trigger 'update', e.cells if e.cells?
       @players.trigger 'update', e.players if e.players?
+      @run() if e == 'start'
     
     
-    @bind 'tick', ->
-      _(@cells).each (cell) ->
+    @bind 'tick', =>
+      @cells.each (cell) =>
         cell.trigger 'tick', @ticks
-    , this
+    
+    @bind 'start', =>
+      @trigger 'publish', 'start'
 
     @ticks = 0
-    
-  tick: ->
-    @ticks++
-    
-    @trigger 'tick'
-    
-    @check_for_end()
+    @running = false
+    @halt = false
   
   check_for_end: ->
     owners = []
@@ -62,3 +61,28 @@ class root.Game extends Backbone.Model
     if owners.length == 1
       alert("Game over")
       @trigger 'end'
+  
+  
+  run: ->
+    console.log "GOGOGOG"
+    
+    @trigger 'start'
+    #object.setup(this) for object in @objects
+    
+    @schedule()
+    
+  schedule: ->
+    setTimeout =>
+      @tick()
+    , @get 'tickLength'
+  
+  halt: ->
+    @halt = true
+  
+  tick: ->
+    @ticks++
+    
+    @trigger 'tick'
+    
+    @check_for_end()
+    @schedule() unless @halt

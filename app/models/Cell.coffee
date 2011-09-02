@@ -33,9 +33,10 @@ class root.Cell extends Backbone.Model
         @set
           owner: new Nanowar.Player(@get('owner'))
     
-    @bind 'tick', (ticks) =>
+    @bind 'tick', (newTicks) ->
       @set
-        ticks: ticks
+        ticks: newTicks
+    , this
   
   
   position: ->
