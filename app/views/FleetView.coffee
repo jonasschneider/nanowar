@@ -8,14 +8,9 @@ class Nanowar.views.FleetView extends Backbone.View
     @model.bind 'destroy', @remove, this
     
     @el = document.createElementNS( "http://www.w3.org/2000/svg", "circle" )
-
-    @el.setAttribute("r", @model.strength)
-    @el.setAttribute("stroke", "none")
+    @el.setAttribute "stroke", "none"
     
-    @el.setAttribute("cx", @start_position().x)
-    @el.setAttribute("cy", @start_position().y)
-    
-    setInterval _(@render).bind(this), 500
+    @interval = setInterval _(@render).bind(this), 500
   
   start_position: ->
     Nanowar.util.nearest_border(@model.get('from').position(), @model.get('from').get('size'), @model.get('to').position())
@@ -25,7 +20,6 @@ class Nanowar.views.FleetView extends Backbone.View
   
   position: ->
     startpos = @start_position()
-    
     endpos = @end_position()
     
     posx = startpos.x + (endpos.x - startpos.x) * @model.fraction_done()
@@ -34,10 +28,14 @@ class Nanowar.views.FleetView extends Backbone.View
   
   render: ->
     pos = @position()
-    @el.setAttribute("cx", Math.round(pos.x))
-    @el.setAttribute("cy", Math.round(pos.y))
+    
+    @el.setAttributes
+      r:  @model.strength
+      cx: Math.round pos.x
+      cy: Math.round pos.y
     
     this
     
   remove: ->
-    @el.parentNode.removeChild(@el)
+    @el.parentNode.removeChild @el
+    clearInterval @interval
