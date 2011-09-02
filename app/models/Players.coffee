@@ -1,5 +1,6 @@
 #= require <nanowar>
 #= require "Player"
+#= require <helpers/IdentifyingCollection>
 
 if exports?
   onServer = true
@@ -8,12 +9,13 @@ if exports?
   root = exports
   Nanowar = {}
   Nanowar.Player = require('./Player')
+  Nanowar.IdentifyingCollection = require('../helpers/IdentifyingCollection').IdentifyingCollection
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
   root      = Nanowar
 
-class root.Players extends Backbone.Collection
+class root.Players extends Nanowar.IdentifyingCollection
   model: Nanowar.Player
   
   initialize: ->
@@ -23,7 +25,7 @@ class root.Players extends Backbone.Collection
     @bind 'update', (data) =>
       @add data.add if data.add
   
-  add: (player) ->
+  _add: (player) ->
     colors = ["red", "blue", "green", "yellow"]
     player.color = colors[@size()]
     super

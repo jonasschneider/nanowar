@@ -28,12 +28,6 @@ var server = require('./app-js/server')
 
 io.sockets.on('connection', function(clientSocket){
   var handler = new server.ClientHandler(clientSocket);
-
-  clientSocket.on('read', function(what, fn) {
-    console.log("read req for "+what)
-    if(what == '/app')
-      fn(handler.obj_to_send)
-  })
 })
   /*
 

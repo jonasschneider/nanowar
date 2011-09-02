@@ -26,7 +26,7 @@ class root.Game extends Backbone.Model
   initialize: ->
     console.log("making game")
     
-    @cells =  new Nanowar.Cells
+    @cells =  new Nanowar.Cells [], game: this
     @players =  new Nanowar.Players
     @fleets =  new Nanowar.Fleets
     
@@ -52,6 +52,8 @@ class root.Game extends Backbone.Model
     @bind 'tick', =>
       @cells.each (cell) =>
         cell.trigger 'tick', @ticks
+      @fleets.each (fleet) =>
+        fleet.trigger 'tick', @ticks
     
     @bind 'start', =>
       @trigger 'publish', 'start'

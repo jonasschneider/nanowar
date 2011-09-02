@@ -1,5 +1,6 @@
 #= require <nanowar>
 #= require "Cell"
+#= require <helpers/IdentifyingCollection>
 
 if exports?
   onServer = true
@@ -8,20 +9,23 @@ if exports?
   root = exports
   Nanowar = {}
   Nanowar.Cell = require('./Cell')
+  Nanowar.IdentifyingCollection = require('../helpers/IdentifyingCollection').IdentifyingCollection
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
   root = Nanowar
 
-class root.Cells extends Backbone.Collection
+class root.Cells extends Nanowar.IdentifyingCollection
   model: Nanowar.Cell
   
-  initialize: ->
-    @bind 'all', =>
-      return if arguments[0] == "tick"
-      console.log 'event: ' + JSON.stringify(arguments)
+  initialize: (models, options) ->
+    options || (options = {})
+    @game = options.game
+    
     @bind 'add', (cell) =>
       @trigger 'publish', { add: cell }
       
     @bind 'update', (data) =>
-      @add data.add if data.add
+      if data.add?
+        data.add.game = @game
+        @add data.add

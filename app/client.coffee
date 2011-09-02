@@ -20,9 +20,11 @@ $(document).ready ->
     #a = ->
     #  console.log "fetched the app:"
     #  console.log(window.App)
-    game = window.App.game
     
-    gameDisplay = new Nanowar.views.GameView({model: game, el: $("#nanowar")[0]})
+    window.App.bind 'publish', (e) =>
+      socket.emit('update', e)
+    
+    gameDisplay = new Nanowar.views.GameView({model: window.App.game, el: $("#nanowar")[0]})
     
     #me = new Nanowar.Player { name: "Joonas" }
     #pc = new Nanowar.Player { name: "Fiz" }

@@ -24,13 +24,14 @@ class root.Cell extends Backbone.Model
     knownStrengthAtTick:  0
   
   initialize: ->
+    @game = @get('game')
+    @set game: undefined
+    throw "Cell needs game" unless @game
+    
     if @get('owner') && @get('owner') not instanceof Nanowar.Player
-      if @get('owner').id
-        @set
-          owner: Nanowar.Player.dir.get(@get('owner').id)
-      else
-        @set
-          owner: new Nanowar.Player(@get('owner'))
+      throw "Not instantiating new player here" unless @get('owner').id
+      @set
+        owner: @game.players.get @get('owner').id
     
     @bind 'tick', (newTicks) ->
       @ticks = newTicks

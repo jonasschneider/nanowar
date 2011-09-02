@@ -29,8 +29,8 @@ class Nanowar.views.CellView extends Backbone.View
       cy: @model.get 'y'
       r: @model.get 'size'
     
-    if @model.get('owner') && @model.get('owner').color
-      @el.setAttribute("fill", @model.get('owner').color)
+    if @model.get('owner') && @model.get('owner').get('color')
+      @el.setAttribute("fill", @model.get('owner').get('color'))
       @el.removeClass("neutral")
     else
       @el.setAttribute("fill", 'grey')

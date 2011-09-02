@@ -15,8 +15,4 @@ else
 class root.Player extends Backbone.Model
   defaults:
     name: 'anonymous coward'
-  
-  initialize: ->
-    root.Player.dir ||= new Nanowar.Players
-    root.Player.dir.add this
 

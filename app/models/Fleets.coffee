@@ -1,5 +1,6 @@
 #= require <nanowar>
 #= require "Fleet"
+#= require <helpers/IdentifyingCollection>
 
 if exports?
   onServer = true
@@ -8,12 +9,13 @@ if exports?
   root = exports
   Nanowar = {}
   Nanowar.Fleet = require('./Fleet').Fleet
+  Nanowar.IdentifyingCollection = require('../helpers/IdentifyingCollection').IdentifyingCollection
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
   root      = Nanowar
 
-class root.Fleets extends Backbone.Collection
+class root.Fleets extends Nanowar.IdentifyingCollection
   model: Nanowar.Fleet
   
   initialize: ->

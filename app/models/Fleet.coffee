@@ -6,6 +6,7 @@ if exports?
   
   root = exports
   Nanowar = {}
+  Nanowar.Cell = require('./Cell').Cell
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
@@ -14,9 +15,29 @@ else
 # attributes: Cell from, Cell to, Game game, Player owner
 class root.Fleet extends Backbone.Model
   initialize: ->
+    @game = @get('game')
+    @set game: undefined
+    
+    if @get('from') && @get('from') not instanceof Nanowar.Cell
+      if @get('from').id
+        @set
+          from: @game.cells.get(@get('from').id)
+      else
+        console.log "looks like a strange cell."
+        @set
+          from: new Nanowar.Cell(@get('from'))
+    
+    if @get('to') && @get('to') not instanceof Nanowar.Cell
+      if @get('to').id
+        @set
+          to: @game.cells.get(@get('to').id)
+      else
+        @set
+          to: new Nanowar.Cell(@get('to'))
     @set
       owner: @get('from').get 'owner'
-    @get('game').bind 'tick', @update, this
+    
+    @bind 'tick', @update, this
     
     @strength = Math.round(@get('from').getCurrentStrength() / 2)
     
