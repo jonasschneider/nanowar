@@ -4,7 +4,6 @@ Nanowar = window.Nanowar
 
 class Nanowar.views.CellView extends Backbone.View
   initialize: ->
-    console.log("hello thar cell")
     #@game.add new NanoWar.CellData(this)
     
     @el = document.createElementNS("http://www.w3.org/2000/svg", "circle")
@@ -17,9 +16,9 @@ class Nanowar.views.CellView extends Backbone.View
       r: @model.get 'size'
       class: "cell"
     
-    
-    if @model.owner && @model.owner.color
-      @el.setAttribute("fill", @model.owner.color)
+    console.log @model.get 'owner'
+    if @model.get('owner') && @model.get('owner').color
+      @el.setAttribute("fill", @model.get('owner').color)
       @el.removeClass("neutral")
     else
       @el.setAttribute("fill", 'grey')
