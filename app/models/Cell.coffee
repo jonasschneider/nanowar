@@ -6,6 +6,7 @@ if exports?
   
   root = exports
   Nanowar = {}
+  Nanowar.Player = require('./Player').Player
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
@@ -17,6 +18,7 @@ class root.Cell extends Backbone.Model
     y:      0
     size:   0
     owner:  null
+    owner_cid: null
     productionMultiplier: 1 / 100
     
     knownStrength:        0
@@ -24,8 +26,18 @@ class root.Cell extends Backbone.Model
   
   initialize: -> 
     @setCurrentStrength(0)
-    console.log 'CELL COLLECTION'
-    console.log(@collection)
+    
+    if @get('owner') && @get('owner') not instanceof Nanowar.Player
+      if @get('owner').id
+        @set
+          owner: Nanowar.Player.dir.get(@get('owner').id)
+      else
+        @set
+          owner: new Nanowar.Player(@get('owner'))
+    
+     if @get('owner')
+      @set
+        owner_cid: @get('owner').cid
     
     @bind 'tick', (ticks) =>
       @ticks = ticks

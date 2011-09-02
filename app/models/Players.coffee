@@ -16,6 +16,13 @@ else
 class root.Players extends Backbone.Collection
   model: Nanowar.Player
   
+  initialize: ->
+    @bind 'add', (player) =>
+      @trigger 'publish', { add: player }
+      
+    @bind 'update', (data) =>
+      @add data.add if data.add
+  
   add: (player) ->
     colors = ["red", "blue", "green", "yellow"]
     player.color = colors[@size()]

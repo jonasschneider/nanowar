@@ -6,6 +6,7 @@ if exports?
   
   root = exports
   Nanowar = {}
+  Nanowar.Players = require('./Players').Players
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
@@ -14,3 +15,13 @@ else
 class root.Player extends Backbone.Model
   defaults:
     name: 'anonymous coward'
+    
+  
+  initialize: ->
+    if onServer?
+      uuid = require('node-uuid');
+      @set 
+        id: uuid()
+    root.Player.dir ||= new Nanowar.Players
+    root.Player.dir.add this
+

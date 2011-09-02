@@ -29,6 +29,10 @@ class root.Game extends Backbone.Model
     @cells.bind 'publish', (e) =>
       @trigger 'publish',
         cells: e
+        
+    @players.bind 'publish', (e) =>
+      @trigger 'publish',
+        players: e
     
     @bind 'update', (e) =>
       @cells.trigger 'update', e.cells if e.cells?
