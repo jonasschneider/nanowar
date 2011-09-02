@@ -62,7 +62,7 @@ class root.Game extends Backbone.Model
       owners.push cellOwner if cellOwner? && owners.indexOf(cellOwner) == -1
     
     if owners.length == 1
-      alert("Game over")
+      console.log "Game over"
       @trigger 'end'
   
   run: ->

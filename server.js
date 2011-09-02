@@ -24,11 +24,9 @@ io.configure('production', function(){
 
 
 
-var server = require('./app-js/server')
+var server = require('./app-js/server').start(io)
 
-io.sockets.on('connection', function(clientSocket){
-  var handler = new server.ClientHandler(clientSocket);
-})
+
   /*
 
 io.sockets.on('connection', function(client) {

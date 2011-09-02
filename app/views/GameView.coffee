@@ -53,7 +53,4 @@ class Nanowar.views.GameView extends Backbone.View
       
     @model.fleets.add fleet
     
-    if fleet.is_valid()
-      fleet.launch()
-      fleetView = new Nanowar.views.FleetView({model: fleet})
-      @el.appendChild(fleetView.render().el)
+    @el.appendChild(new Nanowar.views.FleetView({model: fleet}).render().el)

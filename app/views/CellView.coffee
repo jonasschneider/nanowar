@@ -9,8 +9,6 @@ class Nanowar.views.CellView extends Backbone.View
     @gameView.bind  'select', @render, this
     @model.bind     'change', @render, this
     
-    #@game.add new NanoWar.CellData(this)
-    
     @el = document.createElementNS("http://www.w3.org/2000/svg", "circle")
     @el.addClass 'cell'
       

@@ -13,7 +13,7 @@ else
   Nanowar   = window.Nanowar
   root = Nanowar
 
-# attributes: Cell from, Cell to, Game game, Player owner
+# attributes: Cell from, Cell to, Game game, Player owner, int strength, int launchedAt
 class root.Fleet extends Backbone.Model
   initialize: ->
     @game = @get('game')
@@ -41,7 +41,11 @@ class root.Fleet extends Backbone.Model
     
     @set strength: Math.round(@get('from').getCurrentStrength() / 2)
     
-    @launched_at = null
+    @bind 'change:id', ->
+      console.log("fleet id changed")
+    
+    @set launched_at: null
+    @launch() if @is_valid()
   
   is_valid: ->
     @get('from') != @get('to') and @get('strength') > 0
@@ -49,10 +53,10 @@ class root.Fleet extends Backbone.Model
   launch: ->
     console.log "Fleet of #{@get('strength')} launching from #{@get('from').cid} to #{@get('to').cid}"
     @get('from').changeCurrentStrengthBy -@get('strength')
-    @launched_at = @game.ticks
+    @set launched_at: @game.ticks
   
   fraction_done: ->
-    (@game.ticks - @launched_at) / 30
+    (@game.ticks - @get('launched_at')) / 30
   
   size: ->
     rad = (size) ->
@@ -71,4 +75,4 @@ class root.Fleet extends Backbone.Model
       
   destroy: ->
     @game.unbind 'tick', @update, this
-    @trigger 'destroy', this
+    @trigger 'destroy', this    

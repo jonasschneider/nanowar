@@ -13,3 +13,10 @@
     %h2 Nano War
     %svg#nanowar{ height: "500", width:  "700" }
     %button{ onclick: "window.game.tick();"  } Tick!
+    %ul#log
+    
+    :javascript
+      console.log = function(text) {
+        
+        $("#log").append($('<li>').text(text))
+      }
