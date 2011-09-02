@@ -30,7 +30,7 @@ class Nanowar.views.FleetView extends Backbone.View
     pos = @position()
     
     @el.setAttributes
-      r:  @model.strength
+      r:  @model.get 'strength'
       cx: Math.round pos.x
       cy: Math.round pos.y
     

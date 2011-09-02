@@ -28,7 +28,7 @@ class root.Game extends Backbone.Model
     
     @cells =  new Nanowar.Cells [], game: this
     @players =  new Nanowar.Players
-    @fleets =  new Nanowar.Fleets
+    @fleets =  new Nanowar.Fleets [], game: this
     
     @cells.bind 'publish', (e) =>
       @trigger 'publish',

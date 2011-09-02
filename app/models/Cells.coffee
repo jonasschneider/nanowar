@@ -21,6 +21,7 @@ class root.Cells extends Nanowar.IdentifyingCollection
   initialize: (models, options) ->
     options || (options = {})
     @game = options.game
+    throw "need game" unless @game
     
     @bind 'add', (cell) =>
       @trigger 'publish', { add: cell }

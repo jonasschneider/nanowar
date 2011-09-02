@@ -32,11 +32,6 @@ class root.Cell extends Backbone.Model
       throw "Not instantiating new player here" unless @get('owner').id
       @set
         owner: @game.players.get @get('owner').id
-    
-    @bind 'tick', (newTicks) ->
-      @ticks = newTicks
-    , this
-  
   
   position: ->
     x: @get 'x'
@@ -44,11 +39,11 @@ class root.Cell extends Backbone.Model
   
   handle_incoming_fleet: (fleet) ->
     if fleet.get('owner') == @get('owner') # friendly fleet
-      console.log "Friendly fleet of #{fleet.strength} arrived at #{@cid}"
-      @changeCurrentStrengthBy fleet.strength
+      console.log "Friendly fleet of #{fleet.get('strength')} arrived at #{@cid}"
+      @changeCurrentStrengthBy fleet.get('strength')
     else # hostile fleet
-      console.log "Hostile fleet of #{fleet.strength} arrived at #{@cid}"
-      @changeCurrentStrengthBy -fleet.strength
+      console.log "Hostile fleet of #{fleet.get('strength')} arrived at #{@cid}"
+      @changeCurrentStrengthBy -fleet.get('strength')
       
       if @getCurrentStrength() == 0
         @set
@@ -70,11 +65,11 @@ class root.Cell extends Backbone.Model
     @set_owner @owner
   
   getCurrentStrength: ->
-    @get('knownStrength') + Math.round((@ticks - @get('knownStrengthAtTick')) * @units_per_tick())
+    @get('knownStrength') + Math.round((@game.ticks - @get('knownStrengthAtTick')) * @units_per_tick())
     
   setCurrentStrength: (newStrength) ->
     @set
-      knownStrengthAtTick : @ticks
+      knownStrengthAtTick : @game.ticks
       knownStrength       : newStrength
   
   changeCurrentStrengthBy: (delta) ->

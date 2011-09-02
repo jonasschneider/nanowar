@@ -49,7 +49,7 @@ class Nanowar.views.GameView extends Backbone.View
     fleet = new Nanowar.Fleet 
       from: from
       to: to
-      game: this.model
+      game: @model
       
     @model.fleets.add fleet
     

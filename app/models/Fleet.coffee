@@ -7,6 +7,7 @@ if exports?
   root = exports
   Nanowar = {}
   Nanowar.Cell = require('./Cell').Cell
+  Nanowar.Player = require('./Player').Player
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
@@ -29,32 +30,36 @@ class root.Fleet extends Backbone.Model
       @set
         to: @game.cells.get(@get('to').id)
     
+    if @get('owner') && @get('owner') not instanceof Nanowar.Player
+      throw "Not instantiating new player here" unless @get('owner').id
+      @set
+        owner: @game.players.get @get('owner').id
     @set
       owner: @get('from').get 'owner'
     
-    @bind 'tick', @update, this
+    @game.bind 'tick', @update, this
     
-    @strength = Math.round(@get('from').getCurrentStrength() / 2)
+    @set strength: Math.round(@get('from').getCurrentStrength() / 2)
     
     @launched_at = null
   
   is_valid: ->
-    @get('from') != @get('to') and @strength > 0
+    @get('from') != @get('to') and @get('strength') > 0
   
   launch: ->
-    console.log "Fleet of #{@strength} launching from #{@get('from').cid} to #{@get('to').cid}"
-    @get('from').changeCurrentStrengthBy -@strength
-    @launched_at = @get('game').ticks
+    console.log "Fleet of #{@get('strength')} launching from #{@get('from').cid} to #{@get('to').cid}"
+    @get('from').changeCurrentStrengthBy -@get('strength')
+    @launched_at = @game.ticks
   
   fraction_done: ->
-    (@get('game').ticks - @launched_at) / 30
+    (@game.ticks - @launched_at) / 30
   
   size: ->
     rad = (size) ->
       -0.0005*size^2+0.3*size
     
-    if @strength < 200
-      rad(@strength)
+    if @get('strength') < 200
+      rad(@get('strength'))
     else
       rad(200)
   
@@ -63,3 +68,7 @@ class root.Fleet extends Backbone.Model
       @trigger 'arrive'
       @get('to').handle_incoming_fleet this
       @destroy()
+      
+  destroy: ->
+    @game.unbind 'tick', @update, this
+    @trigger 'destroy', this

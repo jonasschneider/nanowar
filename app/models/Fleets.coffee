@@ -18,10 +18,16 @@ else
 class root.Fleets extends Nanowar.IdentifyingCollection
   model: Nanowar.Fleet
   
-  initialize: ->
-    @bind 'add', (player) =>
-      @trigger 'publish', { add: player }
+  initialize: (models, options) ->
+    options || (options = {})
+    @game = options.game
+    throw "need game" unless @game
+    
+    @bind 'add', (fleet) =>
+      @trigger 'publish', { add: fleet }
       
     @bind 'update', (data) =>
-      console.log 'i see dat fleet: ' + JSON.stringify data.add
-      @add data.add if data.add
+      if data.add
+        console.log 'i see dat fleet: ' + JSON.stringify data.add
+        data.add.game = @game
+        @add data.add
