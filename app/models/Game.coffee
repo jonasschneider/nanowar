@@ -3,8 +3,6 @@
 #= require "Players"
 
 Nanowar = window.Nanowar
-Log = Nanowar.Log
-$ = window.$
 
 Nanowar.uniqueIdCount = 1
 

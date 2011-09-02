@@ -1,7 +1,5 @@
 #= require <nanowar>
 
-Log = NanoWar.Log
-
 # Game game
 class Nanowar.Cell extends Backbone.Model
   defaults:
