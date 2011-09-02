@@ -30,6 +30,7 @@ class Nanowar.views.GameView extends Backbone.View
   
   addCell: (cell) ->
     @el.appendChild(new Nanowar.views.CellView({model: cell, gameView: this}).render().el)
+    @el.appendChild(new Nanowar.views.CellDataView({model: cell}).render().el)
   
   select: (cell) ->
     @selectedCell = cell

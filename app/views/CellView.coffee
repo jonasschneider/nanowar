@@ -12,6 +12,8 @@ class Nanowar.views.CellView extends Backbone.View
     
     @el = document.createElementNS("http://www.w3.org/2000/svg", "circle")
     @el.addClass 'cell'
+      
+    
     
     $(@el).click _(@selectMe).bind(this)
     

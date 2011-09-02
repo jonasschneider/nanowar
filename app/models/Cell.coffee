@@ -34,7 +34,7 @@ class Nanowar.models.Cell extends Backbone.Model
         @set_owner fleet.owner
         @units = -@units
         Log "$@id overtaken by $fleet.owner.name"
-    
+  
   nearest_border: (pos) ->
     dx = pos.x - @x
     dy = @y - pos.y
