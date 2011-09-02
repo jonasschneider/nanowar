@@ -12,15 +12,15 @@ class Nanowar.views.GameView extends Backbone.View
     
     @selectedCell = null
     
-    @objects = new Backbone.Collection
-    @objects.bind 'change', @updateObjects, this
+    #@objects = new Backbone.Collection
+    #@objects.bind 'change', @updateObjects, this
   
   updateObjects: ->
     console.log 'update call'
     console.log(arguments)
   
   addCell: (cell) ->
-    @objects.add cell
+    #@objects.add cell
     view = new Nanowar.views.CellView({model: cell, gameView: this})
     @el.appendChild(view.render().el)
     @el.appendChild(new Nanowar.views.CellDataView({model: cell}).render().el)
@@ -51,7 +51,7 @@ class Nanowar.views.GameView extends Backbone.View
       to: to
       game: this.model
       
-    @objects.add fleet
+    @model.fleets.add fleet
     
     if fleet.is_valid()
       fleet.launch()

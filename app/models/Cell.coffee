@@ -22,7 +22,6 @@ class root.Cell extends Backbone.Model
     
     knownStrength:        0
     knownStrengthAtTick:  0
-    ticks:                0
   
   initialize: ->
     if @get('owner') && @get('owner') not instanceof Nanowar.Player
@@ -34,8 +33,7 @@ class root.Cell extends Backbone.Model
           owner: new Nanowar.Player(@get('owner'))
     
     @bind 'tick', (newTicks) ->
-      @set
-        ticks: newTicks
+      @ticks = newTicks
     , this
   
   
@@ -71,7 +69,7 @@ class root.Cell extends Backbone.Model
     @set_owner @owner
   
   getCurrentStrength: ->
-    @get('knownStrength') + Math.round((@get('ticks') - @get('knownStrengthAtTick')) * @units_per_tick())
+    @get('knownStrength') + Math.round((@ticks - @get('knownStrengthAtTick')) * @units_per_tick())
     
   setCurrentStrength: (newStrength) ->
     @set

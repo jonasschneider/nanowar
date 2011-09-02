@@ -30,7 +30,6 @@ class root.Fleet extends Backbone.Model
     @get('from').changeCurrentStrengthBy -@strength
     @launched_at = @get('game').ticks
   
-  
   fraction_done: ->
     (@get('game').ticks - @launched_at) / 30
   

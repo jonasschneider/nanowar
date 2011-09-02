@@ -1,5 +1,6 @@
 #= require <nanowar>
 #= require "Cells"
+#= require "Fleets"
 #= require "Players"
 
 if exports?
@@ -11,6 +12,7 @@ if exports?
   Nanowar.Cell    = require('./Cell').Cell
   Nanowar.Cells   = require('./Cells').Cells
   Nanowar.Players = require('./Players').Players
+  Nanowar.Fleets  = require('./Fleets').Fleets
   _               = require 'underscore'
 else
   Backbone  = window.Backbone
@@ -26,6 +28,7 @@ class root.Game extends Backbone.Model
     
     @cells =  new Nanowar.Cells
     @players =  new Nanowar.Players
+    @fleets =  new Nanowar.Fleets
     
     @cells.bind 'publish', (e) =>
       @trigger 'publish',
@@ -35,9 +38,14 @@ class root.Game extends Backbone.Model
       @trigger 'publish',
         players: e
     
+    @fleets.bind 'publish', (e) =>
+      @trigger 'publish',
+        fleets: e
+    
     @bind 'update', (e) =>
       @cells.trigger 'update', e.cells if e.cells?
       @players.trigger 'update', e.players if e.players?
+      @fleets.trigger 'update', e.fleets if e.fleets?
       @run() if e == 'start'
     
     

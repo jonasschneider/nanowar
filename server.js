@@ -24,39 +24,16 @@ io.configure('production', function(){
 
 
 
-var nanoServer = require('./app-js/server').Server
-console.log(nanoServer)
-
-
-
+var server = require('./app-js/server')
 
 io.sockets.on('connection', function(clientSocket){
-  /*var re = /(?:connect.sid\=)[\.\w\%]+/;
-  var cookieId = re.exec(client.request.headers.cookie)[0].split('=')[1]
-  var clientModel = clients.get(cookieId)
-
-
-  if (!clientModel) {
-    clientModel = new models.ClientModel({id: cookieId});
-    clients.add(clientModel);
-  }
-
-
-  // store some useful info
-  clientModel.client = client;
-*/
-
-  var handler = new nanoServer(clientSocket);
+  var handler = new server.ClientHandler(clientSocket);
 
   clientSocket.on('read', function(what, fn) {
     console.log("read req for "+what)
     if(what == '/app')
       fn(handler.obj_to_send)
   })
-  
-  
-  
-  
 })
   /*
 
