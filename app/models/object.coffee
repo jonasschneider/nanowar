@@ -1,4 +1,4 @@
-#= require <models/game>
+#= require <nanowar>
 
 Log = NanoWar.Log
 

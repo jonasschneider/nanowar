@@ -1,10 +1,10 @@
-#= require <models/game>
+#= require <nanowar>
 #= require <models/object>
 
 Log = NanoWar.Log
 
-class NanoWar.Cell extends NanoWar.Object
-  constructor: (x, y, size, owner) -> 
+class Nanowar.models.Cell extends Backbone.Model
+  initialize: (x, y, size, owner) -> 
     @type = "cell"
     
     @x = x
@@ -18,12 +18,6 @@ class NanoWar.Cell extends NanoWar.Object
     
   set_owner: (new_owner) ->
     @owner = new_owner
-    if new_owner && new_owner.color
-      @elem.setAttribute("fill", new_owner.color)
-      @elem.removeClass("neutral")
-    else
-      @elem.setAttribute("fill", null)
-      @elem.addClass("neutral")
   
   handle_incoming_fleet: (fleet) ->
     if fleet.owner == @owner # friendly fleet
@@ -66,19 +60,7 @@ class NanoWar.Cell extends NanoWar.Object
     @size * @game.desired_tick_length / 8000
   
   setup: ->
-    @elem = document.createElementNS( "http://www.w3.org/2000/svg", "circle" )
-    @elem.nw_cell = this
-    @elem.setAttributes
-      cx: @x
-      cy: @y
-      r: @size
-      "class": "cell"
-    
     @set_owner @owner
-    
-    @game.container[0].appendChild(@elem)
-    
-    @game.add new NanoWar.CellData(this)
   
   update: ->
     @units += @units_per_tick()

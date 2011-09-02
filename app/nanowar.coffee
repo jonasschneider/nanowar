@@ -1,2 +1,7 @@
 #= require <vendor/backbone.js>
-window.NanoWar = { views: {}, models: {} }
+window.NanoWar = {}
+window.Nanowar = { views: {}, models: {} }
+
+Log = NanoWar.Log = Nanowar.Log = (msg) ->
+  if window? && window.console?
+    window.console.log(msg)

@@ -1,17 +1,16 @@
 #= require <nanowar>
 
-NanoWar = window.NanoWar
+Nanowar = window.Nanowar
+Log = Nanowar.Log
 $ = window.$
-Log = NanoWar.Log = (msg) ->
-  if window? && window.console?
-    window.console.log(msg)
 
+Nanowar.uniqueIdCount = 1
 
-NanoWar.uniqueIdCount = 1
+class Nanowar.Game extends Backbone.Model
+  initialize: () ->
+    
+    @cells = new Nanowar.models.CellCollection
 
-class NanoWar.Game
-  constructor: (container_id) ->
-    @container = $("#"+container_id)
     @ticks = 0
     @last_tick = 0
     @players = []
@@ -27,7 +26,7 @@ class NanoWar.Game
     
   add: (object) ->
     @objects.push object
-    object.set_game this
+    object.game = this
     object.setup() if @running
     
   add_player: (player) ->
@@ -45,16 +44,7 @@ class NanoWar.Game
     Log "GOGOGOG"
     object.setup(this) for object in @objects
     
-    @fps_container = document.createElementNS( "http://www.w3.org/2000/svg", "text" )
-    @fps_container.setAttribute("x", 700-200)
-    @fps_container.setAttribute("y", 500-480)
-    @fps_text = document.createTextNode("asdf")
-    @fps_container.appendChild(@fps_text)
-    @container[0].appendChild(@fps_container)
 
-    $(@container).click (event) =>
-      window.console.log("click event")
-      @events.unshift event
     @schedule()
     
   schedule: ->
@@ -75,7 +65,6 @@ class NanoWar.Game
   update: ->
     try
       # Update FPS
-      @fps_text.nodeValue = @fps_info()
       
       # Tick
       @tick()
@@ -85,19 +74,19 @@ class NanoWar.Game
         @human_player.handle_click(event)
       
       # Update objects
-      object.update() for object in @objects
+      #object.update() for object in @objects
       
       # Remove deleted objects
-      @cleanup_objects()
+      #@cleanup_objects()
       
       # Draw objects
-      object.draw() for object in @objects
+      #object.draw() for object in @objects
       
       # End game if conditions are met
       @check_for_end()
     catch error
       Log error
-    @schedule() unless @halt
+    #@schedule() unless @halt
   
   check_for_end: ->
     owners = []
