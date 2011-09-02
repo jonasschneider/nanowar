@@ -1,10 +1,15 @@
 #= require <nanowar>
 
-# Game game
 class Nanowar.Cell extends Backbone.Model
   defaults:
-    knownStrength: 0
-    knownStrengthAtTick: 0
+    x:      0
+    y:      0
+    size:   0
+    game:   null
+    owner:  null
+    
+    knownStrength:        0
+    knownStrengthAtTick:  0
   
   initialize: -> 
     @setCurrentStrength(0)
