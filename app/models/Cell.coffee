@@ -18,7 +18,6 @@ class root.Cell extends Backbone.Model
     y:      0
     size:   0
     owner:  null
-    owner_cid: null
     productionMultiplier: 1 / 100
     
     knownStrength:        0
@@ -34,10 +33,6 @@ class root.Cell extends Backbone.Model
       else
         @set
           owner: new Nanowar.Player(@get('owner'))
-    
-     if @get('owner')
-      @set
-        owner_cid: @get('owner').cid
     
     @bind 'tick', (ticks) =>
       @ticks = ticks
