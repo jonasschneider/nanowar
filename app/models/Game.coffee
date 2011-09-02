@@ -8,25 +8,19 @@ Nanowar.uniqueIdCount = 1
 
 class Nanowar.Game extends Backbone.Model
   defaults:
-    timeFactor: 1 / 100
+    tickLength: 1000 / 10
+    cellProductionMultiplier: 1 / 100
   
   initialize: () ->
-    
     @cells = new Nanowar.models.CellCollection
 
     @ticks = 0
     @last_tick = 0
     @players = []
     @events = []
-    @objects = []
     
     @human_player = null
     
-    
-  add: (object) ->
-    @objects.push object
-    object.game = this
-    object.setup() if @running
     
   add_player: (player) ->
     colors = ["red", "blue", "green", "yellow"]
@@ -39,7 +33,6 @@ class Nanowar.Game extends Backbone.Model
   
   tick: ->
     @ticks++
-    @last_tick = new Date().getTime()
     
     @trigger 'tick'
     
@@ -47,21 +40,10 @@ class Nanowar.Game extends Backbone.Model
   
   check_for_end: ->
     owners = []
-    for object in @objects
-      owners.push(object.owner) if object.type == "cell" && object.owner && owners.indexOf(object.owner) == -1
-    if(owners.length == 1)
-      if owners[0] == @human_player
-        alert("You win!")
-      else
-        alert("You lose...")
-      @halt = true
+    @cells.each (cell) ->
+      cellOwner = cell.get 'owner'
+      owners.push cellOwner if cellOwner? && owners.indexOf(cellOwner) == -1
     
-
-    
-  cleanup_objects: ->
-    for object, i in @objects
-      if object.delete_me
-        object.destroy()
-        @objects.splice(i,1)
-        @cleanup_objects()
-        break
+    if owners.length == 1
+      alert("Game over")
+      @trigger 'end'

@@ -4,19 +4,15 @@ Nanowar = window.Nanowar
 
 class Nanowar.views.GameView extends Backbone.View
   events:
-    'click': 'handleClick'
+    'click': 'handleClickInGameArea'
   
   initialize: ->
     console.log("hello thar")
     console.log(@model.cells)
+    
     @model.cells.bind 'add', @addCell, this
-        
-    @fps_container = document.createElementNS("http://www.w3.org/2000/svg", "text")
-    @fps_container.setAttribute("x", 700-200)
-    @fps_container.setAttribute("y", 500-480)
-    @fps_text = document.createTextNode("my fps display")
-    @fps_container.appendChild(@fps_text)
-    @el.appendChild(@fps_container)
+    @model.bind       'end', @halt, this
+
     
     @running = false
     @halt = false
@@ -26,17 +22,11 @@ class Nanowar.views.GameView extends Backbone.View
     @objects = new Backbone.Collection
     @objects.bind 'change', @updateObjects, this
     
-    @desired_tick_length = 1000/10
+    @tick_length = 1000/10
   
   updateObjects: ->
     console.log 'update call'
     console.log(arguments)
-  
-  fps_info: ->
-    @last_tick_length = new Date().getTime() - @last_tick
-    fps = Math.round(1000 / @last_tick_length)
-    
-    "#{fps} fps (#{@last_tick_length} ms/frame) #{@objects.length}"
   
   render: ->
     console.log("rendering game")
@@ -52,11 +42,7 @@ class Nanowar.views.GameView extends Backbone.View
     
     view.bind 'click', _.bind(@handleClickOnCellView, this, view)
   
-  select: (cell) ->
-    @selectedCell = cell
-    @trigger 'select'
-    
-  handleClick: ->
+  handleClickInGameArea: ->
     unless @currentClickIsInCell
       @select null
     
@@ -70,8 +56,11 @@ class Nanowar.views.GameView extends Backbone.View
     else
       @select cellClickedOn
   
+  select: (cell) ->
+    @selectedCell = cell
+    @trigger 'select'
+  
   send_fleet: (from, to) ->
-    
     fleet = new Nanowar.models.Fleet 
       from: from
       to: to
@@ -96,8 +85,11 @@ class Nanowar.views.GameView extends Backbone.View
   schedule: ->
     window.setTimeout =>
       @tick()
-    , @desired_tick_length
-    
+    , @model.get 'tickLength'
+  
+  halt: ->
+    @halt = true
+  
   tick: ->
     #console.log "tick"
     #try

@@ -38,7 +38,7 @@ class Nanowar.models.Cell extends Backbone.Model
   
   units_per_tick: ->
     return 0 unless @get 'owner' # neutral cells don't produce
-    @get('size') * @get('game').get 'timeFactor'
+    @get('size') * @get('game').get 'cellProductionMultiplier'
   
   setup: ->
     @set_owner @owner
