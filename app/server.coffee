@@ -10,6 +10,7 @@ class exports.ClientHandler
     console.log "making new server"
     
     knownPlayers = new IdentifyingCollection()
+    knownCells = new IdentifyingCollection()
     
     app = new App
     
@@ -28,12 +29,17 @@ class exports.ClientHandler
     game.players.add me
     game.players.add pc
     
-    game.cells.add new Cell {x: 350, y: 100, size: 50}
-    game.cells.add new Cell {x: 350, y: 300, size: 50, owner: me}
-    game.cells.add new Cell {x: 100, y: 200, size: 50}
-    game.cells.add new Cell {x: 500, y: 200, size: 50}
-    game.cells.add new Cell {x: 550, y: 100, size: 10, owner: pc}
+    cells = [
+      new Cell {x: 350, y: 100, size: 50}
+      new Cell {x: 350, y: 300, size: 50, owner: me}
+      new Cell {x: 100, y: 200, size: 50}
+      new Cell {x: 500, y: 200, size: 50}
+      new Cell {x: 550, y: 100, size: 10, owner: pc}
+    ]
+    knownCells.add cells
+    game.cells.add cells
     
+    console.log "Game has #{game.cells.size()} cells"
     go = ->
       game.run()
     _(go).delay(400)

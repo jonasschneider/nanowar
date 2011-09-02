@@ -15,7 +15,7 @@ else
   root = Nanowar
   
 class root.IdentifyingCollection extends Backbone.Collection
-  add: (model) ->
+  _add: (model) ->
     model.set 
       id: uuid()
     super model

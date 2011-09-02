@@ -43,23 +43,23 @@ class root.Cell extends Backbone.Model
   
   handle_incoming_fleet: (fleet) ->
     if fleet.get('owner') == @get('owner') # friendly fleet
-      Log "Friendly fleet of #{fleet.strength} arrived at #{@cid}"
+      console.log "Friendly fleet of #{fleet.strength} arrived at #{@cid}"
       @changeCurrentStrengthBy fleet.strength
     else # hostile fleet
-      Log "Hostile fleet of #{fleet.strength} arrived at #{@cid}"
+      console.log "Hostile fleet of #{fleet.strength} arrived at #{@cid}"
       @changeCurrentStrengthBy -fleet.strength
       
       if @getCurrentStrength() == 0
         @set
           owner: null
         
-        Log "#{@cid} changed to neutral"
+        console.log "#{@cid} changed to neutral"
       else if @getCurrentStrength() < 0
         @set
           owner: fleet.get('owner')
         @setCurrentStrength -@getCurrentStrength()
         
-        Log "#{@cid} overtaken by #{fleet.get('owner').name}"
+        console.log "#{@cid} overtaken by #{fleet.get('owner').name}"
   
   units_per_tick: ->
     return 0 unless @get 'owner' # neutral cells don't produce
@@ -73,7 +73,7 @@ class root.Cell extends Backbone.Model
     
   setCurrentStrength: (newStrength) ->
     @set
-      knownStrengthAtTick : @get('ticks')
+      knownStrengthAtTick : @ticks
       knownStrength       : newStrength
   
   changeCurrentStrengthBy: (delta) ->

@@ -21,4 +21,5 @@ class root.Fleets extends Backbone.Collection
       @trigger 'publish', { add: player }
       
     @bind 'update', (data) =>
+      console.log 'i see dat fleet: ' + JSON.stringify data.add
       @add data.add if data.add

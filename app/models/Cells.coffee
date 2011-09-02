@@ -17,6 +17,9 @@ class root.Cells extends Backbone.Collection
   model: Nanowar.Cell
   
   initialize: ->
+    @bind 'all', =>
+      return if arguments[0] == "tick"
+      console.log 'event: ' + JSON.stringify(arguments)
     @bind 'add', (cell) =>
       @trigger 'publish', { add: cell }
       
