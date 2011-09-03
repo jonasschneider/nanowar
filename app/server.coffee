@@ -36,6 +36,9 @@ class Match
   constructor: ->
     @players = []
     
+    @app = new App
+    @app.bind 'publish', @distributeUpdate, this
+    
   addPlayer: (clientSocket) ->
     console.log clientSocket.id + " connected"
     player = new NetworkedPlayer socket: clientSocket, name: ("Player " + (@players.length + 1))
@@ -64,9 +67,6 @@ class Match
   
   start: ->
     @sendToAll 'log', 'starting soon!'
-    
-    @app = new App
-    @app.bind 'publish', @distributeUpdate, this
     
     @game = @app.game
     console.log 'starting. players:'
