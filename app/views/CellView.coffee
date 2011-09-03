@@ -5,10 +5,12 @@ Nanowar = window.Nanowar
 class Nanowar.views.CellView extends Backbone.View
   initialize: (options) ->
     @gameView = options.gameView
+    window.lastCellView = this
     
     @gameView.bind          'select',             @render, this
     @gameView.appView.bind  'change:localPlayer', @render, this
     @model.bind             'change',             @render, this
+    @model.bind             'incomingFleet',      @animateIncomingFleet, this
     
     @el = @gameView.el.circle @model.get('x'), @model.get('y'), 0
     
@@ -42,3 +44,7 @@ class Nanowar.views.CellView extends Backbone.View
         stroke: 'black'
     
     this
+    
+  animateIncomingFleet: ->
+    @el.animate r: @model.get('size')+7, 50, 'bounce', => 
+      @el.animate r: @model.get('size'), 60
