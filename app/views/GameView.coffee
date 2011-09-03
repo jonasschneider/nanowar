@@ -44,7 +44,7 @@ class Nanowar.views.GameView extends Backbone.View
     if @selectedCell?
       @send_fleet @selectedCell.model, cellClickedOn.model
     else
-      @select cellClickedOn
+      @select cellClickedOn if @appView.localPlayer == cellClickedOn.model.get('owner') # only select owned cells
   
   select: (cell) ->
     @selectedCell = cell
