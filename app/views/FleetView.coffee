@@ -3,33 +3,21 @@
 Nanowar = window.Nanowar
 
 class Nanowar.views.FleetView extends Backbone.View
-  initialize: ->
+  initialize: (opts) ->
+    @gameView = opts.gameView
+    
     @model.bind 'change', @render, this
     @model.bind 'destroy', @remove, this
     
-    @el = document.createElementNS( "http://www.w3.org/2000/svg", "circle" )
-    @el.setAttribute "stroke", "none"
+    @el = @gameView.el.circle()
     
-    @el.addEventListener 'DOMNodeInserted', ->
-      $(@el).animate({svgFill: 'red'}, 1500)
-    
-    @interval = setInterval _(@render).bind(this), 500
-    console.log("fleet eta: #{@model.eta()} ticks")
-    @animated = false
+    @start()
   
   start_position: ->
     Nanowar.util.nearest_border(@model.get('from').position(), @model.get('from').get('size'), @model.get('to').position())
   
   end_position: ->
     Nanowar.util.nearest_border(@model.get('to').position(), @model.get('to').get('size'), @model.get('from').position())
-  
-  position: ->
-    startpos = @start_position()
-    endpos = @end_position()
-    
-    posx = startpos.x + (endpos.x - startpos.x) * @model.fraction_done()
-    posy = startpos.y + (endpos.y - startpos.y) * @model.fraction_done()
-    { x: posx, y: posy }
   
   size: ->
     rad = (size) ->
@@ -40,16 +28,26 @@ class Nanowar.views.FleetView extends Backbone.View
     else
       rad(200)
     
-  render: ->
-    pos = @position()
+  start: ->
+    startpos = @start_position()
+    endpos = @end_position()
     
-    @el.setAttributes
-      r:  @size()
-      cx: Math.round pos.x
-      cy: Math.round pos.y
+    @el.attr
+      r: 0
+      fill: @model.get('owner').get('color')
+      cx: Math.round startpos.x
+      cy: Math.round startpos.y
+    
+    @el.animate
+      cx: Math.round endpos.x
+      cy: Math.round endpos.y
+    , @gameView.model.ticksToTime @model.eta()
+    
+    @el.animate
+      r: @size()
+    , 100, 'bounce'
     
     this
     
   remove: ->
-    @el.parentNode.removeChild @el
-    clearInterval @interval
+    @el.remove()

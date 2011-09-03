@@ -32,7 +32,7 @@ class Nanowar.views.GameView extends Backbone.View
       @handleClickOnCellView cellView
     
   addFleet: (fleet) ->
-    @el.appendChild(new Nanowar.views.FleetView({model: fleet}).render().el)
+    new Nanowar.views.FleetView({model: fleet, gameView: this})
   
   handleClickInGameArea: ->
     unless @currentClickIsInCell

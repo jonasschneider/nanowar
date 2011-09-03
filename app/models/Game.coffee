@@ -86,3 +86,6 @@ class root.Game extends Backbone.Model
     @trigger 'tick'
     @check_for_end()
     @schedule() unless @stopping
+  
+  ticksToTime: (ticks) ->
+    ticks * @get 'tickLength'
