@@ -48,6 +48,12 @@ class root.Fleet extends Backbone.Model
     
     @set launched_at: null
     @launch() if @is_valid()
+
+  startPosition: ->
+    Nanowar.util.nearestBorder @get('from').position(), @get('from').get('size'), @get('to').position()
+  
+  endPosition: ->
+    Nanowar.util.nearestBorder @get('to').position(), @get('to').get('size'), @get('from').position()
   
   eta: ->
     @arrivalTime - @game.ticks

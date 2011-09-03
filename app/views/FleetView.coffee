@@ -13,12 +13,6 @@ class Nanowar.views.FleetView extends Backbone.View
     
     @start()
   
-  startPosition: ->
-    @model.get('from').position()
-  
-  endPosition: ->
-    @model.get('to').position()
-  
   size: ->
     rad = (size) ->
       -0.0005*size^2+0.3*size
@@ -32,12 +26,12 @@ class Nanowar.views.FleetView extends Backbone.View
     @el.attr
       r: 0
       fill: @model.get('owner').get('color')
-      cx: Math.round @startPosition().x
-      cy: Math.round @startPosition().y
+      cx: Math.round @model.startPosition().x
+      cy: Math.round @model.startPosition().y
     
     @el.animate
-      cx: Math.round @endPosition().x
-      cy: Math.round @endPosition().y
+      cx: Math.round @model.endPosition().x
+      cy: Math.round @model.endPosition().y
     , @gameView.model.ticksToTime @model.flightTime()
     
     @el.animate
