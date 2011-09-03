@@ -10,7 +10,12 @@ class Nanowar.views.FleetView extends Backbone.View
     @el = document.createElementNS( "http://www.w3.org/2000/svg", "circle" )
     @el.setAttribute "stroke", "none"
     
+    @el.addEventListener 'DOMNodeInserted', ->
+      $(@el).animate({svgFill: 'red'}, 1500)
+    
     @interval = setInterval _(@render).bind(this), 500
+    console.log("fleet eta: #{@model.eta()} ticks")
+    @animated = false
   
   start_position: ->
     Nanowar.util.nearest_border(@model.get('from').position(), @model.get('from').get('size'), @model.get('to').position())

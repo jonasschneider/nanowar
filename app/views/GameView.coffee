@@ -1,11 +1,9 @@
 #= require <nanowar>
+#= require <vendor/raphael.js>
 
 Nanowar = window.Nanowar
 
 class Nanowar.views.GameView extends Backbone.View
-  events:
-    'click': 'handleClickInGameArea'
-  
   initialize: (options)->
     @appView = options.appView
     throw "need app view" unless @appView
@@ -16,6 +14,11 @@ class Nanowar.views.GameView extends Backbone.View
     
     @selectedCell = null
     
+    @el = Raphael $('#nanowar')[0], 700, 500
+    
+    $(@el.canvas).click =>
+      @handleClickInGameArea()
+    
   
   updateObjects: ->
     console.log 'update call'
@@ -24,10 +27,13 @@ class Nanowar.views.GameView extends Backbone.View
   addCell: (cell) ->
     #@objects.add cell
     view = new Nanowar.views.CellView({model: cell, gameView: this})
-    @el.appendChild(view.render().el)
-    @el.appendChild(new Nanowar.views.CellDataView({model: cell}).render().el)
+    view.render()
+    #view.el
+    #@el.appendChild(view.render().el)
+    #@el.appendChild(new Nanowar.views.CellDataView({model: cell}).render().el)
     
-    view.bind 'click', _.bind(@handleClickOnCellView, this, view)
+    view.bind 'click', =>
+      @handleClickOnCellView view
     
   addFleet: (fleet) ->
     @el.appendChild(new Nanowar.views.FleetView({model: fleet}).render().el)
@@ -40,10 +46,12 @@ class Nanowar.views.GameView extends Backbone.View
   
   handleClickOnCellView: (cellClickedOn, e) ->
     @currentClickIsInCell = true
+    console.log "got click"
     
     if @selectedCell?
       @send_fleet @selectedCell.model, cellClickedOn.model
     else
+      console.log "selecting"
       @select cellClickedOn if @appView.localPlayer == cellClickedOn.model.get('owner') # only select owned cells
   
   select: (cell) ->

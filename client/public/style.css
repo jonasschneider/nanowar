@@ -1,4 +1,4 @@
-#nanowar {
+/*#nanowar svg {
   border: 1px solid #333333; }
   #nanowar .cell-data {
     text-anchor: middle; }
@@ -11,4 +11,4 @@
       fill: gray; }
     #nanowar .cell.selected {
       fill: orange;
-      stroke: black; }
+      stroke: black; }*/

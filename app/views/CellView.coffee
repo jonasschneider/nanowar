@@ -10,36 +10,42 @@ class Nanowar.views.CellView extends Backbone.View
     @gameView.appView.bind  'change:localPlayer', @render, this
     @model.bind             'change',             @render, this
     
-    @el = document.createElementNS("http://www.w3.org/2000/svg", "circle")
-    @el.addClass 'cell'
+    #@el = document.createElementNS("http://www.w3.org/2000/svg", "circle")
+    #
+      
+    @el = @gameView.el.circle @model.get('x'), @model.get('y'), 0
+    #@el.addClass 'cell'
+    #console.error @el
+    @el.attr
+      fill: 'black'
+      #r: @model.get 'size'
+    @el.animate
+      r: @model.get('size')
+    , 700, 'bounce'
     
-    $(@el).click _(@trigger).bind(this, 'click')
+    console.log "hi, "
+    console.error @el.node
+    
+    $(@el.node).click =>
+      @trigger 'click'
     
   render: ->
-    if @gameView.selectedCell == this
-      @el.addClass "selected"
-    else
-      @el.removeClass 'selected'
-    
-    @el.setAttributes
-      cx: @model.get 'x'
-      cy: @model.get 'y'
-      r: @model.get 'size'
-    
-    #@el.setAttributes
-    #  stroke: "green"
-    #  'stroke-width': 2
-    
     if @gameView.appView.localPlayer && @gameView.appView.localPlayer == @model.get('owner')
-      @el.addClass 'allied'
+      @el.attr
+        stroke: 'green'
+        strokeWidth: '2px'
     else
-      @el.removeClass 'allied'
+      @el.attr stroke: 'none'
     
     if @model.get('owner') && @model.get('owner').get('color')
-      @el.setAttribute("fill", @model.get('owner').get('color'))
-      @el.removeClass("neutral")
+      @el.attr fill: @model.get('owner').get('color')
     else
-      @el.setAttribute("fill", 'grey')
-      @el.addClass("neutral")
+      @el.attr fill: 'grey'
+    
+    if @gameView.selectedCell == this
+      console.log "draw selection"
+      @el.attr
+        fill: 'orange'
+        stroke: 'black'
     
     this

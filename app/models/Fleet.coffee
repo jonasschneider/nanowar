@@ -48,6 +48,9 @@ class root.Fleet extends Backbone.Model
     @set launched_at: null
     @launch() if @is_valid()
   
+  eta: ->
+    (@get('launched_at') + 30) - @game.ticks
+  
   is_valid: ->
     @get('from') != @get('to') and @get('strength') > 0
   

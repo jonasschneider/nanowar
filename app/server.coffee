@@ -70,6 +70,8 @@ class Match
       @game.run()
     _(go).delay(1000)
     
+    
+    
     @onStart()
 
 exports.start = (io) ->
