@@ -50,7 +50,6 @@ class root.Game extends Backbone.Model
 
     @bind 'update', (e) =>
       if e.ticks?
-        console.error 'shifting ticks by ' + (e.ticks - @ticks)
         @ticks = e.ticks
       
       @cells.trigger 'update', e.cells if e.cells?
