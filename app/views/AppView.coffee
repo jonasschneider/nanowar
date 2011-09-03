@@ -4,7 +4,7 @@ Nanowar = window.Nanowar
 
 class Nanowar.views.AppView extends Backbone.View
   initialize: ->
-    @gameDisplay = null
+    @gameDisplay = new Nanowar.views.GameView({model: @model.game, appView: this})
     
     console.log("connecting..")
     socket = io.connect('http://'+location.hostname)
@@ -14,6 +14,9 @@ class Nanowar.views.AppView extends Backbone.View
     
     socket.on 'log', (e) ->
       console.log e
+    
+    socket.on 'ping', (timestamp) =>
+      socket.emit 'pong', timestamp
     
     socket.on 'setLocalPlayer',  (player) =>
       player = @model.game.players.get(player)
@@ -27,6 +30,3 @@ class Nanowar.views.AppView extends Backbone.View
       
       @model.bind 'publish', (e) =>
         socket.emit('update', e)
-      
-      @gameDisplay = new Nanowar.views.GameView({model: @model.game, appView: this})
-      
