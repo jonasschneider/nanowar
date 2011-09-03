@@ -19,6 +19,7 @@ class root.Cell extends Backbone.Model
     size:   0
     owner:  null
     productionMultiplier: 1 / 100
+    maxStorageMultiplier: 2
     
     knownStrength:        0
     knownStrengthAtTick:  0
@@ -79,8 +80,11 @@ class root.Cell extends Backbone.Model
   setup: ->
     @set_owner @owner
   
+  getMax: ->
+    @get('size') * @get 'maxStorageMultiplier'
+    
   getCurrentStrength: ->
-    @get('knownStrength') + Math.round((@game.ticks - @get('knownStrengthAtTick')) * @units_per_tick())
+    Math.min @getMax(), @get('knownStrength') + Math.round((@game.ticks - @get('knownStrengthAtTick')) * @units_per_tick())
     
   setCurrentStrength: (newStrength) ->
     @set
