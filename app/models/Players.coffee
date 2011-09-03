@@ -27,7 +27,8 @@ class root.Players extends Nanowar.IdentifyingCollection
   
   _add: (player, opts) ->
     player = @_prepareModel player, opts
-    colors = ["#A0483E", "#666885", "green", "yellow"]
-    player.set color: colors[@size()] unless player.get 'color'
+    unless player.get 'color'
+      colors = ["#A0483E", "#666885", "green", "yellow"]
+      player.set color: colors[@size()]
     
     super player, opts
