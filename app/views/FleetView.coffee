@@ -12,13 +12,11 @@ class Nanowar.views.FleetView extends Backbone.View
     @el = @gameView.el.circle()
     
     
-    @strengthText = @gameView.el.text -100, -100, ""
-    
-    setInterval _(@renderText).bind(this), 100
+    @strengthText = @gameView.el.text -100, -100, @model.get('strength')
     
     @start()
   
-  renderText: ->
+  render: ->
     @strengthText.attr text: @model.get('strength')
   
   size: ->
