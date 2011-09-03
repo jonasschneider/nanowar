@@ -39,7 +39,8 @@ class root.Fleet extends Backbone.Model
     
     @game.bind 'tick', @update, this
     
-    @set strength: Math.round(@get('from').getCurrentStrength() / 2) if !@get('strength')
+    if !@get('strength')
+      @set strength: Math.round(@get('from').getCurrentStrength() / 2)
     
     @bind 'change:id', ->
       console.log("fleet id changed")
@@ -69,7 +70,6 @@ class root.Fleet extends Backbone.Model
   
   update: ->
     if @fraction_done() >= 1
-      @trigger 'arrive'
       @get('to').handle_incoming_fleet this
       @destroy()
       
