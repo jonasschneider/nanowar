@@ -1,32 +1,56 @@
 App     = require('./models/App').App
 Player  = require('./models/Player').Player
+Players = require('./models/Players').Players
 Cell    = require('./models/Cell').Cell
 util    = require 'util'
 _       = require 'underscore'
 
+class NetworkedPlayer extends Player
+  initialize: ->
+    @socket = @get('socket')
+    @unset 'socket'
+    
+    @socket.emit 'log', 'You are: ' + JSON.stringify(this)
+    
+    pingSentAt = new Date().getTime()
+    @socket.on 'pong', (pingSentAt) => 
+      @latency = new Date().getTime() - pingSentAt
+      console.log @get('name')+' is ready'
+      @trigger 'ready', this
+    @socket.emit 'ping', pingSentAt
+    
+    @socket.on 'update', (e) =>
+      @trigger 'update', e
+  
+  send: ->
+    clean = []
+    _(arguments).each (arg) ->
+      clean.push arg
+    
+    @socket.emit.apply(@socket, clean)
+    
+  updateLocalPlayer: ->
+    @socket.emit 'setLocalPlayer', this
+
 class Match
   constructor: ->
-    @app = new App
-    @game = @app.game
-    
-    @app.bind 'publish', @distributeUpdate, this
-    
     @players = []
     
   addPlayer: (clientSocket) ->
-    player = new Player name: ("Player " + (@players.length + 1))
-    player.socket = clientSocket
-    @players.push player
-    @game.players.add player, silent: true # for id & color
-    clientSocket.emit 'log', 'You are: ' + JSON.stringify(player)
+    console.log clientSocket.id + " connected"
+    player = new NetworkedPlayer socket: clientSocket, name: ("Player " + (@players.length + 1))
     
-    clientSocket.on 'update', (e) =>
+    player.bind 'update', (e) =>
       player.socket.broadcast.emit 'update', e # security?
       @app.trigger 'update', e
     
-    if @players.length == 2
-      @start()
-  
+    player.bind 'ready', (player) =>
+      @players.push player
+      console.log("now #{JSON.stringify(@players)} ready")
+      
+      if @players.length == 2
+        @start()
+    
   distributeUpdate: (update) ->
     @sendToAll('update', update)
   
@@ -34,34 +58,41 @@ class Match
     clean = []
     _(arguments).each (arg) ->
       clean.push arg
-    
+      
     _(@players).each (player) -> # potential problem since we don't use @game.players
-      player.socket.emit.apply(player.socket, clean)
+      player.send.apply player, clean
   
   start: ->
-    console.log 'starting.'
     @sendToAll 'log', 'starting soon!'
     
-    @game.players.reset [], silent: true
-    @game.players.add @players # publish player list
+    @app = new App
+    @app.bind 'publish', @distributeUpdate, this
     
-    _(@players).each (player) ->
-      player.socket.emit 'setLocalPlayer', player
+    @game = @app.game
+    console.log 'starting. players:'
+    _(@players).each (player) =>
+      @game.players.add player
+      console.log "- #{player.get('name')} (#{player.socket.id})"
+      
+      player.updateLocalPlayer()
     
     cells = [
       new Cell {x: 350, y: 100, size: 50, game: @game}
-      new Cell {x: 350, y: 300, size: 30, game: @game, owner: @game.players.first()}
+      new Cell {x: 350, y: 300, size: 30, game: @game, owner: @players[0]}
       new Cell {x: 100, y: 200, size: 50, game: @game}
       new Cell {x: 500, y: 200, size: 50, game: @game}
-      new Cell {x: 550, y: 100, size: 30, game: @game, owner: @game.players.last()}
+      new Cell {x: 550, y: 100, size: 30, game: @game, owner: @players[1]}
     ]
     
+    
+    
     @game.bind 'end', (result) =>
-      result.winner.socket.emit 'log', 'You win!'
+      console.log 'Game is over, disconnecting clients'
+      result.winner.send 'log', 'You win!'
       result.winner.socket.broadcast.emit 'log', "You lose. :'("
       
       _(@players).each (player) -> # potential problem since we don't use @game.players
-        player.socket.emit 'log', 'Bye.'
+        player.send 'log', 'Bye.'
         player.socket.disconnect()
     
     @game.cells.add cells
@@ -69,8 +100,6 @@ class Match
     go = =>
       @game.run()
     _(go).delay(1000)
-    
-    
     
     @onStart()
 
