@@ -8,7 +8,7 @@ server.listen(port)
 io = socketio.listen(server)
 
 io.configure ->
-  io.set 'transports', ['websocket']
+  io.set 'transports', ['websocket', 'xhr-polling']
 
 io.configure 'production', ->
   io.enable('browser client minification')  # send minified client
