@@ -26,11 +26,20 @@ class Nanowar.views.FleetView extends Backbone.View
     posy = startpos.y + (endpos.y - startpos.y) * @model.fraction_done()
     { x: posx, y: posy }
   
+  size: ->
+    rad = (size) ->
+      -0.0005*size^2+0.3*size
+    
+    if @model.get('strength') < 200
+      rad(@model.get 'strength')
+    else
+      rad(200)
+    
   render: ->
     pos = @position()
     
     @el.setAttributes
-      r:  @model.get 'strength'
+      r:  @size()
       cx: Math.round pos.x
       cy: Math.round pos.y
     

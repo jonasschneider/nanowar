@@ -59,15 +59,6 @@ class root.Fleet extends Backbone.Model
   fraction_done: ->
     (@game.ticks - @get('launched_at')) / 30
   
-  size: ->
-    rad = (size) ->
-      -0.0005*size^2+0.3*size
-    
-    if @get('strength') < 200
-      rad(@get('strength'))
-    else
-      rad(200)
-  
   update: ->
     if @fraction_done() >= 1
       @get('to').handle_incoming_fleet this
