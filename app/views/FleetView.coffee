@@ -45,7 +45,7 @@ class Nanowar.views.FleetView extends Backbone.View
     
     @el.animate
       r: @size()
-    , 100, 'bounce'
+    , 200, 'bounce'
     
     this
     
