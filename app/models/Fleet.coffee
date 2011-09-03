@@ -8,6 +8,7 @@ if exports?
   Nanowar = {}
   Nanowar.Cell = require('./Cell').Cell
   Nanowar.Player = require('./Player').Player
+  Nanowar.util = require('../helpers/util').util
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
@@ -49,21 +50,30 @@ class root.Fleet extends Backbone.Model
     @launch() if @is_valid()
   
   eta: ->
-    (@get('launched_at') + 30) - @game.ticks
+    @arrivalTime - @game.ticks
   
+  flightTime: ->
+    Math.round @distance()
+  
+  arrivalTime: ->
+    @get('launched_at') + @flightTime()
+  
+  distance: ->
+    Nanowar.util.distance(@get('from').position(), @get('to').position())
+    
   is_valid: ->
     @get('from') != @get('to') and @get('strength') > 0
   
   launch: ->
-    console.log "Fleet of #{@get('strength')} launching from #{@get('from').cid} to #{@get('to').cid}"
+    console.log "Fleet of #{@get('strength')} launching"
     @get('from').changeCurrentStrengthBy -@get('strength')
     @set launched_at: @game.ticks
   
-  fraction_done: ->
-    (@game.ticks - @get('launched_at')) / 30
+  arrived: ->
+    @arrivalTime() < @game.ticks
   
   update: ->
-    if @fraction_done() >= 1
+    if @arrived()
       @get('to').handle_incoming_fleet this
       @destroy()
       
