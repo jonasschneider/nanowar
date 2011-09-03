@@ -20,6 +20,8 @@ class Nanowar.views.CellView extends Backbone.View
     
     $(@el.node).click =>
       @trigger 'click'
+      
+    new Nanowar.views.CellDataView {model: @model, gameView: @gameView}
     
   render: ->
     if @gameView.appView.localPlayer && @gameView.appView.localPlayer == @model.get('owner')
@@ -35,7 +37,6 @@ class Nanowar.views.CellView extends Backbone.View
       @el.attr fill: 'grey'
     
     if @gameView.selectedCell == this
-      console.log "draw selection"
       @el.attr
         fill: 'orange'
         stroke: 'black'

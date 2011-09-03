@@ -25,15 +25,11 @@ class Nanowar.views.GameView extends Backbone.View
     console.log(arguments)
   
   addCell: (cell) ->
-    #@objects.add cell
-    view = new Nanowar.views.CellView({model: cell, gameView: this})
-    view.render()
-    #view.el
-    #@el.appendChild(view.render().el)
-    #@el.appendChild(new Nanowar.views.CellDataView({model: cell}).render().el)
+    cellView = new Nanowar.views.CellView({model: cell, gameView: this})
+    cellView.render()
     
-    view.bind 'click', =>
-      @handleClickOnCellView view
+    cellView.bind 'click', =>
+      @handleClickOnCellView cellView
     
   addFleet: (fleet) ->
     @el.appendChild(new Nanowar.views.FleetView({model: fleet}).render().el)
@@ -46,13 +42,16 @@ class Nanowar.views.GameView extends Backbone.View
   
   handleClickOnCellView: (cellClickedOn, e) ->
     @currentClickIsInCell = true
-    console.log "got click"
     
     if @selectedCell?
-      @send_fleet @selectedCell.model, cellClickedOn.model
+      # don't send to itself
+      if cellClickedOn != @selectedCell
+        @send_fleet @selectedCell.model, cellClickedOn.model
     else
-      console.log "selecting"
-      @select cellClickedOn if @appView.localPlayer == cellClickedOn.model.get('owner') # only select owned cells
+      # only select cells owned by local player
+      if @appView.localPlayer == cellClickedOn.model.get('owner')
+        @select cellClickedOn
+  
   
   select: (cell) ->
     @selectedCell = cell

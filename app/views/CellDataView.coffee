@@ -3,23 +3,20 @@
 Nanowar = window.Nanowar
 
 class Nanowar.views.CellDataView extends Backbone.View
-  initialize: ->
+  initialize: (options)->
+    @gameView = options.gameView
     
     @model.bind 'change', @render, this
     
-    @el = document.createElementNS( "http://www.w3.org/2000/svg", "text" )
+    @el = @gameView.el.text @model.get('x'), @model.get('y'), "0"
     
-    @el.setAttributes
-      x: @model.get 'x'
-      y: @model.get 'y'
-      transform: "translate(0,5)"
-      "class": "cell-data"
-    
-    @text = document.createTextNode("0")
-    @el.appendChild(@text)
+    @el.attr
+      font: '12px Arial'
+      stroke:   'none'
+      fill:     'white'
     
     setInterval _(@render).bind(this), 500
   
   render: ->
-    @text.nodeValue = @model.getCurrentStrength()
+    @el.attr text: @model.getCurrentStrength()
     this
