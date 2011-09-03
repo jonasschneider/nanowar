@@ -39,7 +39,7 @@ class root.Fleet extends Backbone.Model
     
     @game.bind 'tick', @update, this
     
-    @set strength: Math.round(@get('from').getCurrentStrength() / 2)
+    @set strength: Math.round(@get('from').getCurrentStrength() / 2) if !@get('strength')
     
     @bind 'change:id', ->
       console.log("fleet id changed")

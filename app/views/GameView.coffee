@@ -6,7 +6,10 @@ class Nanowar.views.GameView extends Backbone.View
   events:
     'click': 'handleClickInGameArea'
   
-  initialize: ->
+  initialize: (options)->
+    @appView = options.appView
+    throw "need app view" unless @appView
+    
     @model.cells.bind   'add', @addCell,  this
     @model.fleets.bind  'add', @addFleet, this
     @model.bind       'end', @halt, this

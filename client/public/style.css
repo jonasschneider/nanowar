@@ -1,13 +1,14 @@
 #nanowar {
   border: 1px solid #333333; }
   #nanowar .cell-data {
-    fill: black;
-    stroke: none;
     text-anchor: middle; }
   #nanowar .cell {
     stroke: none; }
+    #nanowar .cell.allied {
+      stroke: green;
+      stroke-width: 2px; }
     #nanowar .cell.neutral {
-      fill: grey; }
+      fill: gray; }
     #nanowar .cell.selected {
       fill: orange;
       stroke: black; }

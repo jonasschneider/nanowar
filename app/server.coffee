@@ -41,8 +41,12 @@ class Match
   start: ->
     console.log 'starting.'
     @sendToAll 'log', 'starting soon!'
+    
     @game.players.reset [], silent: true
     @game.players.add @players # publish player list
+    
+    _(@players).each (player) ->
+      player.socket.emit 'setLocalPlayer', player
     
     cells = [
       new Cell {x: 350, y: 100, size: 50, game: @game}

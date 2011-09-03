@@ -19,10 +19,7 @@ class root.App extends Backbone.Model
   urlRoot: '/app'
   
   initialize: ->
-    console.log "making app"
-    
     @game = new Nanowar.Game
-    @game.trigger 'lulz'
     
     @is_publishing = true
     
@@ -39,4 +36,5 @@ class root.App extends Backbone.Model
       
       @is_publishing = false
       @game.trigger 'update', e.game if e.game?
+      @set e.set if e.set?
       @is_publishing = true
