@@ -28,6 +28,15 @@ class root.Cell extends Backbone.Model
     @set game: undefined
     throw "Cell needs game" unless @game
     
+    
+    @bind 'change:owner', =>
+      if @get('owner') && @get('owner') not instanceof Nanowar.Player
+        throw "Not instantiating new player here" unless @get('owner').id
+        @set { owner: @game.players.get @get('owner').id }, silent: true
+    
+    @bind 'change', =>
+      console.log 'cell change '+JSON.stringify(@attributes)
+    
     if @get('owner') && @get('owner') not instanceof Nanowar.Player
       throw "Not instantiating new player here" unless @get('owner').id
       @set
@@ -44,19 +53,24 @@ class root.Cell extends Backbone.Model
       @changeCurrentStrengthBy fleet.get('strength')
     else # hostile fleet
       console.log "Hostile fleet of #{fleet.get('strength')} arrived at #{@cid}"
-      @changeCurrentStrengthBy -fleet.get('strength')
+      newStrength = @getCurrentStrength() - fleet.get('strength')
       
-      if @getCurrentStrength() == 0
+      if newStrength == 0
         @set
           owner: null
+        , silent: true
         
         console.log "#{@cid} changed to neutral"
-      else if @getCurrentStrength() < 0
+      else if newStrength < 0
         @set
           owner: fleet.get('owner')
-        @setCurrentStrength -@getCurrentStrength()
+        , silent: true
+        
+        newStrength = -newStrength
         
         console.log "#{@cid} overtaken by #{fleet.get('owner').get('name')}"
+      
+      @setCurrentStrength newStrength
   
   units_per_tick: ->
     return 0 unless @get 'owner' # neutral cells don't produce

@@ -12,6 +12,7 @@ if exports?
   Nanowar.Cell    = require('./Cell').Cell
   Nanowar.Cells   = require('./Cells').Cells
   Nanowar.Players = require('./Players').Players
+  Nanowar.Fleet  = require('./Fleet').Fleet
   Nanowar.Fleets  = require('./Fleets').Fleets
   _               = require 'underscore'
 else
@@ -28,26 +29,40 @@ class root.Game extends Backbone.Model
     @players =  new Nanowar.Players
     @fleets =  new Nanowar.Fleets [], game: this
     
-    @cells.bind 'publish', (e) =>
-      @trigger 'publish',
-        cells: e
-        
-    @players.bind 'publish', (e) =>
-      @trigger 'publish',
-        players: e
-    
-    @fleets.bind 'publish', (e) =>
-      @trigger 'publish',
-        fleets: e
-    
+    if onServer?
+      @cells.bind 'publish', (e) =>
+        @trigger 'publish',
+          cells: e
+          ticks: @ticks
+          
+      @players.bind 'publish', (e) =>
+        @trigger 'publish',
+          players: e
+          ticks: @ticks
+      
+      @fleets.bind 'publish', (e) =>
+        @trigger 'publish',
+          fleets: e
+          ticks: @ticks
+          
+      @bind 'start', =>
+        @trigger 'publish', 'start'
+
     @bind 'update', (e) =>
+      if e.ticks?
+        console.error 'shifting ticks by ' + (e.ticks - @ticks)
+        @ticks = e.ticks
+      
       @cells.trigger 'update', e.cells if e.cells?
       @players.trigger 'update', e.players if e.players?
       @fleets.trigger 'update', e.fleets if e.fleets?
+      if e.sendFleet?
+        @sendFleet e.sendFleet
+        #@trigger 'publish', {sendFleet: e.sendFleet} if onServer?
+      
       @run() if e == 'start'
     
-    @bind 'start', =>
-      @trigger 'publish', 'start'
+    
 
     @ticks = 0
     @running = false
@@ -80,10 +95,20 @@ class root.Game extends Backbone.Model
     @stopping = true
   
   tick: ->
+    @schedule() unless @stopping
     @ticks++
     @trigger 'tick'
     @check_for_end()
-    @schedule() unless @stopping
   
   ticksToTime: (ticks) ->
     ticks * @get 'tickLength'
+  
+  sendFleet: (opts) ->
+    fleet = new Nanowar.Fleet 
+      from: @cells.get opts.from.id
+      to: @cells.get opts.to.id
+      game: this
+    
+    fleet.launch()
+    
+    @fleets.add fleet

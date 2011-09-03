@@ -10,7 +10,9 @@ class Nanowar.views.AppView extends Backbone.View
     socket = io.connect('http://'+location.hostname)
     
     socket.on 'update', (e) =>
-      @model.trigger 'update', e
+      fn = =>
+        @model.trigger 'update', e
+      _(fn).delay 200
     
     socket.on 'log', (e) ->
       console.log e
@@ -19,11 +21,13 @@ class Nanowar.views.AppView extends Backbone.View
       socket.emit 'pong', timestamp
     
     socket.on 'setLocalPlayer',  (player) =>
-      player = @model.game.players.get(player)
-      @localPlayer = player
-      @trigger 'change:localPlayer', player
-      
-      console.log 'localPlayer set: ' + JSON.stringify(player)
+      fn = =>
+        player = @model.game.players.get(player)
+        @localPlayer = player
+        @trigger 'change:localPlayer', player
+        
+        console.log 'localPlayer set: ' + JSON.stringify(player)
+      _(fn).delay 200 
     
     socket.on 'connect', =>
       console.log 'connected to server'

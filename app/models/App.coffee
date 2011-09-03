@@ -21,7 +21,12 @@ class root.App extends Backbone.Model
   initialize: ->
     @game = new Nanowar.Game
     
-    @is_publishing = true
+    if onServer
+      @is_publishing = true
+    else
+      @is_publishing = false
+      @game.bind 'start', =>
+        @is_publishing = true
     
     @game.bind 'publish', (e) =>
       return unless @is_publishing
@@ -34,7 +39,7 @@ class root.App extends Backbone.Model
     @bind 'update', (e) => 
       console.log("app getting update: "+JSON.stringify e)
       
-      @is_publishing = false
+      #@is_publishing = false
       @game.trigger 'update', e.game if e.game?
       @set e.set if e.set?
-      @is_publishing = true
+      #@is_publishing = true

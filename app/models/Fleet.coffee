@@ -16,6 +16,9 @@ else
 
 # attributes: Cell from, Cell to, Game game, Player owner, int strength, int launchedAt
 class root.Fleet extends Backbone.Model
+  defaults:
+    launched_at: null
+  
   initialize: ->
     @game = @get('game')
     @set game: undefined
@@ -42,13 +45,7 @@ class root.Fleet extends Backbone.Model
     
     if !@get('strength')
       @set strength: Math.round(@get('from').getCurrentStrength() / 2)
-    
-    @bind 'change:id', ->
-      console.log("fleet id changed")
-    
-    @set launched_at: null
-    @launch() if @is_valid()
-
+  
   startPosition: ->
     Nanowar.util.nearestBorder @get('from').position(), @get('from').get('size'), @get('to').position()
   
@@ -80,7 +77,8 @@ class root.Fleet extends Backbone.Model
   
   update: ->
     if @arrived()
-      @get('to').handle_incoming_fleet this
+      if onServer?
+        @get('to').handle_incoming_fleet this
       @destroy()
       
   destroy: ->

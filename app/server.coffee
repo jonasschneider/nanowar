@@ -15,6 +15,7 @@ class NetworkedPlayer extends Player
     pingSentAt = new Date().getTime()
     @socket.on 'pong', (pingSentAt) => 
       @latency = new Date().getTime() - pingSentAt
+      @socket.emit 'log', "Your RTT is #{@latency}"
       console.log @get('name')+' is ready'
       @trigger 'ready', this
     @socket.emit 'ping', pingSentAt

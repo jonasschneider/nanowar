@@ -46,7 +46,7 @@ class Nanowar.views.GameView extends Backbone.View
     if @selectedCell?
       # don't send to itself
       if cellClickedOn != @selectedCell
-        @send_fleet @selectedCell.model, cellClickedOn.model
+        @model.trigger 'publish', sendFleet: {from: @selectedCell.model, to: cellClickedOn.model}
     else
       # only select cells owned by local player
       if @appView.localPlayer == cellClickedOn.model.get('owner')
@@ -56,11 +56,3 @@ class Nanowar.views.GameView extends Backbone.View
   select: (cell) ->
     @selectedCell = cell
     @trigger 'select'
-  
-  send_fleet: (from, to) ->
-    fleet = new Nanowar.Fleet 
-      from: from
-      to: to
-      game: @model
-      
-    @model.fleets.add fleet

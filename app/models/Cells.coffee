@@ -30,3 +30,9 @@ class root.Cells extends Nanowar.IdentifyingCollection
       if data.add?
         data.add.game = @game
         @add data.add
+        
+      if data.change?
+        @get(data.change.id).set data.change
+        
+    @bind 'change', (cell) =>
+      @trigger 'publish', { change: cell }
