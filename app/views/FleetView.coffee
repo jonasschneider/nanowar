@@ -11,7 +11,15 @@ class Nanowar.views.FleetView extends Backbone.View
     
     @el = @gameView.el.circle()
     
+    
+    @strengthText = @gameView.el.text -100, -100, ""
+    
+    setInterval _(@renderText).bind(this), 100
+    
     @start()
+  
+  renderText: ->
+    @strengthText.attr text: @model.get('strength')
   
   size: ->
     rad = (size) ->
@@ -26,6 +34,18 @@ class Nanowar.views.FleetView extends Backbone.View
     @gameView.model.ticksToTime @model.flightTime()
   
   start: ->
+    @strengthText.attr
+      font: '12px Arial'
+      stroke:   'none'
+      fill:     'black'
+      x: Math.round @model.startPosition().x
+      y: Math.round @model.startPosition().y - 10
+    
+    @strengthText.animate
+      x: Math.round @model.endPosition().x
+      y: Math.round @model.endPosition().y - 10
+    , @timeInFlight()
+    
     @el.attr
       r: 0
       fill: @model.get('owner').get('color')
@@ -52,3 +72,4 @@ class Nanowar.views.FleetView extends Backbone.View
     
   remove: ->
     @el.remove()
+    @strengthText.remove()
