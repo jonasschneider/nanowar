@@ -21,7 +21,10 @@ class Nanowar.views.FleetView extends Backbone.View
       rad(@model.get 'strength')
     else
       rad(200)
-    
+  
+  timeInFlight: ->
+    @gameView.model.ticksToTime @model.flightTime()
+  
   start: ->
     @el.attr
       r: 0
@@ -32,11 +35,18 @@ class Nanowar.views.FleetView extends Backbone.View
     @el.animate
       cx: Math.round @model.endPosition().x
       cy: Math.round @model.endPosition().y
-    , @gameView.model.ticksToTime @model.flightTime()
+    , @timeInFlight()
     
-    @el.animate
-      r: @size()
-    , 200, 'bounce'
+    if @timeInFlight() > 400
+      @el.animate
+        r: @size()
+      , 200, 'bounce'
+      
+      disappear = =>
+        @el.animate
+          r: 0
+        , 200, 'bounce'
+      setTimeout disappear, @timeInFlight()-200
     
     this
     
