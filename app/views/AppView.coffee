@@ -12,7 +12,8 @@ class Nanowar.views.AppView extends Backbone.View
     socket.on 'update', (e) =>
       fn = =>
         @model.trigger 'update', e
-      _(fn).delay 200
+      #_(fn).delay 200
+      fn()
     
     socket.on 'log', (e) ->
       console.log e
@@ -27,7 +28,8 @@ class Nanowar.views.AppView extends Backbone.View
         @trigger 'change:localPlayer', player
         
         console.log 'localPlayer set: ' + JSON.stringify(player)
-      _(fn).delay 200 
+      #_(fn).delay 200 
+      fn()
     
     socket.on 'connect', =>
       console.log 'connected to server'
