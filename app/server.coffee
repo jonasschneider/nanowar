@@ -50,10 +50,10 @@ class Match
     
     cells = [
       new Cell {x: 350, y: 100, size: 50, game: @game}
-      new Cell {x: 350, y: 300, size: 50, game: @game, owner: @game.players.first()}
+      new Cell {x: 350, y: 300, size: 30, game: @game, owner: @game.players.first()}
       new Cell {x: 100, y: 200, size: 50, game: @game}
       new Cell {x: 500, y: 200, size: 50, game: @game}
-      new Cell {x: 550, y: 100, size: 10, game: @game, owner: @game.players.last()}
+      new Cell {x: 550, y: 100, size: 30, game: @game, owner: @game.players.last()}
     ]
     
     @game.bind 'end', (result) =>
