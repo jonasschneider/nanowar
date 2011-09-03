@@ -24,8 +24,6 @@ class root.Game extends Backbone.Model
     tickLength: 1000 / 10
   
   initialize: ->
-    console.log("making game")
-    
     @cells =  new Nanowar.Cells [], game: this
     @players =  new Nanowar.Players
     @fleets =  new Nanowar.Fleets [], game: this

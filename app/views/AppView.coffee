@@ -20,8 +20,7 @@ class Nanowar.views.AppView extends Backbone.View
       @localPlayer = player
       @trigger 'change:localPlayer', player
       
-      console.log 'player set:'
-      console.log player
+      console.log 'localPlayer set: ' + JSON.stringify(player)
     
     socket.on 'connect', =>
       console.log 'connected to server'
