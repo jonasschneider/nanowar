@@ -12,10 +12,10 @@ else
 
 root.util =
   distance: (a, b) ->
-    dx = Math.abs a.x - b.x
-    dy = Math.abs a.y - b.y
+    dx = a.x - b.x
+    dy = a.y - b.y
     
-    return Math.sqrt( (dx^2)+(dy^2) )
+    return Math.sqrt( dx*dx+dy*dy )
     
   nearestBorder: (centerPosition, radius, otherPosition) ->
     dx = otherPosition.x - centerPosition.x
