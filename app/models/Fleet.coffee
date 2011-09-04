@@ -18,6 +18,7 @@ else
 class root.Fleet extends Backbone.Model
   defaults:
     launched_at: null
+    speedPerTick: 6
   
   initialize: ->
     @game = @get('game')
@@ -53,16 +54,16 @@ class root.Fleet extends Backbone.Model
     Nanowar.util.nearestBorder @get('to').position(), @get('to').get('size'), @get('from').position()
   
   eta: ->
-    @arrivalTime - @game.ticks
+    @arrivalTime() - @game.ticks
   
   flightTime: ->
-    Math.round @distance()
+    Math.round @distance() / @get('speedPerTick')
   
   arrivalTime: ->
     @get('launched_at') + @flightTime()
   
   distance: ->
-    Nanowar.util.distance(@get('from').position(), @get('to').position())
+    Nanowar.util.distance(@startPosition(), @endPosition())
     
   is_valid: ->
     @get('from') != @get('to') and @get('strength') > 0
