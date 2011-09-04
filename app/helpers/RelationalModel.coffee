@@ -12,9 +12,10 @@ else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
   root = Nanowar
+  _ = window._
 
 
-# 1. Don't forget to call super
+# 1. Don't forget to call super (after setting directory)
 # Directory API: get(id) => model
 
 class root.RelationalModel extends Backbone.Model
