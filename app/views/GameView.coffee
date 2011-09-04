@@ -10,7 +10,6 @@ class Nanowar.views.GameView extends Backbone.View
     
     @model.cells.bind   'add', @addCell,  this
     @model.fleets.bind  'add', @addFleet, this
-    @model.bind       'end', @halt, this
     
     @selectedCell = null
     
