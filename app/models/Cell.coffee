@@ -14,11 +14,15 @@ else
   root = Nanowar
 
 class root.Cell extends Nanowar.RelationalModel
+  relationSpecs:
+    owner:
+      relatedModel: Nanowar.Player
+      directory: 'game.players'
+
   defaults:
     x:      0
     y:      0
     size:   0
-    owner:  null
     productionMultiplier: 1 / 100
     maxStorageMultiplier: 2
     
