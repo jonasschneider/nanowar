@@ -20,6 +20,11 @@ class root.RelationalModel extends Backbone.Model
   defaults:
     owner: null
   initialize: ->
+    _(@relations).each (options, name) =>
+      dataz = {}
+      dataz[name] = null
+      @set dataz
+    
     @bind 'change:owner', =>
       if @get('owner') && @get('owner') not instanceof Nanowar.Player
         throw "Not instantiating new player here" unless @get('owner').id

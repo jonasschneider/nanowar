@@ -1,23 +1,23 @@
 RelationalModel = require('../../app/helpers/RelationalModel.coffee').RelationalModel
 Backbone = require('backbone')
 
-class CellStub extends RelationalModel
+class Post extends RelationalModel
   relations:
-    owner:
-      model: 'PlayerStub'
+    author:
+      model: 'Author'
     
-class PlayerStub extends Backbone.Model
+class Author extends Backbone.Model
 
 describe 'RelationalModel', ->
   it 'accepts null as relation model', ->
-    expect((new CellStub).get('owner')).toBe null
-  ###
+    expect((new Post).get('author')).toBe null
+  ###  
   it 'accepts Player object as owner', ->
-    player = new Player
-    x = new CellStub owner: player
+    jonas = new Author name: 'Jonas'
+    x = new Post author: jonas
     
-    expect(x.get('owner')).toBe player
-    
+    expect(x.get('author')).toBe jonas
+  ##
   it 'throws on player attributes as owner', ->
     player = new Player
     
