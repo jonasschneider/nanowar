@@ -22,7 +22,7 @@ class root.RelationalModel extends Backbone.Model
   initialize: ->
     _(@relations).each (options, name) =>
       dataz = {}
-      dataz[name] = null
+      dataz[name] = @get(name) || null
       @set dataz
     
     @bind 'change:owner', =>

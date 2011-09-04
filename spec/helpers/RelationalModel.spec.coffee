@@ -11,13 +11,13 @@ class Author extends Backbone.Model
 describe 'RelationalModel', ->
   it 'accepts null as relation model', ->
     expect((new Post).get('author')).toBe null
-  ###  
-  it 'accepts Player object as owner', ->
+  
+  it 'accepts related model object as owner', ->
     jonas = new Author name: 'Jonas'
     x = new Post author: jonas
     
     expect(x.get('author')).toBe jonas
-  ##
+  ###
   it 'throws on player attributes as owner', ->
     player = new Player
     
