@@ -15,6 +15,7 @@ else
 
 
 # 1. Don't forget to call super
+# Directory API: get(id) => model
 
 class root.RelationalModel extends Backbone.Model
   defaults:
@@ -28,7 +29,15 @@ class root.RelationalModel extends Backbone.Model
       dataz[name] = 
         if value = @get(name)
           if value instanceof options.relatedModel
-            value
+            # traverse path to directory
+            segments = options.directory.split '.'
+            directoryObj = this
+            directoryObj = directoryObj[segments.shift()] until segments.length == 0
+            
+            if value.get('id') && inDir = directoryObj.get(value.get('id'))
+              inDir
+            else
+              throw "#{options.relatedModelName} is not registered in this.#{options.directory}"
           else
             throw "Expected an instance of #{options.relatedModelName}"
         else
