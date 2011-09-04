@@ -1,5 +1,6 @@
 #= require <nanowar>
 #= require <vendor/raphael.js>
+#= require <commands/SendFleetCommand>
 
 Nanowar = window.Nanowar
 
@@ -45,7 +46,7 @@ class Nanowar.views.GameView extends Backbone.View
     if @selectedCell?
       # don't send to itself
       if cellClickedOn != @selectedCell
-        @model.trigger 'publish', sendFleet: {from: @selectedCell.model, to: cellClickedOn.model}
+        @model.trigger 'publish', sendFleetCommand: new Nanowar.SendFleetCommand(game: @model, from: @selectedCell.model, to: cellClickedOn.model)
     else
       # only select cells owned by local player
       if @appView.localPlayer == cellClickedOn.model.get('owner')
