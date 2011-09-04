@@ -37,9 +37,6 @@ class root.Cell extends Nanowar.RelationalModel
     throw "Cell needs game" unless @game
     super
     
-    @bind 'change', =>
-      console.log 'cell change '+JSON.stringify(@attributes)
-    
   position: ->
     x: @get 'x'
     y: @get 'y'
