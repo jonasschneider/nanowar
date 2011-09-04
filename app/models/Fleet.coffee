@@ -59,8 +59,8 @@ class root.Fleet extends Nanowar.RelationalModel
   distance: ->
     Nanowar.util.distance(@startPosition(), @endPosition())
     
-  is_valid: ->
-    @get('from') != @get('to') and @get('strength') > 0
+  canLaunch: ->
+    @get('from') && @get('to') && @get('from') != @get('to') && @get('strength') > 0
   
   launch: ->
     @set owner: @get('from').get('owner')
@@ -68,9 +68,12 @@ class root.Fleet extends Nanowar.RelationalModel
     if !@get('strength')
       @set strength: Math.floor(@get('from').getCurrentStrength() / 2)
 
-    console.log "[Tick#{@game.ticks}] [Fleet #{@cid}] Fleet of #{@get('strength')} launching #{@get('from').cid}->#{@get('to').cid}; arrival in #{@flightTime()} ticks"
-    @get('from').changeCurrentStrengthBy -@get('strength')
-    @set launched_at: @game.ticks
+    if @canLaunch()
+      console.log "[Tick#{@game.ticks}] [Fleet #{@cid}] Fleet of #{@get('strength')} launching #{@get('from').cid}->#{@get('to').cid}; arrival in #{@flightTime()} ticks"
+      @get('from').changeCurrentStrengthBy -@get('strength')
+      @set launched_at: @game.ticks
+      true
+    else false
   
   arrived: ->
     @arrivalTime() < @game.ticks

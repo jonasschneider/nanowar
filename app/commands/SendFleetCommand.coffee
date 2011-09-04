@@ -39,6 +39,5 @@ class root.SendFleetCommand extends Nanowar.RelationalModel
       to: @get('to')
       game: @game
     
-    fleet.launch()
-    
-    @game.fleets.add fleet
+    if fleet.launch()
+      @game.fleets.add fleet
