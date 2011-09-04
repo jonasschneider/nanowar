@@ -21,8 +21,18 @@ class root.RelationalModel extends Backbone.Model
     owner: null
   initialize: ->
     _(@relations).each (options, name) =>
+
+      options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(\)/)[1]
+
       dataz = {}
-      dataz[name] = @get(name) || null
+      dataz[name] = 
+        if value = @get(name)
+          if value instanceof options.relatedModel
+            value
+          else
+            throw "Expected an instance of #{options.relatedModelName}"
+        else
+          null
       @set dataz
     
     @bind 'change:owner', =>

@@ -1,22 +1,30 @@
 RelationalModel = require('../../app/helpers/RelationalModel.coffee').RelationalModel
 Backbone = require('backbone')
 
+class Person extends Backbone.Model
+
 class Post extends RelationalModel
   relations:
     author:
-      model: 'Author'
-    
-class Author extends Backbone.Model
+      relatedModel: Person
 
 describe 'RelationalModel', ->
-  it 'accepts null as relation model', ->
-    expect((new Post).get('author')).toBe null
-  
-  it 'accepts related model object as owner', ->
-    jonas = new Author name: 'Jonas'
-    x = new Post author: jonas
+  describe 'when setting the property', ->
+    it 'accepts null', ->
+      expect((new Post).get('author')).toBe null
     
-    expect(x.get('author')).toBe jonas
+    it 'accepts related model object', ->
+      jonas = new Person name: 'Jonas'
+      x = new Post author: jonas
+      
+      expect(x.get('author')).toBe jonas
+      
+    it 'throws on unrelated object', ->
+      class UnrelatedClass
+      
+      expect ->
+        new Post author: new UnrelatedClass
+      .toThrow("Expected an instance of Person")
   ###
   it 'throws on player attributes as owner', ->
     player = new Player
