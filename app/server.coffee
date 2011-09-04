@@ -45,7 +45,7 @@ class Match
     player = new NetworkedPlayer socket: clientSocket, name: ("Player " + (@players.length + 1))
     
     player.bind 'update', (e) =>
-      player.socket.broadcast.emit 'update', e # security?
+      #player.socket.broadcast.emit 'update', e # security?
       @app.trigger 'update', e
     
     player.bind 'ready', (player) =>

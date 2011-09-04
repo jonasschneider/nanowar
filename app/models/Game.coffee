@@ -2,10 +2,11 @@
 #= require "Cells"
 #= require "Fleets"
 #= require "Players"
+#= require <commands/SendFleetCommand>
 
 if exports?
   onServer = true
-  Backbone = require('backbone')
+  Backbone = require('../vendor/backbone')
   
   root = exports
   Nanowar = {}
@@ -14,6 +15,7 @@ if exports?
   Nanowar.Players = require('./Players').Players
   Nanowar.Fleet  = require('./Fleet').Fleet
   Nanowar.Fleets  = require('./Fleets').Fleets
+  Nanowar.SendFleetCommand  = require('../commands/SendFleetCommand').SendFleetCommand
   _               = require 'underscore'
 else
   Backbone  = window.Backbone
@@ -55,8 +57,10 @@ class root.Game extends Backbone.Model
       @cells.trigger 'update', e.cells if e.cells?
       @players.trigger 'update', e.players if e.players?
       @fleets.trigger 'update', e.fleets if e.fleets?
-      if e.sendFleet?
-        @sendFleet e.sendFleet
+      if e.sendFleetCommand?
+        e.sendFleetCommand.game = this
+        cmd = new Nanowar.SendFleetCommand e.sendFleetCommand
+        cmd.run()
         #@trigger 'publish', {sendFleet: e.sendFleet} if onServer?
       
       @run() if e == 'start'
@@ -101,13 +105,3 @@ class root.Game extends Backbone.Model
   
   ticksToTime: (ticks) ->
     ticks * @get 'tickLength'
-  
-  sendFleet: (opts) ->
-    fleet = new Nanowar.Fleet 
-      from: @cells.get opts.from.id
-      to: @cells.get opts.to.id
-      game: this
-    
-    fleet.launch()
-    
-    @fleets.add fleet

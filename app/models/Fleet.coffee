@@ -2,7 +2,7 @@
 
 if exports?
   onServer = true
-  Backbone = require('backbone')
+  Backbone = require('../vendor/backbone')
   
   root = exports
   Nanowar = {}
@@ -36,15 +36,10 @@ class root.Fleet extends Nanowar.RelationalModel
     @game = @get('game')
     @set game: undefined
     throw "Fleet needs game" unless @game
-    
+
     super
     
     @game.bind 'tick', @update, this
-
-    @bind 'change:from', =>
-      @set owner: @get('from').get('owner')
-      if !@get('strength')
-        @set strength: Math.round(@get('from').getCurrentStrength() / 2)
   
   startPosition: ->
     Nanowar.util.nearestBorder @get('from').position(), @get('from').get('size'), @get('to').position()
@@ -68,7 +63,12 @@ class root.Fleet extends Nanowar.RelationalModel
     @get('from') != @get('to') and @get('strength') > 0
   
   launch: ->
-    console.log "Fleet of #{@get('strength')} launching"
+    @set owner: @get('from').get('owner')
+
+    if !@get('strength')
+      @set strength: Math.floor(@get('from').getCurrentStrength() / 2)
+
+    console.log "[Tick#{@game.ticks}] [Fleet #{@cid}] Fleet of #{@get('strength')} launching #{@get('from').cid}->#{@get('to').cid}; arrival in #{@flightTime()} ticks"
     @get('from').changeCurrentStrengthBy -@get('strength')
     @set launched_at: @game.ticks
   
@@ -77,10 +77,11 @@ class root.Fleet extends Nanowar.RelationalModel
   
   update: ->
     if @arrived()
+      console.log "[Tick#{@game.ticks}] [Fleet #{@cid}] Arrived from route #{@get('from').cid}->#{@get('to').cid}"
       if onServer?
         @get('to').handle_incoming_fleet this
       @destroy()
-      
+            
   destroy: ->
     @game.unbind 'tick', @update, this
-    @trigger 'destroy', this    
+    @trigger 'destroy', this
