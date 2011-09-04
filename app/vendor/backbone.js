@@ -71,6 +71,8 @@
     // Bind an event, specified by a string name, `ev`, to a `callback` function.
     // Passing `"all"` will bind the callback to all events fired.
     bind : function(ev, callback, context) {
+      if(!callback)
+        throw("Callback needs to be specified")
       var calls = this._callbacks || (this._callbacks = {});
       var list  = calls[ev] || (calls[ev] = []);
       list.push([callback, context]);
