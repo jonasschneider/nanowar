@@ -21,7 +21,7 @@ class root.RelationalModel extends Backbone.Model
   defaults:
     owner: null
   initialize: ->
-    _(@relations).each (options, name) =>
+    _(@relationSpec).each (options, name) =>
 
       options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(\)/)[1]
 

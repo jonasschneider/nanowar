@@ -4,7 +4,7 @@ Backbone = require('backbone')
 class Person extends Backbone.Model
 
 class Post extends RelationalModel
-  relations:
+  relationSpec:
     author:
       relatedModel: Person
       directory: 'blog.authors'
