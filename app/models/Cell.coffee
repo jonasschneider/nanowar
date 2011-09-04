@@ -33,16 +33,24 @@ class root.Cell extends Backbone.Model
     @bind 'change:owner', =>
       if @get('owner') && @get('owner') not instanceof Nanowar.Player
         throw "Not instantiating new player here" unless @get('owner').id
-        @set { owner: @game.players.get @get('owner').id }, silent: true
+        
+        if owner = @game.players.get(@get('owner').id)
+          console.log owner
+          @set { owner: owner }, silent: true
+        else
+          
+          throw "Couldn't find player with id " + @get('owner').id
+        
+    @trigger 'change:owner'
     
     @bind 'change', =>
       console.log 'cell change '+JSON.stringify(@attributes)
-    
+    ###
     if @get('owner') && @get('owner') not instanceof Nanowar.Player
       throw "Not instantiating new player here" unless @get('owner').id
       @set
         owner: @game.players.get @get('owner').id
-  
+    ###
   position: ->
     x: @get 'x'
     y: @get 'y'
