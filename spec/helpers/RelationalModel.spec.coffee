@@ -108,3 +108,13 @@ describe 'RelationalModel', ->
       x.toJSON()
 
       expect(x.get('author')).toBe jonas
+
+  describe 'integrated', ->
+    it 'exports & restores relation', ->
+      jonas = new Person name: 'Jonas', id: 123
+      json = new Post(blog: new BlogWithAuthor(jonas), author: jonas).toJSON()
+
+      json.blog = new BlogWithAuthor(jonas)
+      restored = new Post json
+
+      expect(restored.get 'author').toBe jonas
