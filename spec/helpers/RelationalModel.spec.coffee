@@ -68,7 +68,7 @@ describe 'RelationalModel', ->
 
     it "accepts a correct serialized relation ", ->
       jonas = new Person name: 'Jonas', id: 123
-      
+
       x = new Post blog: new BlogWithAuthor(jonas), author: { type: 'serializedRelation', model: 'Person', id: jonas.id }
 
       expect(x.get('author')).toBe jonas
@@ -79,6 +79,13 @@ describe 'RelationalModel', ->
       expect ->
         new Post blog: new BlogWithAuthor(jonas), author: { type: 'serializedRelation', model: 'Comment', id: jonas.id }
       .toThrow("Expected serialized relation of a Person model, not a Comment model")
+
+    it "throws on serialized relation with unregistered model", ->
+      jonas = new Person name: 'Jonas', id: 123
+
+      expect ->
+        new Post author: { type: 'serializedRelation', model: 'Person', id: jonas.id }
+      .toThrow("Person is not registered in this.blog.authors")
   ###
   it "throws on unregistered player's attributes' as owner", ->
     player = new Player

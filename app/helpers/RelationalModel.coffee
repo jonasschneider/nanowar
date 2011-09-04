@@ -33,21 +33,24 @@ class root.RelationalModel extends Backbone.Model
       dataz = {}
       dataz[name] = 
         if value = @get(name)
-          if value instanceof options.relatedModel
-            if value.get('id') && inDir = directoryObject.get(value.get('id'))
-              inDir
-            else
-              throw "#{options.relatedModelName} is not registered in this.#{options.directory}"
-          else if directoryObject && value.type? && value.type == 'serializedRelation'
+          deserialized = false
+          if value instanceof Backbone.Model
+            id = value.get('id')
+          else if value.type? && value.type == 'serializedRelation'
             if value.model != options.relatedModelName
               throw "Expected serialized relation of a #{options.relatedModelName} model, not a #{value.model} model"
-            directoryObject.get value.id
-            
+            id = value.id
           else
             try
               value = JSON.stringify value
             finally
               throw "Expected an instance of #{options.relatedModelName}, not #{value}"
+
+          if id && directoryObject && inDir = directoryObject.get id
+            inDir
+          else
+            throw "#{options.relatedModelName} is not registered in this.#{options.directory}"
+
         else
           null
       @set dataz
