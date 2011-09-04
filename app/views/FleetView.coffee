@@ -45,7 +45,7 @@ class Nanowar.views.FleetView extends Backbone.View
     , @timeInFlight()
     
     @el.attr
-      r: 0
+      r: @size()
       fill: @model.get('owner').get('color')
       cx: Math.round @model.startPosition().x
       cy: Math.round @model.startPosition().y
@@ -55,7 +55,8 @@ class Nanowar.views.FleetView extends Backbone.View
       cy: Math.round @model.endPosition().y
     , @timeInFlight()
     
-    if @timeInFlight() > 400
+    if @timeInFlight() > 500
+      @el.attr r: 0
       @el.animate
         r: @size()
       , 200, 'bounce'
