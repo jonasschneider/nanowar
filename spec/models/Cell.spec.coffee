@@ -16,10 +16,12 @@ describe 'Cell', ->
   it 'accepts Player object as owner', ->
     player = new Player
     x = new Cell game: new Game, owner: player
-    expect x.get('owner') instanceof Player
+    
+    expect(x.get('owner')).toBe player
     
   it 'throws on player attributes as owner', ->
     player = new Player
+    
     expect ->
       new Cell game: new Game, owner: player.attributes
     .toThrow()
@@ -29,12 +31,13 @@ describe 'Cell', ->
     player = new Player
     game.players.add player
     x = new Cell game: game, owner: player.attributes
+    
     expect(x.get('owner')).toBe player
   
   it "throws on unregistered player's attributes' as owner", ->
     player = new Player
     player.set id: "myid"
-    console.log player.attributes
+    
     expect ->
       new Cell game: new Game, owner: player.attributes
     .toThrow "Couldn't find player with id myid"
