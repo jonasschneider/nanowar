@@ -1,4 +1,6 @@
 #= require <nanowar>
+#= require <helpers/RelationalModel>
+#= require "Player"
 
 if exports?
   onServer = true
