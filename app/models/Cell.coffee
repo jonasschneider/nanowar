@@ -7,12 +7,13 @@ if exports?
   root = exports
   Nanowar = {}
   Nanowar.Player = require('./Player').Player
+  Nanowar.RelationalModel = require('../helpers/RelationalModel.coffee').RelationalModel
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
   root = Nanowar
 
-class root.Cell extends Backbone.Model
+class root.Cell extends Nanowar.RelationalModel
   defaults:
     x:      0
     y:      0
@@ -28,29 +29,11 @@ class root.Cell extends Backbone.Model
     @game = @get('game')
     @set game: undefined
     throw "Cell needs game" unless @game
-    
-    
-    @bind 'change:owner', =>
-      if @get('owner') && @get('owner') not instanceof Nanowar.Player
-        throw "Not instantiating new player here" unless @get('owner').id
-        
-        if owner = @game.players.get(@get('owner').id)
-          console.log owner
-          @set { owner: owner }, silent: true
-        else
-          
-          throw "Couldn't find player with id " + @get('owner').id
-        
-    @trigger 'change:owner'
+    super
     
     @bind 'change', =>
       console.log 'cell change '+JSON.stringify(@attributes)
-    ###
-    if @get('owner') && @get('owner') not instanceof Nanowar.Player
-      throw "Not instantiating new player here" unless @get('owner').id
-      @set
-        owner: @game.players.get @get('owner').id
-    ###
+    
   position: ->
     x: @get 'x'
     y: @get 'y'
