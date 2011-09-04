@@ -30,7 +30,6 @@ class BlogWithAuthor
           undefined 
 
 describe 'RelationalModel', ->
-
   describe 'when setting the property via initializer', ->
     it 'accepts null', ->
       expect((new Post).get('author')).toBe null
@@ -44,7 +43,7 @@ describe 'RelationalModel', ->
       .toThrow("Expected an instance of Person, not {}")
 
 
-    it 'does not accept unregistered related model object', ->
+    it 'throws on unregistered related model object', ->
       jonas = new Person name: 'Jonas'
 
       expect ->
@@ -66,13 +65,15 @@ describe 'RelationalModel', ->
 
       expect(x.get('author')).toBe jonas
 
+
     it "accepts a correct serialized relation ", ->
       jonas = new Person name: 'Jonas', id: 123
 
       x = new Post blog: new BlogWithAuthor(jonas), author: { type: 'serializedRelation', model: 'Person', id: jonas.id }
 
       expect(x.get('author')).toBe jonas
-      
+
+
     it "throws on serialized relation with wrong model", ->
       jonas = new Person name: 'Jonas', id: 123
 
@@ -80,12 +81,63 @@ describe 'RelationalModel', ->
         new Post blog: new BlogWithAuthor(jonas), author: { type: 'serializedRelation', model: 'Comment', id: jonas.id }
       .toThrow("Expected serialized relation of a Person model, not a Comment model")
 
+
     it "throws on serialized relation with unregistered model", ->
       jonas = new Person name: 'Jonas', id: 123
 
       expect ->
         new Post author: { type: 'serializedRelation', model: 'Person', id: jonas.id }
       .toThrow("Person is not registered in this.blog.authors")
+
+
+
+  describe 'when setting the property via #set', ->
+    it 'accepts null', ->
+      p = new Post
+      p.set author: null
+      expect(p.get 'author').toBe null
+
+
+    it 'throws on unrelated object', ->
+      class UnrelatedClass
+
+      expect ->
+        p = new Post
+        p.set author: {}
+      .toThrow("Expected an instance of Person, not {}")
+
+
+    it 'throws on unregistered related model object', ->
+      jonas = new Person name: 'Jonas'
+
+      expect ->
+        p = new Post
+        p.set author: jonas
+      .toThrow("Person is not registered in this.blog.authors")
+
+
+    it 'throws on registered related model object without id', ->
+      jonas = new Person name: 'Jonas'
+
+      expect ->
+        new Post blog: new BlogWithAuthor(jonas), author: jonas
+      .toThrow("Person is not registered in this.blog.authors")
+
+
+    it 'accepts registered related model object with id', ->
+      jonas = new Person name: 'Jonas', id: 123
+      x = new Post blog: new BlogWithAuthor(jonas)
+      x.set author: jonas
+
+      expect(x.get('author')).toBe jonas
+
+
+    it "accepts a correct serialized relation ", ->
+      jonas = new Person name: 'Jonas', id: 123
+      x = new Post blog: new BlogWithAuthor(jonas)
+      x.set author: { type: 'serializedRelation', model: 'Person', id: jonas.id }
+
+      expect(x.get('author')).toBe jonas
 
 
 
@@ -102,12 +154,15 @@ describe 'RelationalModel', ->
       expect(x.author.model).toBe 'Person'
       expect(x.author.id).toBe jonas.id
 
+
     it 'does not change attributes', ->
       jonas = new Person name: 'Jonas', id: 123
       x = new Post blog: new BlogWithAuthor(jonas), author: jonas
       x.toJSON()
 
       expect(x.get('author')).toBe jonas
+
+
 
   describe 'integrated', ->
     it 'exports & restores relation', ->

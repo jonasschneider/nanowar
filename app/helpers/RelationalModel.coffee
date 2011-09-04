@@ -47,30 +47,34 @@ class root.RelationalModel extends Backbone.Model
         options.directoryObject = this
         options.directoryObject = options.directoryObject[segments.shift()] until segments.length == 0
 
-      dataz = {}
-      dataz[name] = 
-        if value = @get(name)
-          deserialized = false
-          if value instanceof Backbone.Model
-            id = value.get('id')
-          else if value.type? && value.type == 'serializedRelation'
-            if value.model != options.relatedModelName
-              throw "Expected serialized relation of a #{options.relatedModelName} model, not a #{value.model} model"
-            id = value.id
+      @bind 'change:'+name, =>
+        dataz = {}
+        dataz[name] = 
+          if value = @get(name)
+            deserialized = false
+            if value instanceof Backbone.Model
+              id = value.get('id')
+            else if value.type? && value.type == 'serializedRelation'
+              if value.model != options.relatedModelName
+                throw "Expected serialized relation of a #{options.relatedModelName} model, not a #{value.model} model"
+              id = value.id
+            else
+              try
+                value = JSON.stringify value
+              finally
+                throw "Expected an instance of #{options.relatedModelName}, not #{value}"
+  
+            if id && options.directoryObject && inDir = options.directoryObject.get id
+              inDir
+            else
+              throw "#{options.relatedModelName} is not registered in this.#{options.directory}"
+  
           else
-            try
-              value = JSON.stringify value
-            finally
-              throw "Expected an instance of #{options.relatedModelName}, not #{value}"
-
-          if id && options.directoryObject && inDir = options.directoryObject.get id
-            inDir
-          else
-            throw "#{options.relatedModelName} is not registered in this.#{options.directory}"
-
-        else
-          null
-      @set dataz
+            null
+        @set dataz
+      @trigger 'change:'+name  
+      
+      
     ###
     @bind 'change:owner', =>
       if @get('owner') && @get('owner') not instanceof Nanowar.Player
