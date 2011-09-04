@@ -10,7 +10,7 @@ class Post extends RelationalModel
       directory: 'blog.authors'
 
   initialize: ->
-    @blog = @get('blog')
+    @blog = @get('blog') || new BlogWithoutAuthors
     @unset 'blog'
 
     super
@@ -27,7 +27,7 @@ class BlogWithAuthor
         if id == author.id
           author
         else
-          undefined
+          undefined 
 
 describe 'RelationalModel', ->
 
@@ -41,7 +41,7 @@ describe 'RelationalModel', ->
 
       expect ->
         new Post author: new UnrelatedClass
-      .toThrow("Expected an instance of Person")
+      .toThrow("Expected an instance of Person, not {}")
 
 
     it 'does not accept unregistered related model object', ->
@@ -65,22 +65,21 @@ describe 'RelationalModel', ->
       x = new Post blog: new BlogWithAuthor(jonas), author: jonas
 
       expect(x.get('author')).toBe jonas
+
+    it "accepts a correct serialized relation ", ->
+      jonas = new Person name: 'Jonas', id: 123
+      
+      x = new Post blog: new BlogWithAuthor(jonas), author: { type: 'serializedRelation', model: 'Person', id: jonas.id }
+
+      expect(x.get('author')).toBe jonas
+      
+    it "throws on serialized relation with wrong model", ->
+      jonas = new Person name: 'Jonas', id: 123
+
+      expect ->
+        new Post blog: new BlogWithAuthor(jonas), author: { type: 'serializedRelation', model: 'Comment', id: jonas.id }
+      .toThrow("Expected serialized relation of a Person model, not a Comment model")
   ###
-  it 'throws on player attributes as owner', ->
-    player = new Player
-    
-    expect ->
-      new Cell game: new Game, owner: player.attributes
-    .toThrow()
-    
-  it "accepts a registered player's attributes' as owner", ->
-    game = new Game
-    player = new Player
-    game.players.add player
-    x = new Cell game: game, owner: player.attributes
-    
-    expect(x.get('owner')).toBe player
-  
   it "throws on unregistered player's attributes' as owner", ->
     player = new Player
     player.set id: "myid"

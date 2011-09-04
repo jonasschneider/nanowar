@@ -22,24 +22,32 @@ class root.RelationalModel extends Backbone.Model
     owner: null
   initialize: ->
     _(@relationSpec).each (options, name) =>
-
       options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(\)/)[1]
+      
+      if(options.directory)
+        # traverse path to directory
+        segments = options.directory.split '.'
+        directoryObject = this
+        directoryObject = directoryObject[segments.shift()] until segments.length == 0
 
       dataz = {}
       dataz[name] = 
         if value = @get(name)
           if value instanceof options.relatedModel
-            # traverse path to directory
-            segments = options.directory.split '.'
-            directoryObj = this
-            directoryObj = directoryObj[segments.shift()] until segments.length == 0
-            
-            if value.get('id') && inDir = directoryObj.get(value.get('id'))
+            if value.get('id') && inDir = directoryObject.get(value.get('id'))
               inDir
             else
               throw "#{options.relatedModelName} is not registered in this.#{options.directory}"
+          else if directoryObject && value.type? && value.type == 'serializedRelation'
+            if value.model != options.relatedModelName
+              throw "Expected serialized relation of a #{options.relatedModelName} model, not a #{value.model} model"
+            directoryObject.get value.id
+            
           else
-            throw "Expected an instance of #{options.relatedModelName}"
+            try
+              value = JSON.stringify value
+            finally
+              throw "Expected an instance of #{options.relatedModelName}, not #{value}"
         else
           null
       @set dataz
