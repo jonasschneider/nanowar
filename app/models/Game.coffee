@@ -6,7 +6,7 @@
 
 if exports?
   onServer = true
-  Backbone = require('backbone')
+  Backbone = require('../vendor/backbone')
   
   root = exports
   Nanowar = {}
