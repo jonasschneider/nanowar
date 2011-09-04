@@ -31,7 +31,7 @@ class BlogWithAuthor
 
 describe 'RelationalModel', ->
 
-  describe 'when setting the property', ->
+  describe 'when setting the property via initializer', ->
     it 'accepts null', ->
       expect((new Post).get('author')).toBe null
 
@@ -86,12 +86,25 @@ describe 'RelationalModel', ->
       expect ->
         new Post author: { type: 'serializedRelation', model: 'Person', id: jonas.id }
       .toThrow("Person is not registered in this.blog.authors")
-  ###
-  it "throws on unregistered player's attributes' as owner", ->
-    player = new Player
-    player.set id: "myid"
-    
-    expect ->
-      new Cell game: new Game, owner: player.attributes
-    .toThrow "Couldn't find player with id myid"
-  ###
+
+
+
+  describe '#toJSON', ->
+    it 'works with null', ->
+       expect((new Post).toJSON().author).toBe null
+
+
+    it 'serializes relation', ->
+      jonas = new Person name: 'Jonas', id: 123
+      x = new Post(blog: new BlogWithAuthor(jonas), author: jonas).toJSON()
+
+      expect(x.author.type).toBe 'serializedRelation'
+      expect(x.author.model).toBe 'Person'
+      expect(x.author.id).toBe jonas.id
+
+    it 'does not change attributes', ->
+      jonas = new Person name: 'Jonas', id: 123
+      x = new Post blog: new BlogWithAuthor(jonas), author: jonas
+      x.toJSON()
+
+      expect(x.get('author')).toBe jonas

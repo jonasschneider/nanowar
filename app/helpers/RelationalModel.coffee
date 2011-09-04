@@ -18,8 +18,24 @@ else
 # Directory API: get(id) => model
 
 class root.RelationalModel extends Backbone.Model
-  defaults:
-    owner: null
+  toJSON: ->
+    oldValues = {}
+    dataz = {}
+    _(@relationSpec).each (options, name) =>
+      dataz[name] = 
+        if oldValues[name] = @get(name)
+          { type: 'serializedRelation', model: options.relatedModelName, id: oldValues[name].id, toJSON: ->
+            this
+          }
+        else
+          null
+    @set dataz, silent: true
+    val = super
+    _(@relationSpec).each (options, name) =>
+      dataz[name] = oldValues[name]
+    @set dataz, silent: true
+    val
+
   initialize: ->
     _(@relationSpec).each (options, name) =>
       options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(\)/)[1]
@@ -27,8 +43,8 @@ class root.RelationalModel extends Backbone.Model
       if(options.directory)
         # traverse path to directory
         segments = options.directory.split '.'
-        directoryObject = this
-        directoryObject = directoryObject[segments.shift()] until segments.length == 0
+        options.directoryObject = this
+        options.directoryObject = options.directoryObject[segments.shift()] until segments.length == 0
 
       dataz = {}
       dataz[name] = 
@@ -46,7 +62,7 @@ class root.RelationalModel extends Backbone.Model
             finally
               throw "Expected an instance of #{options.relatedModelName}, not #{value}"
 
-          if id && directoryObject && inDir = directoryObject.get id
+          if id && options.directoryObject && inDir = options.directoryObject.get id
             inDir
           else
             throw "#{options.relatedModelName} is not registered in this.#{options.directory}"
