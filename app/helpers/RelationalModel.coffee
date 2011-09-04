@@ -78,7 +78,7 @@ class root.RelationalModel extends Backbone.Model
 
       else
         null
-    @set dataz
+    @set dataz, silent: true
     ###
     @bind 'change:owner', =>
       if @get('owner') && @get('owner') not instanceof Nanowar.Player
