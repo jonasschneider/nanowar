@@ -21,7 +21,7 @@ class root.RelationalModel extends Backbone.Model
   toJSON: ->
     oldValues = {}
     dataz = {}
-    _(@relationSpec).each (options, name) =>
+    _(@relationSpecs).each (options, name) =>
       dataz[name] = 
         if oldValues[name] = @get(name)
           { type: 'serializedRelation', model: options.relatedModelName, id: oldValues[name].id, toJSON: ->
@@ -31,13 +31,13 @@ class root.RelationalModel extends Backbone.Model
           null
     @set dataz, silent: true
     val = super
-    _(@relationSpec).each (options, name) =>
+    _(@relationSpecs).each (options, name) =>
       dataz[name] = oldValues[name]
     @set dataz, silent: true
     val
 
   initialize: ->
-    _(@relationSpec).each (options, name) =>
+    _(@relationSpecs).each (options, name) =>
       options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(\)/)[1]
       
       if(options.directory)
@@ -70,7 +70,7 @@ class root.RelationalModel extends Backbone.Model
         else
           null
       @set dataz
-    
+    ###
     @bind 'change:owner', =>
       if @get('owner') && @get('owner') not instanceof Nanowar.Player
         throw "Not instantiating new player here" unless @get('owner').id
@@ -82,3 +82,4 @@ class root.RelationalModel extends Backbone.Model
           throw "Couldn't find player with id " + @get('owner').id
         
     @trigger 'change:owner'
+    ###
