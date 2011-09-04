@@ -17,6 +17,8 @@ else
 # 1. Don't forget to call super
 
 class root.RelationalModel extends Backbone.Model
+  defaults:
+    owner: null
   initialize: ->
     @bind 'change:owner', =>
       if @get('owner') && @get('owner') not instanceof Nanowar.Player
