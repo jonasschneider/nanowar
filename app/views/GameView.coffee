@@ -24,8 +24,8 @@ class Nanowar.views.GameView extends Backbone.View
     console.log(arguments)
   
   addEntity: (e) ->
-    console.log 'view sees new entity!' + JSON.stringify(e)
     if e.type == 'Cell'
+      console.log 'Yeah, thats a cell.'
       @addCell e
     
   addCell: (cell) ->
