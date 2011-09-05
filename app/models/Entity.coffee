@@ -16,3 +16,10 @@ else
 
 
 class root.Entity extends Nanowar.RelationalModel
+  constructor: (attributes, options) ->
+    if attributes && attributes.game
+      @game = attributes.game
+      delete attributes.game
+    else
+      throw "Entity needs game"
+    super

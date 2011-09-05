@@ -27,7 +27,7 @@ class root.Game extends Backbone.Model
     tickLength: 1000 / 10
   
   initialize: ->
-    @entities = new Nanowar.EntityCollection [], types: [Nanowar.Cell, Nanowar.Player]
+    @entities = new Nanowar.EntityCollection [], game: this, types: [Nanowar.Cell, Nanowar.Player]
 
     if onServer?
       @entities.bind 'publish', (e) =>

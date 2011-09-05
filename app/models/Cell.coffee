@@ -32,10 +32,6 @@ class root.Cell extends Nanowar.Entity
     knownStrengthAtTick:  0
   
   initialize: ->
-    @game = @get('game')
-    @set game: undefined
-    throw "Cell needs game" unless @game
-    super
     
   position: ->
     x: @get 'x'

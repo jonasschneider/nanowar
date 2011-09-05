@@ -17,12 +17,14 @@ else
 class root.EntityCollection extends Nanowar.IdentifyingCollection
   initialize: (models, options) ->
     unless options && options.types?
-      console.log "Need types"
       throw "Need types"
     
     @types = {}
     _(options.types).each (klass) =>
       @types[klass.getType()] = klass
+      
+    unless @game = options.game
+      throw "Need game" 
     
     @bind 'add', (entity) =>
       @trigger 'publish', { add: entity }
@@ -47,5 +49,6 @@ class root.EntityCollection extends Nanowar.IdentifyingCollection
       unless klass
         typeNames = _(@types).map (klass, name) -> name
         throw "I dont know what to do with #{JSON.stringify entity}. Known types are [#{typeNames.join(', ')}]"
+      entity.game = @game
       entityObj = new klass entity
       super entityObj
