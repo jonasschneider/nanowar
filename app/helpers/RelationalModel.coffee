@@ -80,6 +80,3 @@ class root.RelationalModel extends Nanowar.SuperModel
       else
         null
     @set dataz, silent: true
-
-console.log "r"+root    
-console.log "e"+exports
