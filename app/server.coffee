@@ -1,6 +1,5 @@
 App     = require('./models/App').App
 Player  = require('./models/Player').Player
-Players = require('./models/Players').Players
 Cell    = require('./models/Cell').Cell
 util    = require 'util'
 _       = require 'underscore'

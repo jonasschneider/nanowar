@@ -1,8 +1,7 @@
 #= require <nanowar>
-#= require "Cells"
 #= require "Cell"
-#= require "Fleets"
-#= require "Players"
+#= require "Player"
+#= require "Fleet"
 #= require <commands/SendFleetCommand>
 
 if exports?

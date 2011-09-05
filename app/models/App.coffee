@@ -8,7 +8,6 @@ if exports?
   root = exports
   Nanowar = {}
   Nanowar.Game = require('./Game').Game
-  Nanowar.Players = require('./Players').Players
   _ = require('underscore')
 else
   Backbone  = window.Backbone
