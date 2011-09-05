@@ -16,7 +16,10 @@ else
 
 class root.EntityCollection extends Nanowar.IdentifyingCollection
   initialize: (models, options) ->
-    throw "Need types" unless options && options.types
+    unless options && options.types?
+      console.log "Need types"
+      throw "Need types"
+    
     @types = {}
     _(options.types).each (klass) =>
       @types[klass.getType()] = klass
