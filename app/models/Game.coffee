@@ -58,10 +58,15 @@ class root.Game extends Backbone.Model
     @running = false
     @stopping = false
   
+  getEntities: (type) ->
+    @entities.select (entity) -> entity instanceof type
+  
   getCells: ->
-    @entities.select (entity) -> 
-      entity instanceof Nanowar.Cell
+    @getEntities Nanowar.Cell
 
+  getPlayers: ->
+    @getEntities Nanowar.Player
+  
   check_for_end: ->
     owners = []
     _(@getCells()).each (cell) ->
