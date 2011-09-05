@@ -1,3 +1,5 @@
+#= require <helpers/SuperModel>
+
 onServer = false
 if exports?
   onServer = true
@@ -13,7 +15,6 @@ else
   Nanowar   = window.Nanowar
   root = Nanowar
   _ = window._
-
 
 
 # 1. Don't forget to call super (after setting directory)
@@ -38,7 +39,7 @@ class root.RelationalModel extends Nanowar.SuperModel
     @set dataz, silent: true
     val
 
-  initialize: ->
+  initialize: -> # TODO: work into constructor
     _(@relationSpecs).each (options, name) =>
       options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(\)/)[1]
       
