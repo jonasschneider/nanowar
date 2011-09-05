@@ -1,0 +1,11 @@
+watch( /spec\/.*\.spec\.coffee/ )  {|mod| run("jasmine-node --coffee .") }
+watch( /app\/.*\.coffee/ )  {|mod| run("jasmine-node --coffee .") }
+
+watch( /spec\/.*#{ARGV[1]}\.spec\.coffee/  )  {|mod| run("jasmine-node --coffee . -m #{ARGV[1]}\.") }
+watch( /app\/.*#{ARGV[1]}\.coffee/  )  {|mod| run("jasmine-node --coffee . -m #{ARGV[1]}\.") }
+
+
+def run cmd
+  puts cmd
+  system cmd
+end
