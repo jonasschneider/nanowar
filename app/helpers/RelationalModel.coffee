@@ -7,7 +7,7 @@ if exports?
   Nanowar = {}
   _ = require('underscore')
   uuid = require('node-uuid');
-  Nanowar.Player = require('../models/Player').Player
+  Nanowar.SuperModel = require('./SuperModel').SuperModel
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
@@ -15,10 +15,11 @@ else
   _ = window._
 
 
+
 # 1. Don't forget to call super (after setting directory)
 # Directory API: get(id) => model
 
-class root.RelationalModel extends Backbone.Model
+class root.RelationalModel extends Nanowar.SuperModel
   toJSON: ->
     oldValues = {}
     dataz = {}
@@ -63,32 +64,22 @@ class root.RelationalModel extends Backbone.Model
           id = value.get('id')
         else if value.type? && value.type == 'serializedRelation'
           if value.model != options.relatedModelName
-            throw "Expected serialized relation of a #{options.relatedModelName} model, not a #{value.model} model"
+            throw "While instantiating #{@get 'type'}: Expected serialized relation of a #{options.relatedModelName} model, not a #{value.model} model"
           id = value.id
         else
           try
             value = JSON.stringify value
           finally
-            throw "Expected an instance of #{options.relatedModelName}, not #{value}"
+            throw "While instantiating #{@get 'type'}: Expected an instance of #{options.relatedModelName}, not #{value}"
 
         if id && options.directoryObject && inDir = options.directoryObject.get id
           inDir
         else
-          throw "#{options.relatedModelName} is not registered in this.#{options.directory}"
+          throw "While instantiating #{@get 'type'}: #{options.relatedModelName} is not registered in this.#{options.directory}"
 
       else
         null
     @set dataz, silent: true
-    ###
-    @bind 'change:owner', =>
-      if @get('owner') && @get('owner') not instanceof Nanowar.Player
-        throw "Not instantiating new player here" unless @get('owner').id
-        
-        if owner = @game.players.get(@get('owner').id)
-          @set { owner: owner }, silent: true
-        else
-          
-          throw "Couldn't find player with id " + @get('owner').id
-        
-    @trigger 'change:owner'
-    ###
+
+console.log "r"+root    
+console.log "e"+exports

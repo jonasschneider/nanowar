@@ -40,7 +40,7 @@ describe 'RelationalModel', ->
 
       expect ->
         new Post author: new UnrelatedClass
-      .toThrow("Expected an instance of Person, not {}")
+      .toThrow("While instantiating Post: Expected an instance of Person, not {}")
 
 
     it 'throws on unregistered related model object', ->
@@ -48,7 +48,7 @@ describe 'RelationalModel', ->
 
       expect ->
         new Post blog: new BlogWithoutAuthors, author: jonas
-      .toThrow("Person is not registered in this.blog.authors")
+      .toThrow("While instantiating Post: Person is not registered in this.blog.authors")
 
 
     it 'throws on registered related model object without id', ->
@@ -56,7 +56,7 @@ describe 'RelationalModel', ->
 
       expect ->
         new Post blog: new BlogWithAuthor(jonas), author: jonas
-      .toThrow("Person is not registered in this.blog.authors")
+      .toThrow("While instantiating Post: Person is not registered in this.blog.authors")
 
 
     it 'accepts registered related model object with id', ->
@@ -79,7 +79,7 @@ describe 'RelationalModel', ->
 
       expect ->
         new Post blog: new BlogWithAuthor(jonas), author: { type: 'serializedRelation', model: 'Comment', id: jonas.id }
-      .toThrow("Expected serialized relation of a Person model, not a Comment model")
+      .toThrow("While instantiating Post: Expected serialized relation of a Person model, not a Comment model")
 
 
     it "throws on serialized relation with unregistered model", ->
@@ -87,7 +87,7 @@ describe 'RelationalModel', ->
 
       expect ->
         new Post author: { type: 'serializedRelation', model: 'Person', id: jonas.id }
-      .toThrow("Person is not registered in this.blog.authors")
+      .toThrow("While instantiating Post: Person is not registered in this.blog.authors")
 
 
 
@@ -104,7 +104,7 @@ describe 'RelationalModel', ->
       expect ->
         p = new Post
         p.set author: {}
-      .toThrow("Expected an instance of Person, not {}")
+      .toThrow("While instantiating Post: Expected an instance of Person, not {}")
 
 
     it 'throws on unregistered related model object', ->
@@ -113,7 +113,7 @@ describe 'RelationalModel', ->
       expect ->
         p = new Post
         p.set author: jonas
-      .toThrow("Person is not registered in this.blog.authors")
+      .toThrow("While instantiating Post: Person is not registered in this.blog.authors")
 
 
     it 'throws on registered related model object without id', ->
@@ -121,7 +121,7 @@ describe 'RelationalModel', ->
 
       expect ->
         new Post blog: new BlogWithAuthor(jonas), author: jonas
-      .toThrow("Person is not registered in this.blog.authors")
+      .toThrow("While instantiating Post: Person is not registered in this.blog.authors")
 
 
     it 'accepts registered related model object with id', ->
