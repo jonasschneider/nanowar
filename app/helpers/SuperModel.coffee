@@ -10,10 +10,11 @@ else
   Nanowar   = window.Nanowar
   root = Nanowar
 
+# BUG: .getType does not respect anonymous subclasses - copying code doesn't help ;)
+
 class root.SuperModel extends Backbone.Model
   @getType: ->
-    checker = new this __justSetType: true
-    checker.type
+    this.toString().match(/^function (.*)\(\)/)[1]
 
   constructor: (attributes) ->
     attributes ||= {}
