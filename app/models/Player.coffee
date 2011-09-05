@@ -1,18 +1,18 @@
 #= require <nanowar>
+#= require "Entity"
 
 if exports?
   onServer = true
-  Backbone = require('../vendor/backbone')
-  
   root = exports
+  
   Nanowar = {}
-  Nanowar.Players = require('./Players').Players
+  Nanowar.Entity = require('./Entity').Entity
 else
-  Backbone  = window.Backbone
   Nanowar   = window.Nanowar
   root = Nanowar
 
-class root.Player extends Backbone.Model
+class root.Player extends Nanowar.Entity
+  
   defaults:
     name: 'anonymous coward'
 

@@ -1,5 +1,6 @@
 #= require <nanowar>
 #= require "Cells"
+#= require "Cell"
 #= require "Fleets"
 #= require "Players"
 #= require <commands/SendFleetCommand>
@@ -11,11 +12,10 @@ if exports?
   root = exports
   Nanowar = {}
   Nanowar.Cell    = require('./Cell').Cell
-  Nanowar.Cells   = require('./Cells').Cells
-  Nanowar.Players = require('./Players').Players
+  Nanowar.Player = require('./Player').Player
   Nanowar.Fleet  = require('./Fleet').Fleet
-  Nanowar.Fleets  = require('./Fleets').Fleets
   Nanowar.SendFleetCommand  = require('../commands/SendFleetCommand').SendFleetCommand
+  Nanowar.EntityCollection = require('./EntityCollection').EntityCollection
   _               = require 'underscore'
 else
   Backbone  = window.Backbone
@@ -27,26 +27,14 @@ class root.Game extends Backbone.Model
     tickLength: 1000 / 10
   
   initialize: ->
-    @cells =  new Nanowar.Cells [], game: this
-    @players =  new Nanowar.Players
-    @fleets =  new Nanowar.Fleets [], game: this
-    
+    @entities = new Nanowar.EntityCollection [], types: [Nanowar.Cell, Nanowar.Player]
+
     if onServer?
-      @cells.bind 'publish', (e) =>
+      @entities.bind 'publish', (e) =>
         @trigger 'publish',
-          cells: e
-          ticks: @ticks
-          
-      @players.bind 'publish', (e) =>
-        @trigger 'publish',
-          players: e
+          entities: e
           ticks: @ticks
       
-      @fleets.bind 'publish', (e) =>
-        @trigger 'publish',
-          fleets: e
-          ticks: @ticks
-          
       @bind 'start', =>
         @trigger 'publish', 'start'
 
@@ -54,9 +42,8 @@ class root.Game extends Backbone.Model
       if e.ticks?
         @ticks = e.ticks
       
-      @cells.trigger 'update', e.cells if e.cells?
-      @players.trigger 'update', e.players if e.players?
-      @fleets.trigger 'update', e.fleets if e.fleets?
+      @entities.trigger 'update', e.entities if e.entities?
+      
       if e.sendFleetCommand?
         e.sendFleetCommand.game = this
         cmd = new Nanowar.SendFleetCommand e.sendFleetCommand
@@ -71,9 +58,13 @@ class root.Game extends Backbone.Model
     @running = false
     @stopping = false
   
+  getCells: ->
+    @entities.select (entity) -> 
+      entity instanceof Nanowar.Cell
+
   check_for_end: ->
     owners = []
-    @cells.each (cell) ->
+    _(@getCells()).each (cell) ->
       cellOwner = cell.get 'owner'
       owners.push cellOwner if cellOwner? && owners.indexOf(cellOwner) == -1
     

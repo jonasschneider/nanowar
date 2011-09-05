@@ -1,4 +1,5 @@
 #= require <nanowar>
+#= require "Entity"
 
 if exports?
   onServer = true
@@ -7,16 +8,16 @@ if exports?
   root = exports
   Nanowar = {}
   Nanowar.Cell = require('./Cell').Cell
+  Nanowar.Entity = require('./Entity').Entity
   Nanowar.Player = require('./Player').Player
   Nanowar.util = require('../helpers/util').util
-  Nanowar.RelationalModel = require('../helpers/RelationalModel.coffee').RelationalModel
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
   root = Nanowar
 
 # attributes: Cell from, Cell to, Game game, Player owner, int strength, int launchedAt
-class root.Fleet extends Nanowar.RelationalModel
+class root.Fleet extends Nanowar.Entity
   defaults:
     launched_at: null
     speedPerTick: 6
@@ -24,13 +25,13 @@ class root.Fleet extends Nanowar.RelationalModel
   relationSpecs:
     from:
       relatedModel: Nanowar.Cell
-      directory: 'game.cells'
+      directory: 'game.entities'
     to:
       relatedModel: Nanowar.Cell
-      directory: 'game.cells'
+      directory: 'game.entities'
     owner:
       relatedModel: Nanowar.Player
-      directory: 'game.players'
+      directory: 'game.entities'
 
   initialize: ->
     @game = @get('game')

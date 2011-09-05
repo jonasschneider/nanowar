@@ -6,6 +6,8 @@ util    = require 'util'
 _       = require 'underscore'
 
 class NetworkedPlayer extends Player
+  anonymousSubclass: true
+  
   initialize: ->
     @socket = @get('socket')
     @unset 'socket'
@@ -72,7 +74,7 @@ class Match
     @game = @app.game
     console.log 'starting. players:'
     _(@players).each (player) =>
-      @game.players.add player
+      @game.entities.add player
       console.log "- #{player.get('name')} (#{player.socket.id})"
       
       player.updateLocalPlayer()
@@ -96,7 +98,7 @@ class Match
         player.send 'log', 'Bye.'
         player.socket.disconnect()
     
-    @game.cells.add cells
+    @game.entities.add cells
     
     go = =>
       @game.run()

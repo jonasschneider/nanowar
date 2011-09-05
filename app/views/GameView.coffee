@@ -9,8 +9,7 @@ class Nanowar.views.GameView extends Backbone.View
     @appView = options.appView
     throw "need app view" unless @appView
     
-    @model.cells.bind   'add', @addCell,  this
-    @model.fleets.bind  'add', @addFleet, this
+    @model.entities.bind 'add', @addEntity,  this
     
     @selectedCell = null
     
@@ -24,6 +23,9 @@ class Nanowar.views.GameView extends Backbone.View
     console.log 'update call'
     console.log(arguments)
   
+  addEntity: (e) ->
+    @addCell e
+    
   addCell: (cell) ->
     cellView = new Nanowar.views.CellView({model: cell, gameView: this})
     cellView.render()

@@ -1,5 +1,5 @@
 #= require <nanowar>
-#= require <helpers/RelationalModel>
+#= require "Entity"
 #= require "Player"
 
 if exports?
@@ -9,17 +9,17 @@ if exports?
   root = exports
   Nanowar = {}
   Nanowar.Player = require('./Player').Player
-  Nanowar.RelationalModel = require('../helpers/RelationalModel.coffee').RelationalModel
+  Nanowar.Entity = require('./Entity').Entity
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
   root = Nanowar
 
-class root.Cell extends Nanowar.RelationalModel
+class root.Cell extends Nanowar.Entity
   relationSpecs:
     owner:
       relatedModel: Nanowar.Player
-      directory: 'game.players'
+      directory: 'game.entities'
 
   defaults:
     x:      0
