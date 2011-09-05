@@ -40,11 +40,12 @@ class Match
     @players = []
     
     @app = new App
+    @game = @app.game
     @app.bind 'publish', @distributeUpdate, this
     
   addPlayer: (clientSocket) ->
     console.log clientSocket.id + " connected"
-    player = new NetworkedPlayer socket: clientSocket, name: ("Player " + (@players.length + 1))
+    player = new NetworkedPlayer socket: clientSocket, name: ("Player " + (@players.length + 1)), game: @game
     
     player.bind 'update', (e) =>
       #player.socket.broadcast.emit 'update', e # security?
@@ -71,7 +72,7 @@ class Match
   start: ->
     @sendToAll 'log', 'starting soon!'
     
-    @game = @app.game
+    
     console.log 'starting. players:'
     _(@players).each (player) =>
       @game.entities.add player
