@@ -12,7 +12,12 @@ else
   root = Nanowar
 
 class root.Player extends Nanowar.Entity
+  colors: ["#A0483E", "#666885", "green", "yellow"]
   
   defaults:
     name: 'anonymous coward'
 
+  initialize: ->
+    @bind 'add', ->
+      unless @get 'color'
+        @set color: @colors[@game.getPlayers().length]
