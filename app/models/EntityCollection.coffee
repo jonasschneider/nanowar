@@ -16,8 +16,8 @@ class root.EntityCollection extends Nanowar.IdentifyingCollection
   
   initialize: (models, options) ->
     
-    @bind 'add', (cell) =>
-      @trigger 'publish', { add: cell }
+    @bind 'add', (entity) =>
+      @trigger 'publish', { add: entity }
       
     @bind 'update', (data) =>
       if data.add?
@@ -26,6 +26,5 @@ class root.EntityCollection extends Nanowar.IdentifyingCollection
       if data.change?
         @get(data.change.id).set data.change
         
-    @bind 'change', (cell) =>
-      @trigger 'publish', { change: cell }
-  
+    @bind 'change', (entity) =>
+      @trigger 'publish', { change: entity }
