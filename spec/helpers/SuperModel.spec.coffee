@@ -2,6 +2,14 @@ SuperModel = require('../../app/helpers/SuperModel.coffee').SuperModel
 
 class Blog extends SuperModel
 
+class SpecialBlog extends Blog
+
+class AnonymousBlog extends Blog
+  anonymousSubclass: true
+
+class BlackHatBlog extends AnonymousBlog
+  anonymousSubclass: true
+
 MySite = {}
 class MySite.Header extends SuperModel
 
@@ -22,3 +30,9 @@ describe 'Nanowar.SuperModel', ->
     expect ->
       new Blog(type: 'Post')
     .toThrow 'Tried to initialize a Blog with type set to Post'
+
+  it 'makes subclasses anonymous when anonymousSubclass is set', ->
+    expect(new AnonymousBlog().get 'type').toBe 'Blog'
+
+  it 'works with nested anonymous subclasses', ->
+    expect(new BlackHatBlog().get 'type').toBe 'Blog'
