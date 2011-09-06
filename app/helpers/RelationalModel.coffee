@@ -45,6 +45,7 @@ class root.RelationalModel extends Nanowar.SuperModel
           options.directoryObject = options.directoryObject[segments.shift()] until segments.length == 0
     
     super
+    @_previousAttributes = _.clone(@attributes)
 
   set: (attrs, options) ->
     thisType = @get('type') || attrs.type # for initial set
