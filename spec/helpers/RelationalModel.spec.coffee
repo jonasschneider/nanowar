@@ -1,7 +1,7 @@
 RelationalModel = require('../../app/helpers/RelationalModel.coffee').RelationalModel
 Backbone = require('../../app/vendor/backbone')
 
-class Person extends Backbone.Model
+class Person extends RelationalModel
 
 class Post extends RelationalModel
   relationSpecs:

@@ -19,30 +19,25 @@ else
 
 # 1. Don't forget to call super (after setting directory)
 # Directory API: get(id) => model
+# Related models have to be SuperModels (or RelationalModels) because #toJSON fetches the type
 
 class root.RelationalModel extends Nanowar.SuperModel
   toJSON: ->
-    oldValues = {}
-    dataz = {}
+    json = super
+
     _(@relationSpecs).each (options, name) =>
-      dataz[name] = 
-        if oldValues[name] = @get(name)
-          { type: 'serializedRelation', model: options.relatedModelName, id: oldValues[name].id, toJSON: ->
+      json[name] =
+        if related = @get(name)
+          { type: 'serializedRelation', model: related.get('type'), id: related.id, toJSON: ->
             this
           }
         else
           null
-    @set dataz, silent: true
-    val = super
-    _(@relationSpecs).each (options, name) =>
-      dataz[name] = oldValues[name]
-    @set dataz, silent: true
-    val
+
+    json
 
   constructor: (attrs) ->
-    #throw JSON.stringify (attrs || "no attrs")
-    
-    @bind 'beforeInitialize', =>
+    @bind 'beforeInitialSet', =>
       _(@relationSpecs).each (options, name) =>
         options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(\)/)[1]
         
@@ -51,38 +46,36 @@ class root.RelationalModel extends Nanowar.SuperModel
           segments = options.directory.split '.'
           options.directoryObject = this
           options.directoryObject = options.directoryObject[segments.shift()] until segments.length == 0
-  
-        @bind 'change:'+name, =>
-          @_updateRelation(name)
-        
-        @_updateRelation(name)
     
     super
 
-  _updateRelation: (name) ->
+  set: (attrs, options) ->
+    thisType = @get('type') || attrs.type # for initial set
+
+    _(@relationSpecs).each (options, name) =>
+      attrs[name] = @_fetchRelation(name, attrs[name], thisType)
+
+    super
+
+  _fetchRelation: (name, value, thisType) ->
     options = @relationSpecs[name]
 
-    dataz = {}
-    dataz[name] =
-      if value = @get(name)
-        deserialized = false
-        if value instanceof Backbone.Model
-          id = value.get('id')
-        else if value.type? && value.type == 'serializedRelation'
-          if value.model != options.relatedModelName
-            throw "While instantiating #{@get 'type'}: Expected serialized relation of a #{options.relatedModelName} model, not a #{value.model} model"
-          id = value.id
-        else
-          try
-            value = JSON.stringify value
-          finally
-            throw "While instantiating #{@get 'type'}: Expected an instance of #{options.relatedModelName}, not #{value}"
+    return null unless value
 
-        if id && options.directoryObject && inDir = options.directoryObject.get id
-          inDir
-        else
-          throw "While instantiating #{@get 'type'}: #{options.relatedModelName} is not registered in this.#{options.directory}"
+    if value instanceof Backbone.Model
+      id = value.get('id')
+    else if value.type? && value.type == 'serializedRelation'
+      if value.model != options.relatedModelName
+        throw "While instantiating #{thisType}: Expected serialized relation of a #{options.relatedModelName} model, not a #{value.model} model"
+      id = value.id
+    else
+      debug = try
+          value = JSON.stringify value
+        catch e
+          value
+      throw "While instantiating #{thisType}: Expected an instance of #{options.relatedModelName}, not #{debug}"
 
-      else
-        null
-    @set dataz, silent: true
+    if id && options.directoryObject && inDir = options.directoryObject.get id
+      inDir
+    else
+      throw "While instantiating #{thisType}: #{options.relatedModelName} is not registered in this.#{options.directory}" 
