@@ -39,20 +39,25 @@ class root.RelationalModel extends Nanowar.SuperModel
     @set dataz, silent: true
     val
 
-  initialize: -> # TODO: work into constructor
-    _(@relationSpecs).each (options, name) =>
-      options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(\)/)[1]
-      
-      if(options.directory)
-        # traverse path to directory
-        segments = options.directory.split '.'
-        options.directoryObject = this
-        options.directoryObject = options.directoryObject[segments.shift()] until segments.length == 0
-
-      @bind 'change:'+name, =>
+  constructor: (attrs) ->
+    #throw JSON.stringify (attrs || "no attrs")
+    
+    @bind 'beforeInitialize', =>
+      _(@relationSpecs).each (options, name) =>
+        options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(\)/)[1]
+        
+        if(options.directory)
+          # traverse path to directory
+          segments = options.directory.split '.'
+          options.directoryObject = this
+          options.directoryObject = options.directoryObject[segments.shift()] until segments.length == 0
+  
+        @bind 'change:'+name, =>
+          @_updateRelation(name)
+        
         @_updateRelation(name)
-      
-      @_updateRelation(name)
+    
+    super
 
   _updateRelation: (name) ->
     options = @relationSpecs[name]

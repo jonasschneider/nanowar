@@ -9,11 +9,15 @@ class Post extends RelationalModel
       relatedModel: Person
       directory: 'blog.authors'
 
-  initialize: ->
-    @blog = @get('blog') || new BlogWithoutAuthors
-    @unset 'blog'
-
-    super
+  constructor: (attrs) ->
+    @blog =
+      if attrs && attrs.blog
+         val = attrs.blog
+         delete attrs.blog
+         val
+      else
+        new BlogWithoutAuthors
+    super attrs
 
 class BlogWithoutAuthors
   authors:
