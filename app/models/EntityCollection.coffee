@@ -1,4 +1,5 @@
 #= require <nanowar>
+#= require <helpers/IdentifyingCollection>
 
 if exports?
   onServer = true
