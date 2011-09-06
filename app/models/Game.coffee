@@ -20,6 +20,7 @@ else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
   root = Nanowar
+  _         = window._
 
 class root.Game extends Backbone.Model
   defaults:
