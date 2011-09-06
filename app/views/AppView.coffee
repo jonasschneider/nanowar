@@ -23,7 +23,7 @@ class Nanowar.views.AppView extends Backbone.View
     
     socket.on 'setLocalPlayer',  (player) =>
       fn = =>
-        player = @model.game.players.get(player)
+        player = @model.game.entities.get(player)
         @localPlayer = player
         @trigger 'change:localPlayer', player
         
