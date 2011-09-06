@@ -105,6 +105,8 @@ class Match
     _(go).delay(1000)
     
     go = =>
+      console.log "sending random update"
+      @sendToAll 'log', 'sending random update now'
       c1.set owner: @players[0]
     _(go).delay(3000)
     
