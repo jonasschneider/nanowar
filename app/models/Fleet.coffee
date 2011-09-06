@@ -34,12 +34,6 @@ class root.Fleet extends Nanowar.Entity
       directory: 'game.entities'
 
   initialize: ->
-    @game = @get('game')
-    @set game: undefined
-    throw "Fleet needs game" unless @game
-
-    super
-    
     @game.bind 'tick', @update, this
   
   startPosition: ->
