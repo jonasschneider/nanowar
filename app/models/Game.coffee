@@ -66,24 +66,25 @@ class root.Game extends Backbone.Model
   getPlayers: ->
     @getEntities Nanowar.Player
   
-  check_for_end: ->
+  getWinner: ->
     owners = []
-    _(@getCells()).each (cell) ->
+    _(@getCells()).each (cell) =>
       cellOwner = cell.get 'owner'
       owners.push cellOwner if cellOwner? && owners.indexOf(cellOwner) == -1
     
     if owners.length == 1
-      console.log "Game over"
-      @halt()
-      @trigger 'end', winner: owners[0]
+      owners[0]
+    else
+      null
   
+  # UNSPECCED
   run: ->
     console.log "GOGOGOG"
     
     @trigger 'start'
     
     @schedule()
-    
+  
   schedule: ->
     setTimeout =>
       @tick()
@@ -96,7 +97,10 @@ class root.Game extends Backbone.Model
     @schedule() unless @stopping
     @ticks++
     @trigger 'tick'
-    @check_for_end()
+    
+    if winner = @getWinner()
+      @trigger 'end', winner: winner
+      @halt()
   
   ticksToTime: (ticks) ->
     ticks * @get 'tickLength'
