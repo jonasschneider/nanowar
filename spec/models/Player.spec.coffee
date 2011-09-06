@@ -18,3 +18,13 @@ describe 'Player', ->
     game.entities.add p1
     
     expect(p1.get 'color').toBe 'lila-blassblau-kariert'
+    
+  describe '#toString()', ->
+    it 'returns name', ->
+      p = new Player game: new Game, name: 'ohai'
+      expect(p.toString()).toBe "[object Player 'ohai']"
+
+
+    it 'returns default when name is null', ->  
+      p = new Player game: new Game, name: null
+      expect(p.toString()).toBe "[object Player]"

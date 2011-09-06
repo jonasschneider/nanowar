@@ -67,3 +67,8 @@ describe 'Nanowar.SuperModel', ->
     
       it 'works with nested anonymous subclasses', ->
         expect(new BlackHatBlog().get 'type').toBe 'Blog'
+
+  describe '#toString()', ->
+    it 'returns class name', ->
+      expect(new Blog().toString()).toBe '[object Blog]'
+      expect(new SpecialBlog().toString()).toBe '[object SpecialBlog]'
