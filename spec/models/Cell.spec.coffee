@@ -3,16 +3,6 @@ Game = require('../../app/models/Game').Game
 Player = require('../../app/models/Player').Player
 
 describe 'Cell', ->
-  it 'throws without game', ->
-    expect ->
-      new Cell
-    .toThrow()
-
-
-  it 'is creatable with game', ->
-    new Cell game: new Game
-
-
   it 'accepts registered Player as owner', ->
     game = new Game
     player = new Player game: game
