@@ -8,8 +8,8 @@ class MyEntity extends Entity
 class MyOtherEntity extends Entity
 
 describe 'EntityCollection', ->
-  describe 'change triggers', ->
-    it 'publishes on add', ->
+  describe 'on entity change', ->
+    it 'publishes entity on add', ->
       coll = new EntityCollection [], types: [MyEntity], game: {}
       
       spy = jasmine.createSpy()
@@ -20,10 +20,10 @@ describe 'EntityCollection', ->
       coll.add myEntity
       
       expect(spy).toHaveBeenCalled()
-      expect(spy.mostRecentCall.args[0].add).toBe myEntity
+      expect(JSON.stringify spy.mostRecentCall.args[0].add).toBe JSON.stringify myEntity
   
   
-    it 'publishes on change', ->
+    it 'publishes a delta on change', ->
       coll = new EntityCollection [], types: [MyEntity], game: {}
       
       spy = jasmine.createSpy()
@@ -35,7 +35,28 @@ describe 'EntityCollection', ->
       myEntity.set someProperty: 'hi'
       
       expect(spy).toHaveBeenCalled()
-      expect(spy.mostRecentCall.args[0].change).toBe myEntity
+      callArg = spy.mostRecentCall.args[0]
+      expect(callArg.changedEntityId).toBe myEntity.id
+      expect(JSON.stringify callArg.changeDelta).toBe '{"someProperty":"hi"}'
+
+
+    it 'sends incremental updates', ->
+      coll = new EntityCollection [], types: [MyEntity, MyOtherEntity], game: {}
+      
+      updates = []
+      coll.bind 'publish', (c) =>
+        updates.push c
+      
+      coll.add ent = new MyEntity game: {}, id: 1
+      
+      expect(updates.length).toBe 1
+      expect(JSON.stringify updates[0].add).toBe JSON.stringify ent
+      
+      ent.set someProperty: 'cool'
+      
+      expect(updates.length).toBe 2
+      expect(updates[1].changedEntityId).toBe 1
+      expect(JSON.stringify updates[1].changeDelta).toBe '{"someProperty":"cool"}'
 
 
 
@@ -54,23 +75,31 @@ describe 'EntityCollection', ->
 
 
     describe 'with a change entity request', ->
-      it "calls 'update' on an entity", ->
+      it "calls 'update' on the changed entity", ->
         coll = new EntityCollection [], types: [MyEntity], game: {}
         
-        myEntity = new MyEntity someProperty: 1, game: {}
-        coll.add myEntity
-        
-        json = myEntity.toJSON()
-        json.someProperty = 2
+        coll.add myEntity = new MyEntity someProperty: 1, game: {}
         
         spy = jasmine.createSpy('entity update handler')
         myEntity.bind 'update', spy
         
-        coll.trigger 'update', { change: json }
+        coll.trigger 'update', { changedEntityId: myEntity.id, changeDelta: {"someProperty":1337} }
         
         expect(spy).toHaveBeenCalled()
         expect(spy.mostRecentCall.args.length).toBe 1
-        expect(spy.mostRecentCall.args[0]).toBe json
+        expect(spy.mostRecentCall.args[0].someProperty).toBe 1337
+
+
+      it "throws when attempting to update an unknown entity", ->
+        coll = new EntityCollection [], types: [MyEntity], game: {}
+        
+        coll.add myEntity = new MyEntity someProperty: 1, game: {}
+        
+        expect ->
+          coll.trigger 'update', { changedEntityId: 2, changeDelta: {"someProperty":1337} }
+        .toThrow 'Could not find entity with id 2'
+
+
 
   describe '#add', ->
     it 'passes the game to new entities', ->
@@ -93,7 +122,7 @@ describe 'EntityCollection', ->
       .toThrow 'I dont know what to do with {"type":"MyOtherEntity"}. Known types are [MyEntity]'
 
 
-    it 'can be polymorphic', ->
+    it 'is polymorphic', ->
       coll = new EntityCollection [], types: [MyEntity, MyOtherEntity], game: {}
       
       myEntityA = new MyEntity aProperty: 'value', game: {}

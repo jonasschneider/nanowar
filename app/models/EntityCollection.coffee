@@ -34,11 +34,14 @@ class root.EntityCollection extends Nanowar.IdentifyingCollection
       if data.add?
         @add data.add
         
-      if data.change?
-        @get(data.change.id).trigger 'update', data.change
+      if data.changedEntityId?
+        unless ent = @get(data.changedEntityId)
+          throw "Could not find entity with id #{data.changedEntityId}"
+        ent.trigger 'update', data.changeDelta
         
     @bind 'change', (entity) =>
-      @trigger 'publish', { change: entity }
+      if delta = entity.changedAttributesToJSON()
+        @trigger 'publish', changedEntityId: entity.id, changeDelta: delta
 
   _add: (entity) ->
     if _(@types).any((type) ->
