@@ -143,11 +143,13 @@
     this.attributes = {};
     this._escapedAttributes = {};
     this.cid = _.uniqueId('c');
-    this.set(attributes, {silent : true});
     this._changed = false;
     this._previousAttributes = _.clone(this.attributes);
     if (options && options.collection) this.collection = options.collection;
-    this.trigger('beforeInitialize');
+
+    this.trigger('beforeInitialSet');
+    this.set(attributes, {silent : true});
+
     this.initialize(attributes, options);
   };
 
