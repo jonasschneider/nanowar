@@ -32,7 +32,7 @@ class root.Cell extends Nanowar.Entity
     knownStrengthAtTick:  0
 
   initialize: ->
-    
+    @bind 'change:owner', @handleOwnerUpdate
 
   position: ->
     x: @get 'x'
@@ -64,6 +64,12 @@ class root.Cell extends Nanowar.Entity
       
       @setCurrentStrength newStrength
   
+  handleOwnerUpdate: ->
+    val = @get 'owner'
+    @set { owner: @_previousAttributes.owner }, silent: true
+    @checkpointStrength()
+    @set { owner: val }, silent: true
+  
   units_per_tick: ->
     return 0 unless @get 'owner' # neutral cells don't produce
     @get('size') * @get 'productionMultiplier'
@@ -76,11 +82,15 @@ class root.Cell extends Nanowar.Entity
     
   getCurrentStrength: ->
     Math.min @getMax(), @get('knownStrength') + Math.round((@game.ticks - @get('knownStrengthAtTick')) * @units_per_tick())
-    
-  setCurrentStrength: (newStrength) ->
+  
+  checkpointStrength: (options) ->
+    @setCurrentStrength @getCurrentStrength(), options
+  
+  setCurrentStrength: (newStrength, options) ->
     @set
       knownStrengthAtTick : @game.ticks
       knownStrength       : newStrength
+    , options
   
-  changeCurrentStrengthBy: (delta) ->
-    @setCurrentStrength @getCurrentStrength() + delta
+  changeCurrentStrengthBy: (delta, options) ->
+    @setCurrentStrength @getCurrentStrength() + delta, options
