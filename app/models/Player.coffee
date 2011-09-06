@@ -20,7 +20,7 @@ class root.Player extends Nanowar.Entity
   initialize: ->
     @bind 'add', ->
       unless @get 'color'
-        @set color: @colors[@game.getPlayers().length-1]
+        @set { color: @colors[@game.getPlayers().length-1] }, silent: true
 
   toString: ->
     if @get('name')
