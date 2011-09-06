@@ -182,27 +182,27 @@ describe 'RelationalModel', ->
 
 
 
-  describe '#changedAttributesToJSON', ->
+  describe '#changedAttributes', ->
     it 'returns nothing when nothing has changed', ->
-      expect(JSON.stringify (new Post title: 'asdf').changedAttributesToJSON()).toBe '{}'
+      expect((new Post title: 'asdf').changedAttributes()).toBe false
 
-
-    it 'returns changes', ->
+    it 'returns changed attributes', ->
       p = new Post title: 'Hello world'
       c = null
       p.bind 'change', =>
-        c = p.changedAttributesToJSON()
+        c = p.changedAttributes()
       p.set title: "Hi world"
       expect(JSON.stringify c).toBe '{"title":"Hi world"}'
 
 
-    it 'gets the changed attributes from #toJSON', ->
+    it 'returns the #toJSON representation of attributes when #toJSON() is called on the return value', ->
       jonas = new Person name: 'Jonas', id: 123
       p = new Post(blog: new BlogWithAuthor(jonas))
       c = null
       p.bind 'change', =>
-        c = p.changedAttributesToJSON()
+        c = p.changedAttributes()
       p.set title: "Hi world", author: jonas
+      expect(c.author).toBe jonas
       expect(JSON.stringify c).toBe '{"title":"Hi world","author":{"type":"serializedRelation","model":"Person","id":123}}'
 
 

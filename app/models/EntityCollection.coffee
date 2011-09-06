@@ -40,7 +40,7 @@ class root.EntityCollection extends Nanowar.IdentifyingCollection
         ent.trigger 'update', data.changeDelta
         
     @bind 'change', (entity) =>
-      if delta = entity.changedAttributesToJSON()
+      if delta = entity.changedAttributes()
         @trigger 'publish', changedEntityId: entity.id, changeDelta: delta
 
   _add: (entity) ->

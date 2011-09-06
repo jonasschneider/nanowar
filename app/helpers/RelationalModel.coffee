@@ -77,10 +77,13 @@ class root.RelationalModel extends Nanowar.SuperModel
     else
       throw "While instantiating #{thisType}: #{options.relatedModelName} is not registered in this.#{options.directory}"
 
-
-  changedAttributesToJSON: ->
+  changedAttributes: ->
+    return false unless value = super
     allJson = @toJSON()
-    changedJson = {}
-    _(@changedAttributes()).each (rawVal, name) ->
-      changedJson[name] = allJson[name]
-    changedJson
+    
+    value.toJSON = ->
+      changedJson = {}
+      _(this).each (rawVal, name) ->
+        changedJson[name] = allJson[name]
+      changedJson
+    value
