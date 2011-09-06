@@ -21,7 +21,7 @@ class root.SuperModel extends Backbone.Model
     nameGiver = this.__proto__
     nameGiver = nameGiver.__proto__ while nameGiver.anonymousSubclass? && nameGiver.anonymousSubclass
 
-    type = nameGiver.constructor.toString().match(/^function (.*)\(\)/)[1]
+    type = nameGiver.constructor.toString().match(/^function (.*)\(/)[1]
 
     nameGiver.type = type
 
