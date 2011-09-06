@@ -26,20 +26,16 @@ class root.RelationalModel extends Nanowar.SuperModel
     json = super
 
     _(@relationSpecs).each (options, name) =>
-      json[name] =
-        if related = @get(name)
-          { type: 'serializedRelation', model: related.get('type'), id: related.id, toJSON: ->
-            this
-          }
-        else
-          null
+      if related = @get(name)
+        json[name] = { type: 'serializedRelation', model: related.get('type'), id: related.id, toJSON: ->
+          this
+        }
 
     json
 
   constructor: (attrs) ->
     @bind 'beforeInitialSet', =>
       _(@relationSpecs).each (options, name) =>
-        @attributes[name] = null # hackishly setting this beforehand
         options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(\)/)[1]
         
         if(options.directory)
@@ -52,16 +48,15 @@ class root.RelationalModel extends Nanowar.SuperModel
 
   set: (attrs, options) ->
     thisType = @get('type') || attrs.type # for initial set
-
+    
     _(@relationSpecs).each (options, name) =>
-      attrs[name] = @_fetchRelation(name, attrs[name], thisType) if attrs[name]
+      attrs[name] = @_fetchRelation(name, attrs[name], thisType) if typeof attrs[name] != 'undefined'
 
     super
 
   _fetchRelation: (name, value, thisType) ->
     options = @relationSpecs[name]
-
-    return null unless value
+    return null if value == null
 
     if value instanceof Backbone.Model
       id = value.get('id')
@@ -79,4 +74,12 @@ class root.RelationalModel extends Nanowar.SuperModel
     if id && options.directoryObject && inDir = options.directoryObject.get id
       inDir
     else
-      throw "While instantiating #{thisType}: #{options.relatedModelName} is not registered in this.#{options.directory}" 
+      throw "While instantiating #{thisType}: #{options.relatedModelName} is not registered in this.#{options.directory}"
+
+
+  changedAttributesToJSON: ->
+    allJson = @toJSON()
+    changedJson = {}
+    _(@changedAttributes()).each (rawVal, name) ->
+      changedJson[name] = allJson[name]
+    changedJson

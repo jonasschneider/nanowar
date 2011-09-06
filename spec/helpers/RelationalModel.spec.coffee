@@ -35,9 +35,11 @@ class BlogWithAuthor
 
 describe 'RelationalModel', ->
   describe 'when setting the property via initializer', ->
+    it 'accepts no related object', ->
+      expect((new Post).get('author')).toBe undefined
+    
     it 'accepts null', ->
-      expect((new Post).get('author')).toBe null
-
+      expect((new Post author: null).get('author')).toBe null
 
     it 'throws on unrelated object', ->
       class UnrelatedClass
@@ -100,6 +102,11 @@ describe 'RelationalModel', ->
       p = new Post
       p.set author: null
       expect(p.get 'author').toBe null
+      
+    it 'unsets', ->
+      p = new Post
+      p.unset 'author'
+      expect(p.get 'author').toBe undefined
 
 
     it 'throws on unrelated object', ->
@@ -154,7 +161,7 @@ describe 'RelationalModel', ->
 
   describe '#toJSON', ->
     it 'works with null', ->
-       expect((new Post).toJSON().author).toBe null
+       expect((new Post).toJSON().author).toBe undefined
 
 
     it 'serializes relation', ->
@@ -173,6 +180,30 @@ describe 'RelationalModel', ->
 
       expect(x.get('author')).toBe jonas
 
+
+
+  describe '#changedAttributesToJSON', ->
+    it 'returns nothing when nothing has changed', ->
+      expect(JSON.stringify (new Post).changedAttributesToJSON()).toBe '{}'
+
+
+    it 'returns changes', ->
+      p = new Post title: 'Hello world'
+      c = null
+      p.bind 'change', =>
+        c = p.changedAttributesToJSON()
+      p.set title: "Hi world"
+      expect(JSON.stringify c).toBe '{"title":"Hi world"}'
+
+
+    it 'gets the changed attributes from #toJSON', ->
+      jonas = new Person name: 'Jonas', id: 123
+      p = new Post(blog: new BlogWithAuthor(jonas), author: jonas)
+      c = null
+      p.bind 'change', =>
+        c = p.changedAttributesToJSON()
+      p.set title: "Hi world"
+      expect(JSON.stringify c).toBe '{"author":{"type":"serializedRelation","model":"Person","id":123},"title":"Hi world"}'
 
 
   describe 'integrated', ->
