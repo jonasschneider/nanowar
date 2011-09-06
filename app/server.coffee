@@ -80,7 +80,7 @@ class Match
       player.updateLocalPlayer()
     
     cells = [
-      new Cell {x: 350, y: 100, size: 50, game: @game}
+      c1 = new Cell {x: 350, y: 100, size: 50, game: @game}
       new Cell {x: 350, y: 300, size: 30, game: @game, owner: @players[0]}
       new Cell {x: 100, y: 200, size: 50, game: @game}
       new Cell {x: 500, y: 200, size: 50, game: @game}
@@ -103,6 +103,10 @@ class Match
     go = =>
       @game.run()
     _(go).delay(1000)
+    
+    go = =>
+      c1.set owner: @players[0]
+    _(go).delay(3000)
     
     @onStart()
 
