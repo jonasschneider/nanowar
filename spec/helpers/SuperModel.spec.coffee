@@ -38,7 +38,10 @@ describe 'Nanowar.SuperModel', ->
     it 'sets the model name as an attribute', ->
       expect(new Blog().get 'type').toBe 'Blog'
   
-  
+    it 'does not mark the type as a changed attribute', ->
+      b = new Blog title: 'My Page'
+      expect(JSON.stringify b.changedAttributes()).toBe '{"title":"My Page"}'
+    
     it 'ignores namespaces', -> # should it?
       expect(new MySite.Header().get 'type').toBe 'Header'
   

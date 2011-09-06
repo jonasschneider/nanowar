@@ -29,6 +29,7 @@ class root.SuperModel extends Backbone.Model
       throw "Tried to initialize a #{type} with type set to #{attributes.type}"
     attributes.type = type
     super attributes
+    @_previousAttributes.type = type
     
   toString: ->
     "[object #{@type}]"
