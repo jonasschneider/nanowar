@@ -17,10 +17,14 @@
     
     %script
       :plain
+        oldLog = console.log
         console.log = function(text) {
-          var ticks = ''
-          if(window.App && window.App.game)
+          var ticks = '', ticksText = ''
+          if(window.App && window.App.game) {
             ticks = '<b>'+window.App.game.ticks+':</b> '
+            ticksText = window.App.game.ticks+': '
+          }
           
           $("#log").append($('<li>').html(ticks+text))
+          console.debug(ticksText + text)
         }
