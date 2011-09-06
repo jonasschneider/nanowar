@@ -22,4 +22,8 @@ class root.Entity extends Nanowar.RelationalModel
       delete attributes.game
     else
       throw "Entity needs game"
+    
+    @bind 'update', (data) ->
+      @set data
+    
     super
