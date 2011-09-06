@@ -147,6 +147,7 @@
     this._changed = false;
     this._previousAttributes = _.clone(this.attributes);
     if (options && options.collection) this.collection = options.collection;
+    this.trigger('beforeInitialize');
     this.initialize(attributes, options);
   };
 
