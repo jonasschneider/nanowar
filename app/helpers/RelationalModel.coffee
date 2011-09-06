@@ -39,6 +39,7 @@ class root.RelationalModel extends Nanowar.SuperModel
   constructor: (attrs) ->
     @bind 'beforeInitialSet', =>
       _(@relationSpecs).each (options, name) =>
+        @attributes[name] = null # hackishly setting this beforehand
         options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(\)/)[1]
         
         if(options.directory)
@@ -53,7 +54,7 @@ class root.RelationalModel extends Nanowar.SuperModel
     thisType = @get('type') || attrs.type # for initial set
 
     _(@relationSpecs).each (options, name) =>
-      attrs[name] = @_fetchRelation(name, attrs[name], thisType)
+      attrs[name] = @_fetchRelation(name, attrs[name], thisType) if attrs[name]
 
     super
 

@@ -142,6 +142,13 @@ describe 'RelationalModel', ->
       x.set author: { type: 'serializedRelation', model: 'Person', id: jonas.id }
 
       expect(x.get('author')).toBe jonas
+      
+    it "doesn't overwrite the relation when setting other properties", ->
+      jonas = new Person name: 'Jonas', id: 123
+      x = new Post blog: new BlogWithAuthor(jonas), author: jonas
+      x.set title: 'Hi guys'
+      
+      expect(x.get('author')).toBe jonas
 
 
 
