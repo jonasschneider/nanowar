@@ -44,12 +44,10 @@ describe 'Nanowar.SuperModel', ->
     
     it 'ignores namespaces', -> # should it?
       expect(new MySite.Header().get 'type').toBe 'Header'
-  
-  
+
     it 'does not overwrite attributes', ->
       expect(new Blog(name: 'My Site').get 'name').toBe 'My Site'
-  
-  
+
     it 'ignores the type when already set', ->
       expect(new Blog(type: 'Blog').get 'type').toBe 'Blog'
     
