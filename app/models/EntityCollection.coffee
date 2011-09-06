@@ -35,7 +35,7 @@ class root.EntityCollection extends Nanowar.IdentifyingCollection
         @add data.add
         
       if data.change?
-        @get(data.change.id).set data.change
+        @get(data.change.id).trigger 'update', data.change
         
     @bind 'change', (entity) =>
       @trigger 'publish', { change: entity }

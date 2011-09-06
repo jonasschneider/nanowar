@@ -39,8 +39,8 @@ describe 'EntityCollection', ->
 
 
 
-  describe 'when updating', ->
-    describe 'with a new entity', ->
+  describe 'on update', ->
+    describe 'with an add entity request', ->
       it 'adds the entity', ->
         coll = new EntityCollection [], types: [MyEntity], game: {}
         
@@ -52,7 +52,9 @@ describe 'EntityCollection', ->
         expect(coll.first().hello()).toBe 'world'
         expect(coll.first().get 'aProperty').toBe 'value'
 
-      it 'changes an entity when updated', ->
+
+    describe 'with a change entity request', ->
+      it "calls 'update' on an entity", ->
         coll = new EntityCollection [], types: [MyEntity], game: {}
         
         myEntity = new MyEntity someProperty: 1, game: {}
@@ -61,9 +63,14 @@ describe 'EntityCollection', ->
         json = myEntity.toJSON()
         json.someProperty = 2
         
+        spy = jasmine.createSpy('entity update handler')
+        myEntity.bind 'update', spy
+        
         coll.trigger 'update', { change: json }
         
-        expect(coll.get(myEntity.id).get 'someProperty').toBe 2
+        expect(spy).toHaveBeenCalled()
+        expect(spy.mostRecentCall.args.length).toBe 1
+        expect(spy.mostRecentCall.args[0]).toBe json
 
   describe '#add', ->
     it 'passes the game to new entities', ->
