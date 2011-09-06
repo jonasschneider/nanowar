@@ -31,6 +31,9 @@ class root.Cell extends Nanowar.Entity
     knownStrength:        0
     knownStrengthAtTick:  0
 
+  initialize: ->
+    
+
   position: ->
     x: @get 'x'
     y: @get 'y'
