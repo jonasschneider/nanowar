@@ -26,5 +26,9 @@
           }
           
           $("#log").append($('<li>').html(ticks+text))
-          console.debug(ticksText + text)
+          if(typeof text == 'string')
+            console.debug(ticksText + text)
+          
+          else
+            console.debug(text)
         }
