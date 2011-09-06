@@ -11,27 +11,22 @@ if exports?
   Nanowar = {}
   Nanowar.Fleet = require('../models/Fleet').Fleet
   Nanowar.Cell = require('../models/Cell').Cell
-  Nanowar.RelationalModel = require('../helpers/RelationalModel.coffee').RelationalModel
+  Nanowar.Entity = require('../models/Entity').Entity
 else
   Backbone  = window.Backbone
   Nanowar   = window.Nanowar
   root = Nanowar
 
-class root.SendFleetCommand extends Nanowar.RelationalModel
+class root.SendFleetCommand extends Nanowar.Entity
   relationSpecs:
     from:
       relatedModel: Nanowar.Cell
-      directory: 'game.cells'
+      directory: 'game.entities'
     to:
       relatedModel: Nanowar.Cell
-      directory: 'game.cells'
+      directory: 'game.entities'
       
   initialize: ->
-    @game = @get('game')
-    @set game: undefined
-    throw "SendFleetCommand needs game" unless @game
-    
-    super
     
   run: ->
     fleet = new Nanowar.Fleet 
@@ -40,4 +35,4 @@ class root.SendFleetCommand extends Nanowar.RelationalModel
       game: @game
     
     if fleet.launch()
-      @game.fleets.add fleet
+      @game.entities.add fleet

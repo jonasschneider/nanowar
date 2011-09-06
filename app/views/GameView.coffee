@@ -24,19 +24,20 @@ class Nanowar.views.GameView extends Backbone.View
     console.log(arguments)
   
   addEntity: (e) ->
-    if e.type == 'Cell'
-      @addCell e
-    
-  addCell: (cell) ->
-    cellView = new Nanowar.views.CellView({model: cell, gameView: this})
-    cellView.render()
-    
-    cellView.bind 'click', =>
-      @handleClickOnCellView cellView
-    
-  addFleet: (fleet) ->
-    new Nanowar.views.FleetView({model: fleet, gameView: this})
-  
+    switch e.type
+      when 'Cell'
+        cellView = new Nanowar.views.CellView model: e, gameView: this
+        cellView.render()
+        
+        cellView.bind 'click', =>
+          @handleClickOnCellView cellView
+      
+      when 'Fleet'
+        new Nanowar.views.FleetView model: e, gameView: this
+      
+      else
+        console.error "wtf is a #{e.type}? - #{JSON.stringify e}"
+
   handleClickInGameArea: ->
     unless @currentClickIsInCell
       @select null
