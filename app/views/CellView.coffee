@@ -15,6 +15,7 @@ class Nanowar.views.CellView extends Backbone.View
     @el = layers = @gameView.paper.set()
 
     layers.push @shadow = @gameView.paper.circle(0,0,40)
+    layers.push @selectedShadow = @gameView.paper.circle(0,0,40)
     layers.push @bg = @gameView.paper.circle(0,0,40)
     layers.push metal = @gameView.paper.circle(0,0,40)
     layers.push @fg = @gameView.paper.circle(0,0,40)
@@ -22,7 +23,10 @@ class Nanowar.views.CellView extends Backbone.View
     
     @hover.attr fill: 'white', opacity: 0
     metal.attr fill: "url(#metalPattern)"
+    @shadow.attr fill: 'black'
+    @selectedShadow.attr fill: 'white'
     @shadow.node.setAttribute "filter", "url(#cellShadow)" # Raphael doesn't like the filter attribute
+    @selectedShadow.node.setAttribute "filter", "url(#cellShadow)" # Raphael doesn't like the filter attribute
     
     layers.attr
       stroke: 'none'
@@ -44,7 +48,7 @@ class Nanowar.views.CellView extends Backbone.View
     $(@hover.node).mouseout =>
       @hover.attr opacity: 0
     
-    new Nanowar.views.CellDataView {model: @model, gameView: @gameView}
+    new Nanowar.views.CellDataView {model: @model, gameView: @gameView, cellView: this}
 
   render: ->
     if @model.get('owner') && @model.get('owner').get('color')
@@ -55,14 +59,18 @@ class Nanowar.views.CellView extends Backbone.View
         when 'blue'
           @bg.attr({fill: "url(#blueBackground)"})
           @fg.attr({fill: "url(#blueForeground)"})
+        else
+          throw "I don't know color #{@model.get('owner').get('color')}"
     else
       @bg.attr({fill: "url(#greyBackground)"})
       @fg.attr({fill: "url(#greyForeground)"})
     
     if @gameView.selectedCell == this
-      @shadow.attr fill: '#ccc'
+      @selectedShadow.attr opacity: 0.7
+      @shadow.attr opacity: 0
     else
-      @shadow.attr fill: 'black'
+      @selectedShadow.attr opacity: 0
+      @shadow.attr opacity: 1
     
     this
 
