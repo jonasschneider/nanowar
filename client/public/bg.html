@@ -36,9 +36,9 @@ $(document).ready(function() {
   
   layers = paper.set()
   
-  layers.push(shadow = paper.circle(0,0,40))
-  shadow.attr({fill: "black" })
-  shadow.node.setAttribute("filter", "url(#cellShadow)")
+  layers.push(shadow1 = paper.circle(0,0,40))
+  shadow1.attr({fill: "black" })
+  shadow1.node.setAttribute("filter", "url(#cellShadow)")
   
   layers.push(bg = paper.circle(0,0,40))
   bg.attr({fill: "url(#blueBackground)"})
@@ -48,6 +48,19 @@ $(document).ready(function() {
   
   layers.push(fg = paper.circle(0,0,40))
   fg.attr({fill: "url(#blueForeground)"})
+  
+  layers.push(hover = paper.circle(0,0,40))
+  hover.attr({fill: 'white', opacity: 0.0})
+  hover.node.onmouseover = function() {
+    hover.attr({opacity: 0.05})
+  }
+  hover.node.onmouseout = function() {
+    hover.attr({opacity: 0})
+  }
+  
+  hover.node.onclick = function() {
+    shadow1.attr({fill: "white" })
+  }
   
   layers.attr({stroke: 'none', cx: 300, cy: 300})
   
@@ -102,7 +115,7 @@ $(document).ready(function() {
   
   setTimeout(function() {
     layers3.animate({r: 50}, 500, 'bounce')
-  }, 2000)
+  }, 2400)
   
   
 })

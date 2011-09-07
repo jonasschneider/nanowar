@@ -139,7 +139,7 @@ class Particle {
     n = newN;
     myImg = particleImages[n % particleImages.length];
     r = 0.0;
-    timer = 100.0;
+    timer = 50.0;
     if(l)
       loc = l;
     else
@@ -160,7 +160,7 @@ class Particle {
   void update() {
     vel.add(new PVector((noise(n*10, curTime)-0.5)/2, (noise(n*100+50, curTime)-0.5)/2));
     
-    if(timer > 90.0)
+    if(timer > 40.0)
       r += 1;
     if(timer < 10.0)
       r -= 1;
