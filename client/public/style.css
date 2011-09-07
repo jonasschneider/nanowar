@@ -11,3 +11,9 @@ body {
   top: 0;
   left: 0;
 }
+  .blue .inner {
+    stop-color: #5e7e9f;
+  }
+  .blue .outer {
+    stop-color: #455269;
+  }

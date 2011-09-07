@@ -12,20 +12,34 @@ class Nanowar.views.CellView extends Backbone.View
     @model.bind             'change',             @render,  this
     @model.bind             'incomingFleet',      @pop,     this
     
-    @el = @gameView.el.circle @model.get('x'), @model.get('y'), 0
+    @el = layers = @gameView.paper.set()
+
+    layers.push(@shadow = @gameView.paper.circle(0,0,40))
+    @shadow.attr({fill: "black" })
+    @shadow.node.setAttribute("filter", "url(#cellShadow)")
+    
+    layers.push(bg = @gameView.paper.circle(0,0,40))
+    bg.attr({fill: "url(#blueBackground)"})
+    
+    layers.push(metal = @gameView.paper.circle(0,0,40))
+    metal.attr({fill: "url(#metalPattern)"})
+    
+    layers.push(fg = @gameView.paper.circle(0,0,40))
+    fg.attr({fill: "url(#blueForeground)"})
+    
+    layers.attr({stroke: 'none', cx: @model.get('x'), cy: @model.get('y'), r: 0})
+    
     window.processingAuxSources ||= []
     window.processingAuxSources.push
       x: @model.get('x') + $(@gameView.container).offset().left
       y: @model.get('y') + $(@gameView.container).offset().top
       r: @model.get('size') + 20
     
-    @el.attr
-      fill: 'black'
     @el.animate
       r: @model.get('size')
     , 700, 'bounce'
     
-    $(@el.node).click =>
+    $(_(@el.items).pluck('node')).click =>
       @trigger 'click'
       
     new Nanowar.views.CellDataView {model: @model, gameView: @gameView}
@@ -38,15 +52,17 @@ class Nanowar.views.CellView extends Backbone.View
     else
       @el.attr stroke: 'none'
     
-    if @model.get('owner') && @model.get('owner').get('color')
-      @el.attr fill: @model.get('owner').get('color')
-    else
-      @el.attr fill: 'grey'
+    #if @model.get('owner') && @model.get('owner').get('color')
+    #  @el.attr fill: @model.get('owner').get('color')
+    #else
+    #  @el.attr fill: 'grey'
     
     if @gameView.selectedCell == this
-      @el.attr
+      @shadow.attr
         fill: 'orange'
-        stroke: 'black'
+    else
+      @shadow.attr
+        fill: 'black'
     
     this
     

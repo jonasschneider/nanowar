@@ -8,7 +8,7 @@ class Nanowar.views.CellDataView extends Backbone.View
     
     @model.bind 'change', @render, this
     
-    @el = @gameView.el.text @model.get('x'), @model.get('y'), "0"
+    @el = @gameView.paper.text @model.get('x'), @model.get('y'), "0"
     
     @el.attr
       font: '12px Arial'

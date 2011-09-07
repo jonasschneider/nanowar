@@ -12,10 +12,16 @@ class Nanowar.views.GameView extends Backbone.View
     @model.entities.bind 'add', @addEntity,  this
     
     @selectedCell = null
-    @container = $('#nanowar')[0]
-    @el = Raphael @container, 700, 500
     
-    $(@el.canvas).click =>
+    @container = $('#nanowar')[0]
+    @paper = Raphael @container, 700, 500
+    @svg = $('#nanowar svg')[0]
+    
+    
+    window.$.get '/images/defs.svg', (defsSVG) =>
+      @svg.appendChild defsSVG.getElementById 'nanowarDefs'
+    
+    $(@paper.canvas).click =>
       @handleClickInGameArea()
     
   

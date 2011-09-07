@@ -3,15 +3,10 @@
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"> 
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <style>
-  .blue .inner {
-    stop-color: #5e7e9f;
-  }
-  .blue .outer {
-    stop-color: #455269;
-  }
+
 </style>
 
-  <defs>
+  <defs id="nanowarDefs">
     <filter id="cellShadow" width="150%" height="150%">
       <feGaussianBlur result="blurOut" stdDeviation="5" />
     </filter>
@@ -39,4 +34,6 @@
   </defs>
     
     <use xlink:href="#blueCell" x="-50" y="-50" width="100" height="100"/>
+    
+    <circle cx="300" cy="300" r="50" fill="black" stroke="none" filter="url(#cellShadow)"></circle><circle cx="300" cy="300" r="50" fill="url(#blueBackground)" stroke="none"></circle><circle cx="300" cy="300" r="50" fill="url(#metalPattern)" stroke="none"></circle><circle cx="300" cy="300" r="50" fill="url(#blueForeground)" stroke="none"></circle>
 </svg>

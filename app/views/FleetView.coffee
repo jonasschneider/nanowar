@@ -9,10 +9,10 @@ class Nanowar.views.FleetView extends Backbone.View
     @model.bind 'change', @render, this
     @model.bind 'destroy', @remove, this
     
-    @el = @gameView.el.circle()
+    @el = @gameView.paper.circle()
     
     
-    @strengthText = @gameView.el.text -100, -100, @model.get('strength')
+    @strengthText = @gameView.paper.text -100, -100, @model.get('strength')
     
     @start()
   

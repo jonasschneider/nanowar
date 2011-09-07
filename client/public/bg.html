@@ -27,6 +27,19 @@ $(document).ready(function() {
   svg = $("#test svg")[0]
   console.log(svg)
   
+  
+  
+  
+  //var clone = document.importNode(nodeFromAnotherDoc,true);
+  
+  $.get('/images/defs.svg', function(defsSVG) {
+    svg.appendChild(defsSVG.getElementById("nanowarDefs"))
+  })
+  
+  
+  
+  
+  
   layers = paper.set()
   
   layers.push(shadow = paper.circle(0,0,40))
