@@ -76,8 +76,7 @@ class root.Fleet extends Nanowar.Entity
   update: ->
     if @arrived()
       console.log "[Tick#{@game.ticks}] [Fleet #{@cid}] Arrived from route #{@get('from').cid}->#{@get('to').cid}"
-      if onServer?
-        @get('to').handle_incoming_fleet this
+      @get('to').handle_incoming_fleet this
       @destroy()
             
   destroy: ->
