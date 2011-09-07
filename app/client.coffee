@@ -1,6 +1,7 @@
 #= require_tree models
 #= require_tree views
 #= require_tree helpers
+#= require <vendor/processing-1.3.0.js>
 
 $(document).ready ->
   

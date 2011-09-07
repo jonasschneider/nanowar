@@ -10,9 +10,10 @@
     - each script in global_scripts()
       %script{ src: script }
   %body
+    %canvas#background{ "data-processing-sources": "background.pde" }
     %h2 Nano War
     #nanowar
-    %button{ onclick: "window.App.game.tick();"  } Tick!
+    
     %ul#log
     
     %script
@@ -25,7 +26,7 @@
             ticksText = window.App.game.ticks+': '
           }
           
-          $("#log").append($('<li>').html(ticks+text))
+          
           if(typeof text == 'string')
             console.debug(ticksText + text)
           
