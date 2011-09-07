@@ -1365,6 +1365,8 @@
                             o.scale(+xy[0] || 1, +xy[1] || +xy[0] || 1, isNaN(toFloat(xy[2])) ? null : +xy[2], isNaN(toFloat(xy[3])) ? null : +xy[3]);
                             break;
                         case fillString:
+                            node.setAttribute("fill", value);
+                            break;
                             var isURL = Str(value).match(ISURL);
                             if (isURL) {
                                 el = $("pattern");
