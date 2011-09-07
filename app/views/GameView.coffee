@@ -12,8 +12,8 @@ class Nanowar.views.GameView extends Backbone.View
     @model.entities.bind 'add', @addEntity,  this
     
     @selectedCell = null
-    
-    @el = Raphael $('#nanowar')[0], 700, 500
+    @container = $('#nanowar')[0]
+    @el = Raphael @container, 700, 500
     
     $(@el.canvas).click =>
       @handleClickInGameArea()

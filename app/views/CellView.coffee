@@ -13,6 +13,11 @@ class Nanowar.views.CellView extends Backbone.View
     @model.bind             'incomingFleet',      @pop,     this
     
     @el = @gameView.el.circle @model.get('x'), @model.get('y'), 0
+    window.processingAuxSources ||= []
+    window.processingAuxSources.push
+      x: @model.get('x') + $(@gameView.container).offset().left
+      y: @model.get('y') + $(@gameView.container).offset().top
+      r: @model.get('size') + 20
     
     @el.attr
       fill: 'black'
