@@ -17,3 +17,17 @@ body {
   .blue .outer {
     stop-color: #455269;
   }
+  
+  .red .inner {
+    stop-color: #b14151;
+  }
+  .red .outer {
+    stop-color: #842f3b;
+  }
+
+  .grey .inner {
+    stop-color: #ccc;
+  }
+  .grey .outer {
+    stop-color: #888;
+  }

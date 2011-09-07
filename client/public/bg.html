@@ -11,18 +11,15 @@
 <body> 
 <canvas id="background" data-processing-sources="background.pde"></canvas>
 <style>
-  .blue .inner {
-    stop-color: #5e7e9f;
-  }
-  .blue .outer {
-    stop-color: #455269;
-  }
+body {
+  overflow: hidden
+}
 </style>
 <div id="test"></div>
 
 <script>
 $(document).ready(function() {
-  var paper = Raphael("test", 400, 400);
+  var paper = Raphael("test", 700, 700);
   
   svg = $("#test svg")[0]
   console.log(svg)
@@ -37,28 +34,74 @@ $(document).ready(function() {
   })
   
   
-  
-  
-  
   layers = paper.set()
   
   layers.push(shadow = paper.circle(0,0,40))
   shadow.attr({fill: "black" })
-  shadow.node.setAttribute("filter", "url(images/defs.svg#cellShadow)")
+  shadow.node.setAttribute("filter", "url(#cellShadow)")
   
   layers.push(bg = paper.circle(0,0,40))
-  bg.attr({fill: "url(images/defs.svg#blueBackground)"})
+  bg.attr({fill: "url(#blueBackground)"})
   
   layers.push(metal = paper.circle(0,0,40))
-  metal.attr({fill: "url(images/defs.svg#metalPattern)"})
+  metal.attr({fill: "url(#metalPattern)"})
   
   layers.push(fg = paper.circle(0,0,40))
-  fg.attr({fill: "url(images/defs.svg#blueForeground)"})
+  fg.attr({fill: "url(#blueForeground)"})
   
   layers.attr({stroke: 'none', cx: 300, cy: 300})
   
   setTimeout(function() {
     layers.animate({r: 50}, 500, 'bounce')
+  }, 1600)
+  
+  
+  
+  
+  
+  layers2 = paper.set()
+  
+  layers2.push(shadow = paper.circle(0,0,40))
+  shadow.attr({fill: "black" })
+  shadow.node.setAttribute("filter", "url(#cellShadow)")
+  
+  layers2.push(bg = paper.circle(0,0,40))
+  bg.attr({fill: "url(#redBackground)"})
+  
+  layers2.push(metal = paper.circle(0,0,40))
+  metal.attr({fill: "url(#metalPattern)"})
+  
+  layers2.push(fg = paper.circle(0,0,40))
+  fg.attr({fill: "url(#redForeground)"})
+  
+  layers2.attr({stroke: 'none', cx: 450, cy: 300})
+  
+  setTimeout(function() {
+    layers2.animate({r: 50}, 500, 'bounce')
+  }, 2000)
+  
+  
+  
+  
+  layers3 = paper.set()
+  
+  layers3.push(shadow = paper.circle(0,0,40))
+  shadow.attr({fill: "black" })
+  shadow.node.setAttribute("filter", "url(#cellShadow)")
+  
+  layers3.push(bg = paper.circle(0,0,40))
+  bg.attr({fill: "url(#greyBackground)"})
+  
+  layers3.push(metal = paper.circle(0,0,40))
+  metal.attr({fill: "url(#metalPattern)"})
+  
+  layers3.push(fg = paper.circle(0,0,40))
+  fg.attr({fill: "url(#greyForeground)"})
+  
+  layers3.attr({stroke: 'none', cx: 600, cy: 300})
+  
+  setTimeout(function() {
+    layers3.animate({r: 50}, 500, 'bounce')
   }, 2000)
   
   
