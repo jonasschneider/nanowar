@@ -15,7 +15,7 @@ class Nanowar.views.CellDataView extends Backbone.View
       stroke:   'none'
       fill:     'white'
     
-    setInterval _(@render).bind(this), 100
+    setInterval _(@render).bind(this), 400
   
   render: ->
     @el.attr text: @model.getCurrentStrength()
