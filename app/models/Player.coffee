@@ -12,7 +12,7 @@ else
   root = Nanowar
 
 class root.Player extends Nanowar.Entity
-  colors: ["#A0483E", "#666885", "green", "yellow"]
+  colors: ["red", "blue", "green", "yellow"]
   
   defaults:
     name: 'anonymous coward'
