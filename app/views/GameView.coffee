@@ -16,10 +16,19 @@ class Nanowar.views.GameView extends Backbone.View
     @container = $('#nanowar')[0]
     @paper = Raphael @container, 700, 500
     @svg = $('#nanowar svg')[0]
-    
-    
+    @ready = 0
     window.$.get '/images/defs.svg', (defsSVG) =>
       @svg.appendChild defsSVG.getElementById 'nanowarDefs'
+      @ready += 1
+      @trigger 'ready' if @ready == 2
+    
+    window.$.get '/images/icons.svg', (iDefsSVG) =>
+      iconDefs = iDefsSVG.getElementById "NanowarIcons"
+      iconDefs.setAttribute "opacity", "0"
+      @svg.appendChild iconDefs
+      @ready += 1
+      @trigger 'ready' if @ready == 2
+    
     
     $(@paper.canvas).click =>
       @handleClickInGameArea()
@@ -40,6 +49,12 @@ class Nanowar.views.GameView extends Backbone.View
       
       when 'Fleet'
         new Nanowar.views.FleetView model: e, gameView: this
+        
+      when 'Player'
+        'asdf'
+      
+      when 'EnhancerNode'
+        new Nanowar.views.EnhancerNodeView model: e, gameView: this
       
       else
         console.error "wtf is a #{e.type}? - #{JSON.stringify e}"
