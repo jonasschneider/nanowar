@@ -59,3 +59,132 @@ describe 'EnhancerNode', ->
       expect(node.affectedCells().length).toBe 2
       expect(node.affectedCells()[0]).toBe cell1
       expect(node.affectedCells()[1]).toBe cell3
+
+
+  it 'triggers affectedCells:add when a new cell gets affected', ->
+    game = new Game
+    game.entities.add me = new Player game: game
+    
+    node = new EnhancerNode game: game, owner: me
+    node.bind 'affectedCells:add', spy = jasmine.createSpy()
+    
+    game.entities.add cell1 = new Cell game: game, owner: me
+    
+    expect(spy).toHaveBeenCalled()
+    expect(spy.mostRecentCall.args[0]).toBe cell1
+
+
+  it "triggers affectedCells:remove when an affected cell's owner changes", ->
+    game = new Game
+    game.entities.add me = new Player game: game
+    game.entities.add fiz = new Player game: game
+    
+    node = new EnhancerNode game: game, owner: me
+    node.bind 'affectedCells:remove', spy = jasmine.createSpy()
+    
+    game.entities.add cell = new Cell game: game, owner: me
+    expect(spy).not.toHaveBeenCalled()
+    
+    cell.set owner: fiz
+    
+    expect(spy).toHaveBeenCalledWith cell
+
+
+  it "doesnt't trigger when another entity is changed", ->
+    game = new Game
+    game.entities.add me = new Player game: game, owner: 'invalid'
+    
+    node = new EnhancerNode game: game, owner: me
+    node.bind 'affectedCells:remove', spy = jasmine.createSpy()
+    
+    me.set owner: 'more invalid'
+    
+    expect(spy).not.toHaveBeenCalled()
+
+
+  it "doesn't trigger when other cell attributes change", ->
+    game = new Game
+    game.entities.add me = new Player game: game
+    
+    node = new EnhancerNode game: game, owner: me
+    node.bind 'affectedCells:remove', spy = jasmine.createSpy()
+    
+    game.entities.add cell = new Cell game: game, owner: me, x: 0
+    
+    cell.set x: 50
+    
+    expect(spy).not.toHaveBeenCalled()
+
+
+  it "doesn't trigger when an unaffected cell changes", ->
+    game = new Game
+    game.entities.add me = new Player game: game
+    game.entities.add fiz = new Player game: game
+    game.entities.add p3 = new Player game: game
+    game.entities.add cell = new Cell game: game, owner: fiz, x: 0
+    
+    node = new EnhancerNode game: game, owner: me
+    node.bind 'affectedCells:remove', spy = jasmine.createSpy()
+    
+    cell.set owner: p3
+    
+    expect(spy).not.toHaveBeenCalled()
+
+
+  it "triggers affectedCells:add when a cell changes owner", ->
+    game = new Game
+    game.entities.add me = new Player game: game
+    game.entities.add fiz = new Player game: game
+    
+    node = new EnhancerNode game: game, owner: me
+    node.bind 'affectedCells:add', spy = jasmine.createSpy()
+    
+    game.entities.add cell = new Cell game: game, owner: fiz, x: 0
+    expect(spy).not.toHaveBeenCalled()
+    
+    cell.set owner: me
+    
+    expect(spy).toHaveBeenCalledWith(cell)
+
+
+  it "doesn't trigger affectedCells:add when the list is already full", ->
+    game = new Game
+    game.entities.add me = new Player game: game
+    
+    node = new EnhancerNode game: game, owner: me
+    
+    game.entities.add cell = new Cell game: game, owner: me, x: 0
+    game.entities.add cell = new Cell game: game, owner: me, x: 0
+    
+    node.bind 'affectedCells:add', spy = jasmine.createSpy()
+    
+    game.entities.add cell = new Cell game: game, owner: me, x: 0
+    
+    expect(spy).not.toHaveBeenCalled()
+
+
+  it "triggers affectedCells:remove when a cell is removed", ->
+    game = new Game
+    game.entities.add me = new Player game: game
+    game.entities.add cell = new Cell game: game, owner: me, x: 0
+    
+    node = new EnhancerNode game: game, owner: me
+    
+    node.bind 'affectedCells:remove', spy = jasmine.createSpy()
+    game.entities.remove cell
+    
+    expect(spy).toHaveBeenCalledWith cell
+
+
+  it "does not trigger affectedCells:remove when an unaffected cell is removed", ->
+    game = new Game
+    game.entities.add me = new Player game: game
+    game.entities.add fiz = new Player game: game
+    game.entities.add cell = new Cell game: game, owner: fiz, x: 0
+    
+    node = new EnhancerNode game: game, owner: me
+    
+    node.bind 'affectedCells:remove', spy = jasmine.createSpy()
+    game.entities.remove cell
+    
+    expect(spy).not.toHaveBeenCalled()

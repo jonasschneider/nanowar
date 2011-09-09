@@ -28,6 +28,25 @@ class root.EnhancerNode extends Nanowar.Entity
       relatedModel: Nanowar.Player
       directory: 'game.entities'
   
+  initialize: ->
+    @_previousAffectedCells = @affectedCells()
+    
+    @game.entities.bind 'add',    @update, this
+    @game.entities.bind 'change', @update, this
+    @game.entities.bind 'remove', @update, this
+  
+  update: ->
+    newly = @affectedCells()
+    previously = @_previousAffectedCells
+    
+    _(newly).chain().difference(previously).each (c) =>
+      @trigger 'affectedCells:add', c
+    
+    _(previously).chain().difference(newly).each (c) =>
+      @trigger 'affectedCells:remove', c
+    
+    @_previousAffectedCells = newly
+    
   position: ->
     x: @get 'x'
     y: @get 'y'
