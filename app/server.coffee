@@ -1,6 +1,7 @@
 App     = require('./models/App').App
 Player  = require('./models/Player').Player
 Cell    = require('./models/Cell').Cell
+EnhancerNode    = require('./models/EnhancerNode').EnhancerNode
 util    = require 'util'
 _       = require 'underscore'
 
@@ -85,6 +86,7 @@ class Match
       new Cell {x: 100, y: 200, size: 50, game: @game}
       new Cell {x: 500, y: 200, size: 50, game: @game}
       new Cell {x: 550, y: 100, size: 30, game: @game, owner: @players[1]}
+      new EnhancerNode x: 440, y: 120, game: @game, owner: @players[1]
     ]
     
     

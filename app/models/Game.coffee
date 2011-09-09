@@ -2,6 +2,7 @@
 #= require "Cell"
 #= require "Player"
 #= require "Fleet"
+#= require "EnhancerNode"
 #= require <commands/SendFleetCommand>
 
 if exports?
@@ -13,6 +14,7 @@ if exports?
   Nanowar.Cell    = require('./Cell').Cell
   Nanowar.Player = require('./Player').Player
   Nanowar.Fleet  = require('./Fleet').Fleet
+  Nanowar.EnhancerNode = require('./EnhancerNode').EnhancerNode
   Nanowar.SendFleetCommand  = require('../commands/SendFleetCommand').SendFleetCommand
   Nanowar.EntityCollection = require('./EntityCollection').EntityCollection
   _               = require 'underscore'
@@ -27,7 +29,7 @@ class root.Game extends Backbone.Model
     tickLength: 1000 / 10
   
   initialize: ->
-    @entities = new Nanowar.EntityCollection [], game: this, types: [Nanowar.Cell, Nanowar.Player, Nanowar.Fleet]
+    @entities = new Nanowar.EntityCollection [], game: this, types: [Nanowar.Cell, Nanowar.Player, Nanowar.Fleet, Nanowar.EnhancerNode]
 
     if onServer?
       @entities.bind 'publish', (e) =>
