@@ -18,7 +18,6 @@ class Nanowar.views.EnhancerNodeView extends Backbone.View
     @el.setAttribute("filter", "url(#compShadow)")
     
     @gameView.svg.appendChild(@el)
-    @gameView.paper.rect(440,120,100,100)
     
     @connections = {}
     
@@ -35,7 +34,8 @@ class Nanowar.views.EnhancerNodeView extends Backbone.View
     me = @model.position()
     cpos = cell.position()
     @connections[cell.id] = @gameView.paper.path "M#{me.x} #{me.y}L#{cpos.x} #{cpos.y}"
+    console.log "enlarging #{cell.id}"
   
   removeConnectionTo: (cell) ->
-    @connections[cell.id].remove()
+    @connections[cell.id] && @connections[cell.id].remove()
     delete @connections[cell.id]

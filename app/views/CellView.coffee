@@ -34,9 +34,11 @@ class Nanowar.views.CellView extends Backbone.View
       cy: @model.get('y')
       r: 0
     
+    @animating = true
     @el.animate
       r: @model.get('size')
-    , 700, 'bounce'
+    , 700, 'bounce', =>
+      @animating = false
     
     $(@hover.node).click =>
       @trigger 'click'
@@ -51,6 +53,9 @@ class Nanowar.views.CellView extends Backbone.View
     new Nanowar.views.CellDataView {model: @model, gameView: @gameView, cellView: this}
 
   render: ->
+    unless @animating
+      @el.attr r: @model.get('size')
+    
     if @model.get('owner') && @model.get('owner').get('color')
       switch @model.get('owner').get('color')
         when 'red'
@@ -75,5 +80,5 @@ class Nanowar.views.CellView extends Backbone.View
     this
 
   pop: ->
-    @el.animate r: @model.get('size')+7, 50, 'bounce', => 
-      @el.animate r: @model.get('size'), 60
+    #@el.animate r: @model.get('size')+7, 50, 'bounce', => 
+    #  @el.animate r: @model.get('size'), 60

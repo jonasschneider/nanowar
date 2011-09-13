@@ -9,7 +9,8 @@
     "glob": "2.0.8",
     "backbone": "0.5.3",
     "underscore": "1.1.7",
-    "node-uuid": "1.2.0"
+    "node-uuid": "1.2.0",
+    "jasmine-node": "1.0.8"
   },
   "scripts": {
     "test": "jasmine-node --coffee ."
