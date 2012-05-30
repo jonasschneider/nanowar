@@ -4,10 +4,9 @@
 <title>Nano War</title> 
 <link href="/style.css" rel="stylesheet" type="text/css"/> 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script> 
-<script src="app/vendor/underscore.js"></script> 
-<script src="app/vendor/raphael.js"></script> 
+<script src="src/require.js" data-main="src/raphael"></script> 
 
-<script src="app/vendor/processing-1.3.0.js"></script> 
+<script src="src/processing-1.3.0.js"></script> 
 <body> 
 <canvas id="background" data-processing-sources="background.pde"></canvas>
 <style>
@@ -19,201 +18,202 @@ body {
 
 <script>
 $(document).ready(function() {
-  var paper = Raphael("test", 700, 700);
-  
-  svg = $("#test svg")[0]
-  console.log(svg)
-  
-  
-  
-  
-  //var clone = document.importNode(nodeFromAnotherDoc,true);
-  
-  $.get('/images/defs.svg', function(defsSVG) {
-    svg.appendChild(defsSVG.getElementById("nanowarDefs"))
-  })
-  $.get('/images/icons.svg', function(defsSVG) {
-    var iconDefs = defsSVG.getElementById("NanowarIcons")
-    iconDefs.setAttribute("opacity", "0")
-    svg.appendChild(iconDefs)
+  require(['raphael'], function(Raphael) {
+    var paper = Raphael("test", 700, 700);
     
-    grey = document.createElementNS("http://www.w3.org/2000/svg", "use")
-    grey.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#EnhanceNodeIconGrey")
-    grey.setAttribute("transform", "translate(400,100), scale(.2)")
-    grey.setAttribute("filter", "url(#compShadow)")
-    svg.appendChild(grey)
-    
-    blue = document.createElementNS("http://www.w3.org/2000/svg", "use")
-    blue.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#EnhanceNodeIconBlue")
-    blue.setAttribute("transform", "translate(450,100), scale(.2)")
-    blue.setAttribute("filter", "url(#compShadow)")
-    svg.appendChild(blue)
-    
-    red = document.createElementNS("http://www.w3.org/2000/svg", "use")
-    red.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#EnhanceNodeIconRed")
-    red.setAttribute("transform", "translate(500,100), scale(.2)")
-    red.setAttribute("filter", "url(#compShadow)")
-    svg.appendChild(red)
+    svg = $("#test svg")[0]
+    console.log(svg)
     
     
     
-    g = document.createElementNS("http://www.w3.org/2000/svg", "g")
-    g.setAttribute("transform", "translate(400,160), scale(1)")
-    svg.appendChild(g)
     
-    animfun = document.createElementNS("http://www.w3.org/2000/svg", "use")
-    animfun.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#EnhanceNodeIconRed")
-    animfun.setAttribute("transform", "scale(.23)")
-    animfun.setAttribute("filter", "url(#compShadow)")
-    g.appendChild(animfun)
+    //var clone = document.importNode(nodeFromAnotherDoc,true);
     
-    animfunblu = document.createElementNS("http://www.w3.org/2000/svg", "use")
-    animfunblu.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#EnhanceNodeIconBlue")
-    animfunblu.setAttribute("transform", "scale(.23)")
-    animfunblu.setAttribute("filter", "url(#compShadow)")
-    animfunblu.setAttribute("opacity", "0")
-    g.appendChild(animfunblu)
-    
-    txt = paper.text(-2, 20, "15")
-    txt.attr({fill: 'white', opacity:0.6, font:"13px Arial"})
-    g.appendChild(txt.node)
-    
-    
-    anim = function(el, target, dur, options) {
-      options || (options = {})
-      var easing = options.easing || Raphael.easing_formulas.bounce,
-          start = new Date().getTime(),
-          finish = start+dur,
-          source, timer;
-      source = {}
-      source.scale = parseFloat(el.getAttribute("transform").match(/scale\((.+)\)/)[1])
-      source.opacity = parseFloat(el.getAttribute("opacity") || 1)
+    $.get('/images/defs.svg', function(defsSVG) {
+      svg.appendChild(defsSVG.getElementById("nanowarDefs"))
+    })
+    $.get('/images/icons.svg', function(defsSVG) {
+      var iconDefs = defsSVG.getElementById("NanowarIcons")
+      iconDefs.setAttribute("opacity", "0")
+      svg.appendChild(iconDefs)
       
-      timer = setInterval(function() {
-        var time = new Date().getTime(),
-            pos = easing(time>finish ? 1 : (time-start)/dur)
+      grey = document.createElementNS("http://www.w3.org/2000/svg", "use")
+      grey.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#EnhanceNodeIconGrey")
+      grey.setAttribute("transform", "translate(400,100), scale(.2)")
+      grey.setAttribute("filter", "url(#compShadow)")
+      svg.appendChild(grey)
+      
+      blue = document.createElementNS("http://www.w3.org/2000/svg", "use")
+      blue.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#EnhanceNodeIconBlue")
+      blue.setAttribute("transform", "translate(450,100), scale(.2)")
+      blue.setAttribute("filter", "url(#compShadow)")
+      svg.appendChild(blue)
+      
+      red = document.createElementNS("http://www.w3.org/2000/svg", "use")
+      red.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#EnhanceNodeIconRed")
+      red.setAttribute("transform", "translate(500,100), scale(.2)")
+      red.setAttribute("filter", "url(#compShadow)")
+      svg.appendChild(red)
+      
+      
+      
+      g = document.createElementNS("http://www.w3.org/2000/svg", "g")
+      g.setAttribute("transform", "translate(400,160), scale(1)")
+      svg.appendChild(g)
+      
+      animfun = document.createElementNS("http://www.w3.org/2000/svg", "use")
+      animfun.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#EnhanceNodeIconRed")
+      animfun.setAttribute("transform", "scale(.23)")
+      animfun.setAttribute("filter", "url(#compShadow)")
+      g.appendChild(animfun)
+      
+      animfunblu = document.createElementNS("http://www.w3.org/2000/svg", "use")
+      animfunblu.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#EnhanceNodeIconBlue")
+      animfunblu.setAttribute("transform", "scale(.23)")
+      animfunblu.setAttribute("filter", "url(#compShadow)")
+      animfunblu.setAttribute("opacity", "0")
+      g.appendChild(animfunblu)
+      
+      txt = paper.text(-2, 20, "15")
+      txt.attr({fill: 'white', opacity:0.6, font:"13px Arial"})
+      g.appendChild(txt.node)
+      
+      
+      anim = function(el, target, dur, options) {
+        options || (options = {})
+        var easing = options.easing || Raphael.easing_formulas.bounce,
+            start = new Date().getTime(),
+            finish = start+dur,
+            source, timer;
+        source = {}
+        source.scale = parseFloat(el.getAttribute("transform").match(/scale\((.+)\)/)[1])
+        source.opacity = parseFloat(el.getAttribute("opacity") || 1)
+        
+        timer = setInterval(function() {
+          var time = new Date().getTime(),
+              pos = easing(time>finish ? 1 : (time-start)/dur)
 
-        for(prop in target) {
-          var val = (source[prop]+(target[prop]-source[prop])*pos).toFixed(3)
-          if(prop == 'scale') {
-            txt = el.getAttribute("transform").replace(/scale\((.+)\)/, function(exp, num) {
-              return "scale("+val+")";
-            })
-            el.setAttribute("transform", txt)
-          } else if (prop == 'opacity') {
-            console.log(val)
-            el.setAttribute("opacity", val)
+          for(prop in target) {
+            var val = (source[prop]+(target[prop]-source[prop])*pos).toFixed(3)
+            if(prop == 'scale') {
+              txt = el.getAttribute("transform").replace(/scale\((.+)\)/, function(exp, num) {
+                return "scale("+val+")";
+              })
+              el.setAttribute("transform", txt)
+            } else if (prop == 'opacity') {
+              console.log(val)
+              el.setAttribute("opacity", val)
+            }
           }
-        }
-        if(time>finish) { clearTimeout(timer); options.done && options.done() }
-      }, 10)
+          if(time>finish) { clearTimeout(timer); options.done && options.done() }
+        }, 10)
+      }
+      
+      setTimeout(function() {
+        anim(g, {scale: 1.3}, 90, {done: function() {
+          animfun.setAttribute("opacity", 0)
+          animfunblu.setAttribute("opacity", 1)
+          anim(g, {scale: 1}, 100)
+        }})
+      }, 2000)
+      
+      /*
+      setTimeout(function() {
+        newx = document.createElementNS("http://www.w3.org/2000/svg", "use")
+        newx.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#EnhanceNodeIconRed")
+        newx.setAttribute("transform", "translate(500,100), scale(.2)")
+        newx.setAttribute("filter", "url(#compShadow)")
+        
+        svg.appendChild(newx)
+        
+        console.log("go")
+      }, 1000)*/
+    })
+    
+    layers = paper.set()
+    
+    layers.push(shadow1 = paper.circle(0,0,40))
+    shadow1.attr({fill: "black" })
+    shadow1.node.setAttribute("filter", "url(#cellShadow)")
+    
+    layers.push(bg = paper.circle(0,0,40))
+    bg.attr({fill: "url(#blueBackground)"})
+    
+    layers.push(metal = paper.circle(0,0,40))
+    metal.attr({fill: "url(#metalPattern)"})
+    
+    layers.push(fg = paper.circle(0,0,40))
+    fg.attr({fill: "url(#blueForeground)"})
+    
+    layers.push(hover = paper.circle(0,0,40))
+    hover.attr({fill: 'white', opacity: 0.0})
+    hover.node.onmouseover = function() {
+      hover.attr({opacity: 0.05})
+    }
+    hover.node.onmouseout = function() {
+      hover.attr({opacity: 0})
     }
     
+    hover.node.onclick = function() {
+      shadow1.attr({fill: "white" })
+    }
+    
+    layers.attr({stroke: 'none', cx: 300, cy: 300})
+    
     setTimeout(function() {
-      anim(g, {scale: 1.3}, 90, {done: function() {
-        animfun.setAttribute("opacity", 0)
-        animfunblu.setAttribute("opacity", 1)
-        anim(g, {scale: 1}, 100)
-      }})
+      layers.animate({r: 50}, 500, 'bounce')
+    }, 1600)
+    
+    
+    
+    
+    
+    layers2 = paper.set()
+    
+    layers2.push(shadow = paper.circle(0,0,40))
+    shadow.attr({fill: "black" })
+    shadow.node.setAttribute("filter", "url(#cellShadow)")
+    
+    layers2.push(bg = paper.circle(0,0,40))
+    bg.attr({fill: "url(#redBackground)"})
+    
+    layers2.push(metal = paper.circle(0,0,40))
+    metal.attr({fill: "url(#metalPattern)"})
+    
+    layers2.push(fg = paper.circle(0,0,40))
+    fg.attr({fill: "url(#redForeground)"})
+    
+    layers2.attr({stroke: 'none', cx: 450, cy: 300})
+    
+    setTimeout(function() {
+      layers2.animate({r: 50}, 500, 'bounce')
     }, 2000)
     
-    /*
+    
+    
+    
+    layers3 = paper.set()
+    
+    layers3.push(shadow = paper.circle(0,0,40))
+    shadow.attr({fill: "black" })
+    shadow.node.setAttribute("filter", "url(#cellShadow)")
+    
+    layers3.push(bg = paper.circle(0,0,40))
+    bg.attr({fill: "url(#greyBackground)"})
+    
+    layers3.push(metal = paper.circle(0,0,40))
+    metal.attr({fill: "url(#metalPattern)"})
+    
+    layers3.push(fg = paper.circle(0,0,40))
+    fg.attr({fill: "url(#greyForeground)"})
+    
+    layers3.attr({stroke: 'none', cx: 600, cy: 300})
+    
     setTimeout(function() {
-      newx = document.createElementNS("http://www.w3.org/2000/svg", "use")
-      newx.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#EnhanceNodeIconRed")
-      newx.setAttribute("transform", "translate(500,100), scale(.2)")
-      newx.setAttribute("filter", "url(#compShadow)")
-      
-      svg.appendChild(newx)
-      
-      console.log("go")
-    }, 1000)*/
+      layers3.animate({r: 50}, 500, 'bounce')
+    }, 2400)
+    
   })
-  
-  layers = paper.set()
-  
-  layers.push(shadow1 = paper.circle(0,0,40))
-  shadow1.attr({fill: "black" })
-  shadow1.node.setAttribute("filter", "url(#cellShadow)")
-  
-  layers.push(bg = paper.circle(0,0,40))
-  bg.attr({fill: "url(#blueBackground)"})
-  
-  layers.push(metal = paper.circle(0,0,40))
-  metal.attr({fill: "url(#metalPattern)"})
-  
-  layers.push(fg = paper.circle(0,0,40))
-  fg.attr({fill: "url(#blueForeground)"})
-  
-  layers.push(hover = paper.circle(0,0,40))
-  hover.attr({fill: 'white', opacity: 0.0})
-  hover.node.onmouseover = function() {
-    hover.attr({opacity: 0.05})
-  }
-  hover.node.onmouseout = function() {
-    hover.attr({opacity: 0})
-  }
-  
-  hover.node.onclick = function() {
-    shadow1.attr({fill: "white" })
-  }
-  
-  layers.attr({stroke: 'none', cx: 300, cy: 300})
-  
-  setTimeout(function() {
-    layers.animate({r: 50}, 500, 'bounce')
-  }, 1600)
-  
-  
-  
-  
-  
-  layers2 = paper.set()
-  
-  layers2.push(shadow = paper.circle(0,0,40))
-  shadow.attr({fill: "black" })
-  shadow.node.setAttribute("filter", "url(#cellShadow)")
-  
-  layers2.push(bg = paper.circle(0,0,40))
-  bg.attr({fill: "url(#redBackground)"})
-  
-  layers2.push(metal = paper.circle(0,0,40))
-  metal.attr({fill: "url(#metalPattern)"})
-  
-  layers2.push(fg = paper.circle(0,0,40))
-  fg.attr({fill: "url(#redForeground)"})
-  
-  layers2.attr({stroke: 'none', cx: 450, cy: 300})
-  
-  setTimeout(function() {
-    layers2.animate({r: 50}, 500, 'bounce')
-  }, 2000)
-  
-  
-  
-  
-  layers3 = paper.set()
-  
-  layers3.push(shadow = paper.circle(0,0,40))
-  shadow.attr({fill: "black" })
-  shadow.node.setAttribute("filter", "url(#cellShadow)")
-  
-  layers3.push(bg = paper.circle(0,0,40))
-  bg.attr({fill: "url(#greyBackground)"})
-  
-  layers3.push(metal = paper.circle(0,0,40))
-  metal.attr({fill: "url(#metalPattern)"})
-  
-  layers3.push(fg = paper.circle(0,0,40))
-  fg.attr({fill: "url(#greyForeground)"})
-  
-  layers3.attr({stroke: 'none', cx: 600, cy: 300})
-  
-  setTimeout(function() {
-    layers3.animate({r: 50}, 500, 'bounce')
-  }, 2400)
-  
-  
 })
 </script>
 </body></html>

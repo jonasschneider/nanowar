@@ -1,6 +1,5 @@
-socketio= require('socket.io')
-
-server = require('./client/webserver').app
+socketio = require('socket.io')
+server = require('./client/webserver').apps
 port = process.env.PORT || 2000
 
 server.listen(port)
@@ -18,6 +17,14 @@ io.configure 'production', ->
   io.set('transports', ['xhr-polling'])
   io.set('polling duration', 30)
 
-server = require('./app/server').start(io)
+requirejs = require('requirejs');
 
-console.log("Server running at port " + port)
+requirejs.configs
+  baseUrl: 'src'
+  nodeRequire: require
+  
+requirejs(['nanowar/server'], (server) ->
+  server.start(io)
+
+  console.log("Server running at port " + port)
+)

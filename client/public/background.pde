@@ -19,8 +19,10 @@ void setup() {
   adjustSize = function() { // TODO: debounce
     size($(window).width(), $(window).height())
   }
-  
-  $(window).resize(_.debounce(_.bind(adjustSize, 300)));
+
+  require(['underscore'], function(_) {
+    $(window).resize(_.debounce(_.bind(adjustSize, 300)));
+  })
   
   adjustSize();
   
@@ -48,8 +50,10 @@ void draw() {
   text(ps.particles.size() + " particles", 10, 20);
   
   ps.run();
+
+  var src = window.processingAuxSources || [{x: 100, y:200, r:50}, {x: 300, y:200, r:50}, {x: 200, y:200, r:50}]
   
-  _(window.processingAuxSources).each(function(aux) {
+  src.forEach(function(aux) {
     ps.addParticle(new ExplosiveParticle(new PVector(aux.x, aux.y), aux.r, ps.n++));
   })
   

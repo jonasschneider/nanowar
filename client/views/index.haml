@@ -3,33 +3,18 @@
   %head
     %title Nano War
     %link{ href: "/style.css", rel: "stylesheet", type: "text/css"}
-    
-    %script{ src: "http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js", type: "text/javascript"}
-    %script{ src: "/app/vendor/socket.io.js", type: "text/javascript"}
-    
-    - each script in global_scripts()
-      %script{ src: script }
+
+    %script{ data-main: "src/client", src: 'src/require.js' }
+
+    :javascript
+      require.config({
+        paths: {
+            "jquery": "http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min"
+        }
+      });
   %body
-    %canvas#background{ "data-processing-sources": "background.pde" }
+    %canvas#background{ data-processing-sources: "background.pde" }
     %h2 Nano War
     #nanowar
     
     %ul#log
-    
-    %script
-      :plain
-        oldLog = console.log
-        console.log = function(text) {
-          var ticks = '', ticksText = ''
-          if(window.App && window.App.game) {
-            ticks = '<b>'+window.App.game.ticks+':</b> '
-            ticksText = window.App.game.ticks+': '
-          }
-          
-          
-          if(typeof text == 'string')
-            console.debug(ticksText + text)
-          
-          else
-            console.debug(text)
-        }
