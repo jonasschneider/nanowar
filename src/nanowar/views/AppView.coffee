@@ -2,8 +2,7 @@ define (require) ->
   Backbone = require 'backbone'
   GameView = require './GameView'
   io       = require 'socket.io'
-  console.log io
-  
+
   return class AppView extends Backbone.View
     initialize: ->
       @gameDisplay = new GameView({model: @model.game, appView: this})

@@ -1,4 +1,6 @@
-SuperModel = require('../../app/helpers/SuperModel.coffee').SuperModel
+SuperModel = require('../../../compiled/nanowar/models/SuperModel')
+
+console.log SuperModel
 
 class Blog extends SuperModel
 

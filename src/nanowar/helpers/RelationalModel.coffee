@@ -61,7 +61,6 @@ define (require) ->
       if id && options.directoryObject && inDir = options.directoryObject.get id
         inDir
       else
-        console.warn options.directoryObject
         throw "While instantiating #{thisType}: #{options.relatedModelName} is not registered in this.#{options.directory}"
 
     changedAttributes: ->

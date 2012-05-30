@@ -1,6 +1,4 @@
 define (require) ->
-  console.log 'hai'
-  console.log require('jquery')
   require('processing-1.3.0')
 
   app = require('nanowar/models/App')

@@ -5,10 +5,11 @@ define (require) ->
   return class App extends Backbone.Model
     urlRoot: '/app'
     
-    initialize: (onServer) ->
+    initialize: ->
       @game = new Game
       
-      if onServer
+      console.log @get('onServer')
+      if @get('onServer')
         @is_publishing = true
       else
         @is_publishing = false

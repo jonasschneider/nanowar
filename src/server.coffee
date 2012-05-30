@@ -19,19 +19,14 @@ server.listen(port)
 #  io.set('transports', ['xhr-polling'])
 #  io.set('polling duration', 30)
 
-try
-  requirejs = require('requirejs');
+requirejs = require('requirejs');
 
-  requirejs.config
-    baseUrl: 'compiled'
-    nodeRequire: require
+requirejs.config
+  baseUrl: 'compiled'
+  nodeRequire: require
 
-  requirejs(['nanowar/server'], (server) ->
-    server.start(io)
-
-    console.log("Server running at port " + port)
-  )
-catch e
-  console.log "asdf"
-  console.log(e.stack)
-  console.trace()
+requirejs(['nanowar/server'], (server) ->
+  server.start(io)
+#
+  console.log("Server running at port " + port)
+)

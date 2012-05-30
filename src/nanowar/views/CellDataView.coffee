@@ -1,6 +1,7 @@
 define (require) ->
   Backbone = require 'backbone'
-
+  _       = require 'underscore'
+  
   return class CellDataView extends Backbone.View
     initialize: (options)->
       @gameView = options.gameView

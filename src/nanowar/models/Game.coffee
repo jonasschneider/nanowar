@@ -15,14 +15,13 @@ define (require) ->
     initialize: ->
       @entities = new EntityCollection [], game: this, types: [Cell, Player, Fleet, EnhancerNode]
 
-      if onServer?
-        @entities.bind 'publish', (e) =>
-          @trigger 'publish',
-            entities: e
-            ticks: @ticks
-        
-        @bind 'start', =>
-          @trigger 'publish', 'start'
+      @entities.bind 'publish', (e) =>
+        @trigger 'publish',
+          entities: e
+          ticks: @ticks
+      
+      @bind 'start', =>
+        @trigger 'publish', 'start'
 
       @bind 'update', (e) =>
         if e.ticks?

@@ -1,9 +1,7 @@
-define('jquery', [], function() {
-  if(typeof window != "undefined")
-    return window.$;
-  else
+if(typeof window == "undefined")
+  define('jquery', [], function() {
     return undefined;
-});
+  });
 
 define(function(require){
 
@@ -14,7 +12,6 @@ define(function(require){
 
   // Save a reference to the global object.
   var root = this;
-  console.log(root)
 
   // Save the previous value of the `Backbone` variable.
   var previousBackbone = root.Backbone;

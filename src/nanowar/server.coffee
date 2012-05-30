@@ -40,7 +40,7 @@ define (require) ->
     constructor: ->
       @players = []
       
-      @app = new App
+      @app = new App onServer: true
       @game = @app.game
       @app.bind 'publish', @distributeUpdate, this
       
@@ -126,5 +126,6 @@ define (require) ->
       fn()
       
       io.sockets.on 'connection', (clientSocket) ->
+        console.log 'connection'
         match.addPlayer clientSocket
   }

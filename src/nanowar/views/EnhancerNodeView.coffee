@@ -1,5 +1,6 @@
 define (require) ->
   Backbone = require 'backbone'
+  _        = require 'underscore'
   
   return class EnhancerNodeView extends Backbone.View
     initialize: (options) ->
