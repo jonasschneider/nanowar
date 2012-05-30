@@ -6,7 +6,7 @@ define (require) ->
       @gameView = opts.gameView
       
       @model.bind 'change', @render, this
-      @model.bind 'destroy', @remove, this
+      @model.bind 'remove', @remove, this
       
       @el = @gameView.paper.circle()
       

@@ -24,7 +24,11 @@ define (require) ->
         directory: 'game.entities'
 
     initialize: ->
-      @game.bind 'tick', @update, this
+      if @game.get('onServer')
+        @game.bind 'tick', @update, this
+        
+        @bind 'remove', =>
+          @game.unbind 'tick', @update, this
     
     startPosition: ->
       util.nearestBorder @get('from').position(), @get('from').get('size'), @get('to').position()
@@ -67,8 +71,4 @@ define (require) ->
       if @arrived()
         console.log "[Tick#{@game.ticks}] [Fleet #{@cid}] Arrived from route #{@get('from').cid}->#{@get('to').cid}"
         @get('to').handle_incoming_fleet this
-        @destroy()
-              
-    destroy: ->
-      @game.unbind 'tick', @update, this
-      @trigger 'destroy', this
+        @collection.remove this

@@ -13,10 +13,7 @@ define (require) ->
         
       unless @game = options.game
         throw "Need game" 
-      
-      @bind 'add', (entity) =>
-        @trigger 'publish', { add: entity }
-        
+
       @bind 'update', (data) =>
         if data.add?
           @add data.add
@@ -25,10 +22,23 @@ define (require) ->
           unless ent = @get(data.changedEntityId)
             throw "Could not find entity with id #{data.changedEntityId}"
           ent.trigger 'update', data.changeDelta
+
+        if data.destroyedEntityId?
+          unless ent = @get(data.destroyedEntityId)
+            throw "Could not find entity with id #{data.destroyedEntityId}"
+          @remove ent
+
+      if @game.get('onServer')
+        @bind 'add', (entity) =>
+          @trigger 'publish', { add: entity }
           
-      @bind 'change', (entity) =>
-        if delta = entity.changedAttributes()
-          @trigger 'publish', changedEntityId: entity.id, changeDelta: delta
+        @bind 'change', (entity) =>
+          if delta = entity.changedAttributes()
+            @trigger 'publish', changedEntityId: entity.id, changeDelta: delta
+
+        @bind 'remove', (entity) =>
+          console.log entity, this
+          @trigger 'publish', destroyedEntityId: entity.id
 
     _add: (entity) ->
       if _(@types).any((type) ->

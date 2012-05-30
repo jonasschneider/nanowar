@@ -3,6 +3,7 @@ define (require) ->
   CellView = require './CellView'
   FleetView = require './FleetView'
   EnhancerNodeView = require './EnhancerNodeView'
+  SendFleetCommand = require '../commands/SendFleetCommand'
   Raphael = require 'raphael'
   
   return class GameView extends Backbone.View
@@ -72,7 +73,7 @@ define (require) ->
       if @selectedCell?
         # don't send to itself
         if cellClickedOn != @selectedCell
-          @model.trigger 'publish', sendFleetCommand: new Nanowar.SendFleetCommand(game: @model, from: @selectedCell.model, to: cellClickedOn.model)
+          @model.trigger 'publish', sendFleetCommand: new SendFleetCommand(game: @model, from: @selectedCell.model, to: cellClickedOn.model)
       else
         # only select cells owned by local player
         if @appView.localPlayer == cellClickedOn.model.get('owner')

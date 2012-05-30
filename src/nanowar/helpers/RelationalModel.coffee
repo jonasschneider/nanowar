@@ -22,7 +22,8 @@ define (require) ->
     constructor: (attrs) ->
       @bind 'beforeInitialSet', =>
         _(@relationSpecs).each (options, name) =>
-          options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(\)/)[1]
+          console.log options, name
+          options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(/)[1]
           
           if(options.directory)
             # traverse path to directory
@@ -48,8 +49,8 @@ define (require) ->
       if value instanceof Model
         id = value.get('id')
       else if value.type? && value.type == 'serializedRelation'
-        if value.model != options.relatedModelName
-          throw "While instantiating #{thisType}: Expected serialized relation of a #{options.relatedModelName} model, not a #{value.model} model"
+        #if value.model != options.relatedModelName
+        #  throw "While instantiating #{thisType}: Expected serialized relation of a #{options.relatedModelName} model, not a #{value.model} model"
         id = value.id
       else
         debug = try

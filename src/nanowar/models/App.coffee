@@ -6,9 +6,8 @@ define (require) ->
     urlRoot: '/app'
     
     initialize: ->
-      @game = new Game
+      @game = new Game onServer: @get('onServer')
       
-      console.log @get('onServer')
       if @get('onServer')
         @is_publishing = true
       else

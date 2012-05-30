@@ -27,7 +27,7 @@ define (require) ->
     
     handle_incoming_fleet: (fleet) ->
       @trigger 'incomingFleet', fleet
-      return unless onServer?
+      #return unless onServer?
       if fleet.get('owner') == @get('owner') # friendly fleet
         console.log "Friendly fleet of #{fleet.get('strength')} arrived at #{@cid}"
         @changeCurrentStrengthBy fleet.get('strength')
