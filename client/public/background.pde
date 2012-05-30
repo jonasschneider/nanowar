@@ -51,7 +51,10 @@ void draw() {
   
   ps.run();
 
-  var src = window.processingAuxSources || [{x: 100, y:200, r:50}, {x: 300, y:200, r:50}, {x: 200, y:200, r:50}]
+  //var defaultAux = [{x: 100, y:200, r:50}, {x: 300, y:200, r:50}, {x: 200, y:200, r:50}]
+  var defaultAux = []
+
+  var src = window.processingAuxSources || defaultAux
   
   src.forEach(function(aux) {
     ps.addParticle(new ExplosiveParticle(new PVector(aux.x, aux.y), aux.r, ps.n++));
