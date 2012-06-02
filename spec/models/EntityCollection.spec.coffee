@@ -123,6 +123,17 @@ require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/mo
           coll.add entity.toJSON()
         .toThrow 'I dont know what to do with {"type":"MyOtherEntity"}. Known types are [MyEntity]'
 
+      it 'sets friendly ids for new entities', ->
+        coll = new EntityCollection [], types: {'MyEntity': MyEntity, 'MyOtherEntity': MyOtherEntity}, game: @game
+        
+        coll.add entity = new MyEntity game: @game
+        coll.add entity2 = new MyEntity game: @game
+        coll.add entity3 = new MyOtherEntity game: @game
+
+        expect(entity.id).toBe('MyEntity_1')
+        expect(entity2.id).toBe('MyEntity_2')
+        expect(entity3.id).toBe('MyOtherEntity_1')
+
 
       it 'is polymorphic', ->
         coll = new EntityCollection [], types: {'MyEntity': MyEntity, 'MyOtherEntity': MyOtherEntity}, game: @game

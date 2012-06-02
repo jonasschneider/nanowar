@@ -13,7 +13,8 @@ define (require) ->
       tickLength: 1000 / 10
     
     initialize: ->
-      @entities = new EntityCollection [], game: this, types: [Cell, Player, Fleet, EnhancerNode]
+      etypes = Cell: Cell, Player: Player, Fleet: Fleet, EnhancerNode: EnhancerNode
+      @entities = new EntityCollection [], game: this, types: etypes
 
       if @get('onServer')
         @entities.bind 'publish', (e) =>

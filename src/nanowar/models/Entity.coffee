@@ -13,3 +13,6 @@ define (require) ->
         @set data
       
       super
+
+    toString: ->
+      @id || super
