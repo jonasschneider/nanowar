@@ -11,7 +11,7 @@ require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/mo
     describe 'on entity change', ->
       it 'publishes entity on add', ->
         @game.set onServer: true
-        coll = new EntityCollection [], types: [MyEntity], game: @game
+        coll = new EntityCollection [], types: {'MyEntity': MyEntity}, game: @game
         
         spy = jasmine.createSpy()
         coll.bind 'publish', spy
@@ -26,7 +26,7 @@ require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/mo
     
       it 'publishes a delta on change', ->
         @game.set onServer: true
-        coll = new EntityCollection [], types: [MyEntity], game: @game
+        coll = new EntityCollection [], types: {'MyEntity': MyEntity}, game: @game
         
         spy = jasmine.createSpy()
         coll.bind 'publish', spy
@@ -44,7 +44,7 @@ require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/mo
 
       it 'sends incremental updates', ->
         @game.set onServer: true
-        coll = new EntityCollection [], types: [MyEntity, MyOtherEntity], game: @game
+        coll = new EntityCollection [], types: {'MyEntity': MyEntity, 'MyOtherEntity': MyOtherEntity}, game: @game
         
         updates = []
         coll.bind 'publish', (c) =>
@@ -66,7 +66,7 @@ require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/mo
     describe 'on update', ->
       describe 'with an add entity request', ->
         it 'adds the entity', ->
-          coll = new EntityCollection [], types: [MyEntity], game: @game
+          coll = new EntityCollection [], types: {'MyEntity': MyEntity}, game: @game
           
           myEntity = new MyEntity aProperty: 'value', game: @game
           
@@ -79,7 +79,7 @@ require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/mo
 
       describe 'with a change entity request', ->
         it "calls 'update' on the changed entity", ->
-          coll = new EntityCollection [], types: [MyEntity], game: @game
+          coll = new EntityCollection [], types: {'MyEntity': MyEntity}, game: @game
           
           coll.add myEntity = new MyEntity someProperty: 1, game: @game
           
@@ -94,7 +94,7 @@ require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/mo
 
 
         it "throws when attempting to update an unknown entity", ->
-          coll = new EntityCollection [], types: [MyEntity], game: @game
+          coll = new EntityCollection [], types: {'MyEntity': MyEntity}, game: @game
           
           coll.add myEntity = new MyEntity someProperty: 1, game: @game
           
@@ -106,7 +106,7 @@ require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/mo
 
     describe '#add', ->
       it 'passes the game to new entities', ->
-        coll = new EntityCollection [], types: [MyEntity], game: @game
+        coll = new EntityCollection [], types: {'MyEntity': MyEntity}, game: @game
         json = new MyEntity(game: @game).toJSON()
         
         coll.add json
@@ -115,7 +115,7 @@ require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/mo
 
 
       it 'throws nicely on unknown entity type', ->
-        coll = new EntityCollection [], types: [MyEntity], game: @game
+        coll = new EntityCollection [], types: {'MyEntity': MyEntity}, game: @game
         
         entity = new MyOtherEntity game: @game
         
@@ -125,7 +125,7 @@ require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/mo
 
 
       it 'is polymorphic', ->
-        coll = new EntityCollection [], types: [MyEntity, MyOtherEntity], game: @game
+        coll = new EntityCollection [], types: {'MyEntity': MyEntity, 'MyOtherEntity': MyOtherEntity}, game: @game
         
         myEntityA = new MyEntity aProperty: 'value', game: @game
         myEntityB = new MyOtherEntity bProperty: 'value2', game: @game

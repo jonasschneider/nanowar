@@ -1,7 +1,7 @@
 define (require) ->
   Player = require('./Player')
   Entity = require('./Entity')
-  Cell = require('./Entity')
+  Cell = require('./Cell')
   
   _      = require('underscore')
   util = require('../helpers/util')

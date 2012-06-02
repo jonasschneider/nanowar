@@ -22,7 +22,6 @@ define (require) ->
     constructor: (attrs) ->
       @bind 'beforeInitialSet', =>
         _(@relationSpecs).each (options, name) =>
-          console.log options, name
           options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(/)[1]
           
           if(options.directory)

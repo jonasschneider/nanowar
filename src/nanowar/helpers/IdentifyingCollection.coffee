@@ -6,7 +6,6 @@ define (require) ->
     _add: (model, options) ->
       model = @_prepareModel model, options
       if !model.id
-        console.log "Setting UUID"
         model.set 
           id: uuid()
       super model, options

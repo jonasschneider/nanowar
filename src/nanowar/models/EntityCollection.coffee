@@ -8,8 +8,8 @@ define (require) ->
         throw "Need types"
       
       @types = {}
-      _(options.types).each (klass) =>
-        @types[klass.getType()] = klass
+      _(options.types).each (klass, name) =>
+        @types[name] = klass
         
       unless @game = options.game
         throw "Need game" 

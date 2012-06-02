@@ -7,10 +7,6 @@ require ['nanowar/helpers/SuperModel'], (SuperModel) ->
 
   class SpecialBlog extends Blog
 
-  class ThrowingInitializer extends SuperModel
-    initialize: ->
-      throw "I am evil"
-
   class AnonymousBlog extends Blog
     anonymousSubclass: true
 
@@ -22,17 +18,6 @@ require ['nanowar/helpers/SuperModel'], (SuperModel) ->
 
   describe 'Nanowar.SuperModel', ->
     describe 'class naming', ->
-      describe '.getType()', ->
-        it 'works', ->
-          expect(Blog.getType()).toBe 'Blog'
-          expect(SpecialBlog.getType()).toBe 'SpecialBlog'
-          #expect(AnonymousBlog.getType()).toBe 'Blog' # bug!
-          #expect(BlackHatBlog.getType()).toBe 'Blog'
-    
-    
-        it 'does not call initializer', ->
-          expect(ThrowingInitializer.getType()).toBe 'ThrowingInitializer'
-      
       it 'sets the model name as an attribute', ->
         expect(new Blog().get 'type').toBe 'Blog'
     
