@@ -76,21 +76,12 @@ define (require) ->
       
       console.log 'starting. players:'
       _(@players).each (player) =>
-        @game.entities.add player
+        @game.tellSelf 'addPlayer', player
         console.log "- #{player.get('name')} (#{player.socket.id})"
         
         player.updateLocalPlayer()
       
-      cells = [
-        c1 = new Cell {x: 350, y: 100, size: 50, game: @game}
-        new Cell {x: 350, y: 300, size: 30, game: @game, owner: @players[0]}
-        new Cell {x: 100, y: 200, size: 50, game: @game}
-        new Cell {x: 500, y: 200, size: 50, game: @game}
-        new Cell {x: 550, y: 100, size: 30, game: @game, owner: @players[1]}
-        new EnhancerNode x: 440, y: 120, game: @game, owner: @players[1]
-      ]
-      
-      
+      @game.tellSelf 'loadMap'
       
       @game.bind 'end', (result) =>
         console.log 'Game is over, disconnecting clients'
@@ -101,7 +92,7 @@ define (require) ->
           player.send 'log', 'Bye.'
           player.socket.disconnect()
       
-      @game.entities.add cells
+      
       
       go = =>
         @game.run()

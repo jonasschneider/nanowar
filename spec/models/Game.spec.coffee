@@ -11,6 +11,82 @@ require ['nanowar/models/Game', 'nanowar/models/Cell', 'nanowar/models/Player'],
         expect(game.getCells().length).toBe 1
         expect(game.getCells()[0]).toBe cell
 
+    describe '#tellSelf', ->
+      it 'can tick without tells', ->
+        game = new Game
+        game.tick()
+
+      it 'runs a tell when ticking', ->
+        game = new Game
+        ran = false
+
+        game.ahoy = ->
+            ran = true
+
+        game.tellSelf 'ahoy'
+        expect(ran).toBe false
+
+        game.tick()
+        expect(ran).toBe true
+
+      it 'runs tells in order', ->
+        game = new Game
+        first = null
+        hissed = false
+        ahoy = false
+
+        game.hiss = ->
+          first = first || 'hiss'
+          hissed = true
+
+        game.ahoy = ->
+          first = first || 'ahoy'
+          ahoy = true
+
+        game.tellSelf 'hiss'
+        game.tellSelf 'ahoy'
+
+        game.tick()
+
+        expect(hissed).toBe true
+        expect(ahoy).toBe true
+        expect(first).toBe 'hiss'
+
+      it 'runs a tell with an argument', ->
+        game = new Game
+        got = null
+
+        game.ahoy = (arg)->
+          got = arg
+
+        game.tellSelf 'ahoy', 'set sails'
+        game.tick()
+
+        expect(got).toBe 'set sails'
+
+    describe '#tick', ->
+      it 'publishes the tells', ->
+        game = new Game
+        output = false
+
+        game.bind 'publish', (arg) ->
+          output = arg
+
+        game.ahoy = ->
+
+        game.tellSelf 'ahoy'
+        game.tick()
+
+        game2 = new Game
+        called = false
+        game2.ahoy = ->
+          called = true
+        
+        game2.trigger 'update', output
+
+        expect(called).toBe true
+       
+
     describe '#getPlayers', ->
       it 'works', ->
         game = new Game
