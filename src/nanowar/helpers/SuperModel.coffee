@@ -9,9 +9,10 @@ define (require) ->
 
     constructor: (attributes) ->
       attributes ||= {}
-      nameGiver = this.__proto__
+      nameGiver = this
       nameGiver = nameGiver.__proto__ while nameGiver.anonymousSubclass? && nameGiver.anonymousSubclass
 
+      console.log nameGiver.constructor.toString()
       type = nameGiver.constructor.toString().match(/^function (.*)\(/)[1]
 
       nameGiver.type = type

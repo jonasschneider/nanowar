@@ -1,7 +1,4 @@
-define (require) ->
-  Game = require('./Game')
-  Player = require('./Player')
-
+require ['nanowar/models/Game', 'nanowar/models/Player'], (Game, Player) ->
   describe 'Player', ->
     it 'gets assigned a color', ->
       game = new Game

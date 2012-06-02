@@ -49,8 +49,8 @@ define (require) ->
       if value instanceof Model
         id = value.get('id')
       else if value.type? && value.type == 'serializedRelation'
-        #if value.model != options.relatedModelName
-        #  throw "While instantiating #{thisType}: Expected serialized relation of a #{options.relatedModelName} model, not a #{value.model} model"
+        if value.model != options.relatedModelName
+          throw "While instantiating #{thisType}: Expected serialized relation of a #{options.relatedModelName} model, not a #{value.model} model"
         id = value.id
       else
         debug = try

@@ -10,7 +10,7 @@ define (require) ->
       @gameView.bind          'select',             @render,  this
       @gameView.appView.bind  'change:localPlayer', @render,  this
       @model.bind             'change',             @render,  this
-      @model.bind             'incomingFleet',      @pop,     this
+      @model.bind             'change',             @pop,     this
       
       @el = layers = @gameView.paper.set()
 
@@ -80,5 +80,5 @@ define (require) ->
       this
 
     pop: ->
-      #@el.animate r: @model.get('size')+7, 50, 'bounce', => 
-      #  @el.animate r: @model.get('size'), 60
+      @el.animate r: @model.get('size')+7, 50, 'bounce', => 
+        @el.animate r: @model.get('size'), 60
