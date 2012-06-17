@@ -141,12 +141,27 @@ require ['nanowar/helpers/RelationalModel', 'backbone'], (RelationalModel, Backb
         expect(x.get('author')).toBe jonas
 
 
-      it "accepts a correct serialized relation ", ->
+      it "accepts a correctly serialized relation", ->
         jonas = new Person name: 'Jonas', id: 123
         x = new Post blog: new BlogWithAuthor(jonas)
         x.set author: { type: 'serializedRelation', model: 'Person', id: jonas.id }
 
         expect(x.get('author')).toBe jonas
+        
+
+      it "accepts a plain serialized model ", ->
+        jonas = new Person name: 'Jonas', id: 123
+        x = new Post blog: new BlogWithAuthor(jonas)
+        x.set author: jonas.toJSON()
+
+        expect(x.get('author')).toBe jonas
+        
+      it "throws on a serialized unrelated model ", ->
+        jonas = new Person name: 'Jonas', id: 123
+        x = new Post blog: new BlogWithAuthor(jonas)
+        expect ->
+          x.set author: x.toJSON()
+        .toThrow()
         
       it "doesn't overwrite the relation when setting other properties", ->
         jonas = new Person name: 'Jonas', id: 123

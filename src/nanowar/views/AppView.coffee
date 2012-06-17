@@ -12,26 +12,29 @@ define (require) ->
         socket = io.connect('http://'+location.hostname)
         
         socket.on 'update', (e) =>
-          fn = =>
-            @model.trigger 'update', e
-          #_(fn).delay 200
-          fn()
+          @model.trigger 'update', e
         
         socket.on 'log', (e) ->
           console.log e
         
         socket.on 'ping', (timestamp) =>
           socket.emit 'pong', timestamp
+
+        socket.on 'runTellQueue', =>
+          @model.game.runTellQueue()
+          alert("tell queue ran")
         
         socket.on 'setLocalPlayer',  (player) =>
-          fn = =>
-            player = @model.game.entities.get(player)
-            @localPlayer = player
-            @trigger 'change:localPlayer', player
-            
-            console.log 'localPlayer set: ' + JSON.stringify(player)
-          #_(fn).delay 200 
-          fn()
+          console.log player, @model.game.entities
+          alert(player)
+
+          player = @model.game.entities.get(player)
+          alert(@model.game.entities.models.toString())
+          alert(player)
+          @localPlayer = player
+          @trigger 'change:localPlayer', player
+          
+          console.log 'localPlayer set: ' + JSON.stringify(player)
         
         socket.on 'connect', =>
           console.log 'connected to server'

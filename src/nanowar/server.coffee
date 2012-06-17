@@ -34,7 +34,7 @@ define (require) ->
       @socket.emit.apply(@socket, clean)
       
     updateLocalPlayer: ->
-      @socket.emit 'setLocalPlayer', this
+      @socket.emit 'setLocalPlayer', this.id
 
   class Match
     constructor: ->
@@ -78,10 +78,14 @@ define (require) ->
       _(@players).each (player) =>
         @game.tellSelf 'addPlayer', player
         console.log "- #{player.get('name')} (#{player.socket.id})"
-        
-        player.updateLocalPlayer()
       
       @game.tellSelf 'loadMap'
+
+      @game.runTellQueue()
+      
+      @sendToAll 'runTellQueue' # hackish, to get the player entities to the clients so we can updateLocalPlayer()
+
+      p.updateLocalPlayer() for p in @players
       
       @game.bind 'end', (result) =>
         console.log 'Game is over, disconnecting clients'
@@ -91,8 +95,6 @@ define (require) ->
         _(@players).each (player) -> # potential problem since we don't use @game.players
           player.send 'log', 'Bye.'
           player.socket.disconnect()
-      
-      
       
       go = =>
         @game.run()

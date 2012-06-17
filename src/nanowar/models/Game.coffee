@@ -17,13 +17,11 @@ define (require) ->
       etypes = Cell: Cell, Player: Player, Fleet: Fleet, EnhancerNode: EnhancerNode
       @entities = new EntityCollection [], game: this, types: etypes
 
-      @bind 'start', =>
-        @trigger 'publish', 'start'
-
       @bind 'update', (e) =>
         console.log 'game got update', e
 
-        @runTells(e.tells) if e.tells
+        if e.tells
+          @tellQueue.push(tell) for tell in e.tells
 
         #if e.ticks?
         # @ticks = e.ticks
@@ -36,7 +34,7 @@ define (require) ->
         #  cmd.run()
         #  #@trigger 'publish', {sendFleet: e.sendFleet} if onServer?
         #
-        #@run() if e == 'start'
+        @run() if e.run
       
       
 
@@ -44,6 +42,7 @@ define (require) ->
       @running = false
       @stopping = false
       @tellQueue = []
+      @sendQueue = []
     
     getEntities: (type) ->
       @entities.select (entity) -> entity instanceof type
@@ -77,7 +76,11 @@ define (require) ->
       @entities.add cells
     
     tellSelf: (what, args...) ->
-      @tellQueue.push(to: '$self', what: what, with: args)
+      tell = to: '$self', what: what, with: args
+      if @get('onServer')
+        @tellQueue.push tell
+      else
+        @sendQueue.push tell
 
     # private?
 
@@ -89,15 +92,36 @@ define (require) ->
     addPlayer: (player) ->
       @entities.add player
 
+    sendFleet: (from, to) ->
+      fleet = new Fleet 
+        from: from
+        to: to
+        game: this
+      
+      if fleet.canLaunch()
+        @entities.add fleet
+        fleet.launch()
+
     runTells: (tells) ->
       @runTell(tell) for tell in tells
 
+    runTellQueue: ->
+      if @tellQueue.length > 0 || @sendQueue.length > 0
+        if @get('onServer')
+          @trigger 'publish', tick: @ticks, tells: @tellQueue
+        else
+          if @sendQueue.length > 0
+            @trigger 'publish', tick: @ticks, tells: @sendQueue
+            @sendQueue = []
+        @runTells(@tellQueue)
+        @tellQueue = []
+      
+
     # UNSPECCED
-    run: ->
+    run: -> # probably blows up synchronisation
       console.log "GOGOGOG"
-      
-      @trigger 'start'
-      
+      @trigger 'publish', run: true if @get('onServer')
+
       @schedule()
     
     schedule: ->
@@ -112,11 +136,7 @@ define (require) ->
       @schedule() unless @stopping
       @ticks++
       @trigger 'tick'
-
-      if @tellQueue.length > 0
-        @trigger 'publish', tick: @ticks, tells: @tellQueue
-        @runTells(@tellQueue)
-        @tellQueue = []
+      @runTellQueue()
 
       if winner = @getWinner()
         @trigger 'end', winner: winner

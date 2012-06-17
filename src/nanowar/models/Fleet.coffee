@@ -58,7 +58,7 @@ define (require) ->
         @set strength: Math.floor(@get('from').getCurrentStrength() / 2)
 
       if @canLaunch()
-        console.log "[Tick#{@game.ticks}] [Fleet #{@cid}] Fleet of #{@get('strength')} launching #{@get('from').cid}->#{@get('to').cid}; arrival in #{@flightTime()} ticks"
+        console.log "[Tick#{@game.ticks}] [Fleet #{@id}] Fleet of #{@get('strength')} launching #{@get('from').id}->#{@get('to').id}; arrival in #{@flightTime()} ticks"
         @get('from').changeCurrentStrengthBy -@get('strength')
         @set launched_at: @game.ticks
         true
@@ -69,6 +69,6 @@ define (require) ->
     
     update: ->
       if @arrived()
-        console.log "[Tick#{@game.ticks}] [Fleet #{@cid}] Arrived from route #{@get('from').cid}->#{@get('to').cid}"
+        console.log "[Tick#{@game.ticks}] [Fleet #{@id}] Arrived from route #{@get('from').id}->#{@get('to').id}"
         @get('to').handle_incoming_fleet this
         @collection.remove this

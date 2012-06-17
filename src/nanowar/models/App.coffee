@@ -8,15 +8,7 @@ define (require) ->
     initialize: ->
       @game = new Game onServer: @get('onServer')
       
-      if @get('onServer')
-        @is_publishing = true
-      else
-        @is_publishing = false
-        @game.bind 'start', =>
-          @is_publishing = true
-      
       @game.bind 'publish', (e) =>
-        return unless @is_publishing
         @trigger 'publish',
           game: e
       

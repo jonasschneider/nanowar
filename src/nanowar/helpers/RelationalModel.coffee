@@ -51,6 +51,11 @@ define (require) ->
         if value.model != options.relatedModelName
           throw "While instantiating #{thisType}: Expected serialized relation of a #{options.relatedModelName} model, not a #{value.model} model"
         id = value.id
+      else if value.id && value.type
+        if value.type == options.relatedModelName
+          id = value.id
+        else
+          throw "While instantiating #{thisType}: Expected serialized #{options.relatedModelName} model, not #{value.type}"
       else
         debug = try
             value = JSON.stringify value
