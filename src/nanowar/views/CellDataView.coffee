@@ -22,5 +22,8 @@ define (require) ->
         @cellView.trigger 'click'
     
     render: ->
-      @el.attr text: @model.getCurrentStrength()
+      @el.attr
+        text: @model.getCurrentStrength()
+        x: @model.get('x')
+        y: @model.get('y')
       this

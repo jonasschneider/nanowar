@@ -107,6 +107,7 @@ define (require) ->
         console.log "sending random update"
         @sendToAll 'log', 'sending random update now'
         #c1.set owner: @players[0]
+        @game.tellSelf('moveCell')
       _(go).delay(3000)
       
       @onStart()

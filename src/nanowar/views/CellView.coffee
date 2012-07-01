@@ -30,8 +30,6 @@ define (require) ->
       
       layers.attr
         stroke: 'none'
-        cx: @model.get('x')
-        cy: @model.get('y')
         r: 0
       
       @animating = true
@@ -53,6 +51,10 @@ define (require) ->
       new CellDataView {model: @model, gameView: @gameView, cellView: this}
 
     render: ->
+      @el.attr
+        cx: @model.get('x')
+        cy: @model.get('y')
+      
       unless @animating
         @el.attr r: @model.get('size')
       

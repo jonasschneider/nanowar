@@ -110,6 +110,10 @@ define (require) ->
       else
         console.log "fleet failed to launch"
 
+    moveCell: ->
+      c = @getCells()[0]
+      c.set x: c.get('x')+50
+
     runTells: (tells) ->
       @runTell(tell) for tell in tells
 
