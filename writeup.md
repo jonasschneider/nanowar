@@ -8,3 +8,6 @@ Client Side Prediction
 
 => That's how Source does it
   player position is within entity, player movemoent never modifies game state outside the player entity (gooba-stomping?)
+
+'Evented Gaming' = old fleets; don't update attributes in every update step, instead, set parameters that allow inferring of the updated attributes
+    i.e. position of fleet vs start/end time of flight

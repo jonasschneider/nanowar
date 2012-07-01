@@ -38,6 +38,9 @@ define (require) ->
     
     eta: ->
       @arrivalTime() - @game.ticks
+
+    fractionDone: ->
+      1 - (@eta() / @flightTime())
     
     flightTime: ->
       Math.round @distance() / @get('speedPerTick')
@@ -66,8 +69,16 @@ define (require) ->
     
     arrived: ->
       @arrivalTime() < @game.ticks
-    
+
     update: ->
+      sp = @startPosition()
+      ep = @endPosition()
+      dx = ep.x - sp.x
+      dy = ep.y - sp.y
+      @set
+        posx: Math.round(sp.x + dx * @fractionDone())
+        posy: Math.round(sp.y + dy * @fractionDone())
+      
       if @arrived()
         console.log "[Tick#{@game.ticks}] [Fleet #{@id}] Arrived from route #{@get('from').id}->#{@get('to').id}"
         @get('to').handle_incoming_fleet this

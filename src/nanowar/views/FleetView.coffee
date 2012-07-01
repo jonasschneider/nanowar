@@ -17,6 +17,10 @@ define (require) ->
     
     render: ->
       @strengthText.attr text: @model.get('strength')
+
+      @el.attr
+        cx: Math.round @model.get('posx')
+        cy: Math.round @model.get('posy')
     
     size: ->
       rad = (size) ->
@@ -38,21 +42,21 @@ define (require) ->
         x: Math.round @model.startPosition().x
         y: Math.round @model.startPosition().y - 10
       
-      @strengthText.animate
-        x: Math.round @model.endPosition().x
-        y: Math.round @model.endPosition().y - 10
-      , @timeInFlight()
+      #@strengthText.animate
+      #  x: Math.round @model.endPosition().x
+      #  y: Math.round @model.endPosition().y - 10
+      #, @timeInFlight()
       
       @el.attr
         r: @size()
         fill: @model.get('owner').get('color')
-        cx: Math.round @model.startPosition().x
-        cy: Math.round @model.startPosition().y
+        #cx: Math.round @model.startPosition().x
+        #cy: Math.round @model.startPosition().y
       
-      @el.animate
-        cx: Math.round @model.endPosition().x
-        cy: Math.round @model.endPosition().y
-      , @timeInFlight()
+      #@el.animate
+      #  cx: Math.round @model.endPosition().x
+      #  cy: Math.round @model.endPosition().y
+      #, @timeInFlight()
       
       if @timeInFlight() > 500
         @el.attr r: 0
