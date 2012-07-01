@@ -1,8 +1,24 @@
+html {
+  height: 100%;
+}
 body {
   background: url(/images/background.jpg);
   margin: 0;
   padding: 0;
   height: 100%;
+}
+
+#container {
+  text-align: center;
+  height: 100%;
+  display: table;
+  width: 100%;
+}
+
+#nanowar {
+  display: table-cell;
+  width: 100%;
+  vertical-align: middle;
 }
 
 #background {
