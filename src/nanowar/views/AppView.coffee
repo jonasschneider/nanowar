@@ -22,19 +22,12 @@ define (require) ->
 
         socket.on 'runTellQueue', =>
           @model.game.runTellQueue()
-          alert("tell queue ran")
         
-        socket.on 'setLocalPlayer',  (player) =>
-          console.log player, @model.game.entities
-          alert(player)
-
-          player = @model.game.entities.get(player)
-          alert(@model.game.entities.models.toString())
-          alert(player)
-          @localPlayer = player
-          @trigger 'change:localPlayer', player
+        socket.on 'setLocalPlayerId',  (player) =>
+          @localPlayerId = player
+          @trigger 'change:localPlayerId', player
           
-          console.log 'localPlayer set: ' + JSON.stringify(player)
+          console.log 'localPlayerId set: ' + player
         
         socket.on 'connect', =>
           console.log 'connected to server'

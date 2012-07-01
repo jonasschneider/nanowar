@@ -17,6 +17,8 @@ define (require) ->
       etypes = Cell: Cell, Player: Player, Fleet: Fleet, EnhancerNode: EnhancerNode
       @entities = new EntityCollection [], game: this, types: etypes
 
+      @serverUpdates = {}
+
       @bind 'update', (e) =>
         console.log 'game got update', e
 
@@ -25,6 +27,10 @@ define (require) ->
 
         #if e.ticks?
         # @ticks = e.ticks
+
+        if e.entityChanges
+          @serverUpdates[e.tick] = { entityChanges: e.entityChanges }
+
         
         #@entities.trigger 'update', e.entities if e.entities?
         
@@ -85,8 +91,8 @@ define (require) ->
     # private?
 
     runTell: (tell) ->
-      #if tell.to == '$self'
-      console.log(tell)
+      console.log("running:", tell)
+      #if tell.to == '$self' # TODO: ONLY WORKS FOR TELLS TO GAME AT THIS TIME!
       this[tell.what].call(this, tell.with...)
 
     addPlayer: (player) ->
@@ -98,23 +104,23 @@ define (require) ->
         to: to
         game: this
       
-      if fleet.canLaunch()
+      if fleet.launch()
+        console.log "launched a fleet"
         @entities.add fleet
-        fleet.launch()
+      else
+        console.log "fleet failed to launch"
 
     runTells: (tells) ->
       @runTell(tell) for tell in tells
 
+    sendClientTells: ->
+      if @sendQueue.length > 0
+        @trigger 'publish', tick: @ticks, tells: @sendQueue
+        @sendQueue = []
+
     runTellQueue: ->
-      if @tellQueue.length > 0 || @sendQueue.length > 0
-        if @get('onServer')
-          @trigger 'publish', tick: @ticks, tells: @tellQueue
-        else
-          if @sendQueue.length > 0
-            @trigger 'publish', tick: @ticks, tells: @sendQueue
-            @sendQueue = []
-        @runTells(@tellQueue)
-        @tellQueue = []
+      @runTells(@tellQueue)
+      @tellQueue = []
       
 
     # UNSPECCED
@@ -128,19 +134,54 @@ define (require) ->
       setTimeout =>
         @tick()
       , @get 'tickLength'
+
+    executeServerUpdatesForTick: (tick) ->
+      if upd = @serverUpdates[tick]
+        (@entities.trigger 'update', change) for change in upd.entityChanges
+        delete @serverUpdates[tick]
+        true
+      else
+        false
     
     halt: ->
       @stopping = true
     
     tick: ->
-      @schedule() unless @stopping
+      @executeServerUpdatesForTick(0)
+
+      @schedule() unless @stopping # FIXME: detect if tick is taking too long
       @ticks++
-      @trigger 'tick'
+      console.log "=== TICKING" if @get('onServer')
+      #@trigger 'tick'
+
+      if @get('onServer')
+        @updateAndPublish()
+      else
+        @sendClientTells()
+        res = @executeServerUpdatesForTick(@ticks)
+
+        throw "did not yet receive update for tick #{@ticks}" unless res
+        # TODO: interpolate
+
+      @entities.each (e) =>
+        @entities.remove(e) if e.get('dead')
+
+      console.log "=== TICK DONE." if @get('onServer')
+    
+    updateAndPublish: ->
+      entityChanges = []
+
+      @entities.bind 'publish', (change) ->
+        entityChanges.push change
+
       @runTellQueue()
+      (ent.update && ent.update()) for ent in @entities.models
 
       if winner = @getWinner()
         @trigger 'end', winner: winner
         @halt()
-    
+
+      @trigger 'publish', tick: @ticks, entityChanges: entityChanges
+
     ticksToTime: (ticks) ->
       ticks * @get 'tickLength'

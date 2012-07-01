@@ -8,7 +8,7 @@ define (require) ->
       window.lastCellView = this
       
       @gameView.bind          'select',             @render,  this
-      @gameView.appView.bind  'change:localPlayer', @render,  this
+      @gameView.appView.bind  'change:localPlayerId', @render,  this
       @model.bind             'change',             @render,  this
       @model.bind             'change',             @pop,     this
       
@@ -44,7 +44,7 @@ define (require) ->
         @trigger 'click'
       
       $(@hover.node).mouseover =>
-        if @gameView.appView.localPlayer == @model.get('owner')
+        if @model.get('owner') && @gameView.appView.localPlayerId == @model.get('owner').id
           @hover.attr opacity: 0.05
       
       $(@hover.node).mouseout =>

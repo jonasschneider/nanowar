@@ -71,4 +71,4 @@ define (require) ->
       if @arrived()
         console.log "[Tick#{@game.ticks}] [Fleet #{@id}] Arrived from route #{@get('from').id}->#{@get('to').id}"
         @get('to').handle_incoming_fleet this
-        @collection.remove this
+        @set dead: true

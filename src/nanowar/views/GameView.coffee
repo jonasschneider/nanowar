@@ -74,11 +74,11 @@ define (require) ->
         # don't send to itself
         if cellClickedOn != @selectedCell
           @model.tellSelf 'sendFleet', @selectedCell.model, cellClickedOn.model
-          @model.tick()
+          #@model.tick()
           #@model.trigger 'publish', sendFleetCommand: new SendFleetCommand(game: @model, )
       else
         # only select cells owned by local player
-        if @appView.localPlayer == cellClickedOn.model.get('owner')
+        if @appView.localPlayerId == cellClickedOn.model.get('owner').id
           @select cellClickedOn
     
     
