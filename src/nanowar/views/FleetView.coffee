@@ -18,10 +18,17 @@ define (require) ->
     render: ->
       @strengthText.attr text: @model.get('strength')
 
-      @el.attr
-        cx: Math.round @model.get('posx')
-        cy: Math.round @model.get('posy')
-    
+      # FIXME: We're immediately screwed when packets go missing
+      @el.animate
+        cx: @model.get('posx')
+        cy: @model.get('posy')
+      , @model.game.get('tickLength')
+
+      @strengthText.animate
+        x: @model.get('posx')
+        y: @model.get('posy') - 10
+      , @model.game.get('tickLength')
+
     size: ->
       rad = (size) ->
         -0.0005*size^2+0.3*size
@@ -42,22 +49,31 @@ define (require) ->
         x: Math.round @model.startPosition().x
         y: Math.round @model.startPosition().y - 10
       
-      #@strengthText.animate
-      #  x: Math.round @model.endPosition().x
-      #  y: Math.round @model.endPosition().y - 10
-      #, @timeInFlight()
-      
+      diff = new Date().getTime() - @model.game.fleetclicktime
+
       @el.attr
         r: @size()
         fill: @model.get('owner').get('color')
-        #cx: Math.round @model.startPosition().x
-        #cy: Math.round @model.startPosition().y
-      
+        cx: @model.get('from').get('x')
+        cy: @model.get('from').get('y') # hackish, should use fleet pos
+
       #@el.animate
       #  cx: Math.round @model.endPosition().x
       #  cy: Math.round @model.endPosition().y
       #, @timeInFlight()
-      
+
+      prevx = newx = @model.get('from').get('x')
+      prevy = newy = @model.get('from').get('y')
+
+      console.log "posx: #{@model.get('posx')}"
+
+      curx = @model.get('posx')
+      cury = @model.get('posy')
+
+      @el.attr
+        cx: curx
+        cy: cury
+
       if @timeInFlight() > 500
         @el.attr r: 0
         @el.animate
@@ -75,3 +91,4 @@ define (require) ->
     remove: ->
       @el.remove()
       @strengthText.remove()
+      clearInterval @drawInterval

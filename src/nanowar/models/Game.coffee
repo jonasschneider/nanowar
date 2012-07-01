@@ -11,6 +11,8 @@ define (require) ->
 
   return class Game extends Backbone.Model
     defaults:
+      # client actions can take at worst 2*tickLength to propagate (command on server, results on client),
+      # not even counting for processing and network latency!
       tickLength: 1000 / 10
     
     initialize: ->
@@ -30,6 +32,8 @@ define (require) ->
 
         if e.entityChanges
           @serverUpdates[e.tick] = { entityChanges: e.entityChanges }
+          @lastServerUpdate = e.tick
+
 
         
         #@entities.trigger 'update', e.entities if e.entities?
@@ -45,6 +49,13 @@ define (require) ->
       
 
       @ticks = 0
+
+      # client vars
+      @clientLag = 0
+      @clientLagTotal = 0
+      @lastServerUpdate = 0
+
+      # common vars
       @running = false
       @stopping = false
       @tellQueue = []
@@ -119,7 +130,7 @@ define (require) ->
 
     sendClientTells: ->
       if @sendQueue.length > 0
-        @trigger 'publish', tick: @ticks, tells: @sendQueue
+        @trigger 'publish', tells: @sendQueue
         @sendQueue = []
 
     runTellQueue: ->
@@ -130,7 +141,8 @@ define (require) ->
     # UNSPECCED
     run: -> # probably blows up synchronisation
       console.log "GOGOGOG"
-      @trigger 'publish', run: true if @get('onServer')
+      if @get('onServer')
+        @trigger 'publish', run: true
 
       @schedule()
     
@@ -150,28 +162,51 @@ define (require) ->
     halt: ->
       @stopping = true
     
-    tick: ->
+    tickClient: ->
       @executeServerUpdatesForTick(0)
 
-      @schedule() unless @stopping # FIXME: detect if tick is taking too long
+      @sendClientTells()
+      if @serverUpdates[@ticks+1]?
+        @ticks++
+        @clientLag = 0
+        @executeServerUpdatesForTick(@ticks)
+
+        if @lastServerUpdate - @ticks > 1
+          console.warn "double ticking to catch up"
+          @ticks++
+          @executeServerUpdatesForTick(@ticks)
+
+      else
+        console.log "did not yet receive update for tick #{@ticks}"
+        @clientLag++
+        @clientLagTotal++
+
+        if @clientLag > 10
+          console.log "lost more than 10 ticks, connection lost :("
+          @halt()
+
+
+      # TODO: interpolate
+      console.log "=== CLIENT TICK DONE (now at tick #{@ticks}, total lag #{@clientLagTotal})"
+    
+    tickServer: ->
       @ticks++
-      console.log "=== TICKING" if @get('onServer')
-      #@trigger 'tick'
+      console.log "=== TICKING"
+    
+      @updateAndPublish()
+      console.log "=== SERVER TICK DONE (now at tick #{@ticks})"
+
+    tick: ->
+      @schedule() unless @stopping # FIXME: detect if tick is taking too long
 
       if @get('onServer')
-        @updateAndPublish()
+        @tickServer()
       else
-        @sendClientTells()
-        res = @executeServerUpdatesForTick(@ticks)
-
-        throw "did not yet receive update for tick #{@ticks}" unless res
-        # TODO: interpolate
+        @tickClient()
 
       @entities.each (e) =>
         @entities.remove(e) if e.get('dead')
 
-      console.log "=== TICK DONE." if @get('onServer')
-    
     updateAndPublish: ->
       entityChanges = []
 

@@ -62,6 +62,9 @@ define (require) ->
 
       if @canLaunch()
         console.log "[Tick#{@game.ticks}] [Fleet #{@id}] Fleet of #{@get('strength')} launching #{@get('from').id}->#{@get('to').id}; arrival in #{@flightTime()} ticks"
+        @set
+          posx: Math.round(@startPosition().x)
+          posy: Math.round(@startPosition().y)
         @get('from').changeCurrentStrengthBy -@get('strength')
         @set launched_at: @game.ticks
         true
