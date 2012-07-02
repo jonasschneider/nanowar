@@ -19,10 +19,16 @@ define (require) ->
       @strengthText.attr text: @model.get('strength')
 
       # FIXME: We're immediately screwed when packets go missing
-      @el.animate
-        cx: @model.get('posx')
-        cy: @model.get('posy')
-      , @model.game.get('tickLength')
+      #@el.animate
+      #  cx: @model.get('posx')
+      #  cy: @model.get('posy')
+      #, @model.game.get('tickLength')
+
+      #@x ||= 0
+      #@x += 2
+
+      #@el.attr
+      #  cx: @x
 
       @strengthText.animate
         x: @model.get('posx')

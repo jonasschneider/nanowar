@@ -141,6 +141,7 @@ define (require) ->
     # UNSPECCED
     run: -> # probably blows up synchronisation
       console.log "GOGOGOG"
+      @trigger 'run'
       if @get('onServer')
         @trigger 'publish', run: true
 
@@ -152,10 +153,14 @@ define (require) ->
       , @get 'tickLength'
 
     executeServerUpdatesForTick: (tick) ->
+      deltas = []
       if upd = @serverUpdates[tick]
-        (@entities.trigger 'update', change) for change in upd.entityChanges
+        for change in upd.entityChanges
+          @entities.trigger 'update', change
+          deltas.push d if d = @entities.lastDelta
+
         delete @serverUpdates[tick]
-        true
+        deltas
       else
         false
     
@@ -163,21 +168,50 @@ define (require) ->
       @stopping = true
     
     tickClient: ->
+      #@halt() if @ticks > 10
       @executeServerUpdatesForTick(0)
 
       @sendClientTells()
       if @serverUpdates[@ticks+1]?
+        console.log "=== CLIENT TICKING"
         @ticks++
         @clientLag = 0
-        @executeServerUpdatesForTick(@ticks)
+        @secondLastDeltas = @lastDeltas
+        @lastDeltas = @executeServerUpdatesForTick(@ticks)
 
-        if @lastServerUpdate - @ticks > 1
-          console.warn "double ticking to catch up"
-          @ticks++
-          @executeServerUpdatesForTick(@ticks)
+        # TODO: interpolate
+        console.log "=== CLIENT TICK DONE (now at tick #{@ticks}, total lag #{@clientLagTotal})"
+
+        if @lastServerUpdate - @ticks > 1 # we are lagging behind, tick again
+          @tickClient()
+
 
       else
-        console.log "did not yet receive update for tick #{@ticks}"
+        console.log "did not yet receive update for tick #{@ticks}, extrapolating!"
+
+        console.log JSON.stringify(@lastDeltas)
+
+        throw 'not enough data for extrapolate' unless @lastDeltas && @secondLastDeltas
+
+        for changedEnt in @lastDeltas
+          oldEnt = _(@secondLastDeltas).detect (delta) =>
+            delta.id == changedEnt.id
+          continue unless oldEnt
+          entDelta = {}
+
+          for own prop of changedEnt 
+            continue if prop == 'id'
+            newerValue = changedEnt[prop]
+            olderValue = oldEnt[prop]
+
+            extrapValue = newerValue + (newerValue - olderValue)
+
+            console.log("#{changedEnt.id}'s #{prop} changed from #{olderValue} to #{newerValue} -> extrapolated to #{extrapValue}")
+            entDelta[prop] = extrapValue
+
+          # FIXME: unbreak encapsulation
+          @entities.trigger 'update', changedEntityId: changedEnt.id, changeDelta: entDelta
+
         @clientLag++
         @clientLagTotal++
 
@@ -185,9 +219,6 @@ define (require) ->
           console.log "lost more than 10 ticks, connection lost :("
           @halt()
 
-
-      # TODO: interpolate
-      console.log "=== CLIENT TICK DONE (now at tick #{@ticks}, total lag #{@clientLagTotal})"
     
     tickServer: ->
       @ticks++

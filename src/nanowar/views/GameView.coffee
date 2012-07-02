@@ -2,9 +2,11 @@ define (require) ->
   Backbone = require 'backbone'
   CellView = require './CellView'
   FleetView = require './FleetView'
+  Fleet = require '../models/Fleet'
   EnhancerNodeView = require './EnhancerNodeView'
   SendFleetCommand = require '../commands/SendFleetCommand'
   Raphael = require 'raphael'
+  _                 = require 'underscore'
   
   return class GameView extends Backbone.View
     initialize: (options)->
@@ -34,8 +36,15 @@ define (require) ->
       
       $(@paper.canvas).click =>
         @handleClickInGameArea()
-      
-    
+
+      @fleetvs = []
+
+      #setInterval =>
+      #  v.render() for v in @fleetvs
+      #  v.render() for v in @fleetvs
+      #, 1000/30
+
+
     updateObjects: ->
       console.log 'update call'
       console.log(arguments)
@@ -50,7 +59,7 @@ define (require) ->
             @handleClickOnCellView cellView
         
         when 'Fleet'
-          new FleetView model: e, gameView: this
+          @fleetvs.push new FleetView model: e, gameView: this
           
         when 'Player'
           'asdf'

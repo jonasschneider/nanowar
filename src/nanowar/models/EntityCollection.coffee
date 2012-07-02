@@ -25,6 +25,11 @@ define (require) ->
           unless ent = @get(data.changedEntityId)
             throw "Could not find entity with id #{data.changedEntityId}"
           ent.trigger 'update', data.changeDelta
+          @lastDelta = data.changeDelta
+          @lastDelta.id = data.changedEntityId
+        else
+          @lastDelta = null
+
 
         if data.destroyedEntityId?
           unless ent = @get(data.destroyedEntityId)
