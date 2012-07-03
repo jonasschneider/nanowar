@@ -90,7 +90,7 @@ define (require) ->
           @model.sendClientTells()
       else
         # only select cells owned by local player
-        if (owner = cellClickedOn.model.get('owner')) && @appView.localPlayerId == owner.id
+        if (owner = cellClickedOn.model.getRelation('owner')) && @appView.localPlayerId == owner.id
           @select cellClickedOn
     
     

@@ -42,7 +42,7 @@ define (require) ->
         @trigger 'click'
       
       $(@hover.node).mouseover =>
-        if @model.get('owner') && @gameView.appView.localPlayerId == @model.get('owner').id
+        if @model.getRelation('owner') && @gameView.appView.localPlayerId == @model.getRelation('owner').id
           @hover.attr opacity: 0.05
       
       $(@hover.node).mouseout =>
@@ -58,8 +58,8 @@ define (require) ->
       unless @animating
         @el.attr r: @model.get('size')
       
-      if @model.get('owner') && @model.get('owner').get('color')
-        switch @model.get('owner').get('color')
+      if @model.getRelation('owner') && @model.getRelation('owner').get('color')
+        switch @model.getRelation('owner').get('color')
           when 'red'
             @bg.attr({fill: "url(#redBackground)"})
             @fg.attr({fill: "url(#redForeground)"})
@@ -67,7 +67,7 @@ define (require) ->
             @bg.attr({fill: "url(#blueBackground)"})
             @fg.attr({fill: "url(#blueForeground)"})
           else
-            throw "I don't know color #{@model.get('owner').get('color')}"
+            throw "I don't know color #{@model.getRelation('owner').get('color')}"
       else
         @bg.attr({fill: "url(#greyBackground)"})
         @fg.attr({fill: "url(#greyForeground)"})

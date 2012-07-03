@@ -52,7 +52,6 @@ define (require) ->
           #@trigger 'publish', destroyedEntityId: entity.id
 
     spawn: (type, attributes) ->
-      alert("spawning "+type) if alert?
       klass = @types[type]
       attributes or (attributes = {})
 
@@ -76,7 +75,7 @@ define (require) ->
       ent.set attributes
 
       @trigger 'add', ent
-      
+
       ent
 
     get: (id) ->
