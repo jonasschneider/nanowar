@@ -1,20 +1,11 @@
-require ['nanowar/models/Entity'], (Entity) ->
+require ['nanowar/models/Game'], (Game) ->
   describe 'Entity', ->
-    it 'throws without game', ->
+    it 'throws when setting undeclared attributes', ->
+      game = new Game
+      fleet = game.entities.spawn 'Fleet', strength: 10
+
+      fleet.set strength: 5
+
       expect ->
-        new Entity
+        fleet.set lolz: 'ohai'
       .toThrow()
-
-    it 'is creatable with game', ->
-      new Entity game: {}
-
-    describe 'on update', ->
-      it 'sets the attributes', ->
-        myEntity = new Entity someProperty: 1, game: {}
-        
-        json = myEntity.toJSON()
-        json.someProperty = 2
-        
-        myEntity.trigger 'update', json
-        
-        expect(myEntity.get 'someProperty').toBe 2

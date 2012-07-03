@@ -6,14 +6,13 @@ define (require) ->
   _      = require('underscore')
   util = require('../helpers/util')
 
-  # attributes: Cell from, Cell to, Game game, Player owner, int strength, int launchedAt
   return class Fleet extends Entity
-    defaults:
+    type: 'Fleet'
+
+    attributeSpecs:
+      strength: 0
       launched_at: null
       speedPerTick: 6
-
-    entityRelations:
-      neighbour: 'Fleet'
 
     relationSpecs:
       from:

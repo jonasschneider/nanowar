@@ -7,25 +7,28 @@ define (require) ->
     constructor: (collection, id) ->
       throw 'Entity constructor needs collection' unless collection
       throw 'Entity constructor needs id' unless id
-      attributes or (attributes = {})
 
       @collection = collection
       @id = id
 
-      #@bind 'update', (data) ->
-      #  @set data
-      
-      #super
+    _initialize: ->
+      @set @attributeSpecs, silent: true
+      @initialize() if @initialize
 
     ticks: ->
       @collection.ticks()
 
     get: (attr) ->
+      unless attr in _(@attributeSpecs).keys()
+        console.trace()
+        throw "attempted to get undeclared attribute #{attr}" 
+
       @collection.getEntityAttribute(@id, attr)
 
     set: (attrs, options) ->
       # FIXME: this is from RelationalModel
       #attrs = @_dereferenceRelations(attrs)
+
 
       options or (options = {})
       return this  unless attrs
@@ -35,9 +38,10 @@ define (require) ->
       alreadyChanging = @_changing
       @_changing = true
       for attr of attrs
+        throw "attempted to set undeclared attribute #{attr}" unless attr in _(@attributeSpecs).keys()
         val = attrs[attr]
         unless _.isEqual(@get(attr), val)
-          @collection.setEntityAttribute(@id, attr, val)
+          @collection.setEntityAttribute(@id, attr, val, options.silent)
 
           @_changed = true
           @trigger "change:" + attr, this, val, options  unless options.silent

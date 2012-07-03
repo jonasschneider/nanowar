@@ -19,11 +19,6 @@ require ['nanowar/models/Fleet', 'nanowar/models/Game', 'nanowar/models/Cell'], 
 
       fleet.set strength: 10
       expect(game.entities.getEntityAttribute(fleet.id, 'strength')).toBe 10
-      
-
-      #fleet2 = game.entities.spawn 'Fleet', strength: 20
-      #fleet.setRelation 'neighbour', fleet2
-    #it 'records newly spawned ents', ->
     
     it 'records mutations of attributes', ->
       game = new Game
@@ -42,7 +37,20 @@ require ['nanowar/models/Fleet', 'nanowar/models/Game', 'nanowar/models/Cell'], 
         game.entities.spawn 'Fleet', strength: 2
 
       expect(JSON.stringify(result)).toBe JSON.stringify([["spawned","Fleet","Fleet_1"],["changed","Fleet_1","strength",2]])
-      
+
+    it 'allows to store and restore snapshots', ->
+      game = new Game
+      fleet = game.entities.spawn 'Fleet', strength: 2
+
+      stateBefore = game.entities.snapshotAttributes()
+
+      fleet.set strength: 10
+      expect(fleet.get('strength')).toBe 10
+
+      game.entities.restoreAttributeSnapshot(stateBefore)
+
+      expect(fleet.get('strength')).toBe 2
+
 
     it 'prohibits spawning and changes outside of mutations when in strict mode', ->
       game = new Game

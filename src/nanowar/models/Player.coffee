@@ -2,15 +2,17 @@ define (require) ->
   Entity = require('./Entity')
 
   return class Player extends Entity
-    colors: ["red", "blue", "green", "yellow"]
-    
-    defaults:
+    type: 'Player'
+
+    attributeSpecs:
+      color: ''
       name: 'anonymous coward'
 
+    colors: ["red", "blue", "green", "yellow"]
+    
     initialize: ->
-      @bind 'add', ->
-        unless @get 'color'
-          @set { color: @colors[@game.getPlayers().length-1] }, silent: true
+      unless @get 'color'
+        @set { color: @colors[@collection.getAllOfType('Player').length-1] }, silent: true
 
     toString: ->
       if @get('name')

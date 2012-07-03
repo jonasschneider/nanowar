@@ -53,6 +53,7 @@ define (require) ->
 
     spawn: (type, attributes) ->
       klass = @types[type]
+      attributes or (attributes = {})
 
       if attributes.id
         newId = attributes.id
@@ -64,42 +65,24 @@ define (require) ->
       @_recordMutation ["spawned", type, newId]
 
       ent = new klass this, newId
+      
+      throw "id #{model.id} is in use" if @entitiesById[newId]
+      @entities.push ent
+      @entitiesById[newId] = ent
+      @trigger 'add', ent
 
-      @add ent
-
+      ent._initialize()
       ent.set attributes
-      
       ent
-
-    add: (entity) ->
-      console.log 'adding', entity
-      if _(@types).any((type) -> entity instanceof type ) # real entity
-        model = entity
-      else # serialized entity
-        klass = @types[entity.type]
-
-        unless klass
-          typeNames = _(@types).map (klass, name) -> name
-          throw "I dont know what to do with #{JSON.stringify entity}. Known types are [#{typeNames.join(', ')}]"
-        entity.game = @game
-        entityObj = new klass entity
-        model = entityObj
-      
-      unless model.id # give it an id
-        num = @nextEntityIds[model.type]++
-        newId = model.type + '_' + num
-        model.set id: newId
-
-      for own k,v of entity.attributes
-        @entityAttributes.push [entity.id, k, v]
-
-      throw "id #{model.id} is in use" if @entitiesById[model.id]
-
-      @entities.push model
-      @entitiesById[model.id] = model
 
     get: (id) ->
       @entitiesById[id]
+
+    getAllOfType: (type) ->
+      results = []
+      for ent in @entities
+        results.push ent if ent.type == type
+      results
 
     enableStrictMode: ->
       @strictMode = true
@@ -116,14 +99,14 @@ define (require) ->
     ticks: ->
       @game.ticks
 
-    setEntityAttribute: (entId, attr, value) ->
+    setEntityAttribute: (entId, attr, value, silent) ->
       storedAttr = _(@entityAttributes).detect (storedAttr) ->
         storedAttr[0] == entId and storedAttr[1] == attr
       if storedAttr
         storedAttr[2] = value
       else
         @entityAttributes.push [entId, attr, value]
-      @_recordMutation ["changed", entId, attr, value]
+      @_recordMutation ["changed", entId, attr, value] unless silent
       value
 
     mutate: (mutator) ->
@@ -135,6 +118,14 @@ define (require) ->
       d = @currentMutations
       @currentMutations = undefined
       d
+
+    snapshotAttributes: ->
+      _.clone(attr) for attr in @entityAttributes
+
+    restoreAttributeSnapshot: (snapshot) ->
+      # TODO: notify changed entities
+      @entityAttributes = snapshot
+
 
     _recordMutation: (mutation) ->
       if @currentMutations
