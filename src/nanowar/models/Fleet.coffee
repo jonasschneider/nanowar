@@ -12,6 +12,9 @@ define (require) ->
       launched_at: null
       speedPerTick: 6
 
+    entityRelations:
+      neighbour: 'Fleet'
+
     relationSpecs:
       from:
         relatedModel: Cell
@@ -23,13 +26,6 @@ define (require) ->
         relatedModel: Player
         directory: 'game.entities'
 
-    initialize: ->
-      if @game.get('onServer')
-        @game.bind 'tick', @update, this
-        
-        @bind 'remove', =>
-          @game.unbind 'tick', @update, this
-    
     startPosition: ->
       util.nearestBorder @get('from').position(), @get('from').get('size'), @get('to').position()
     

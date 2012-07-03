@@ -93,9 +93,10 @@ so how does the extrapolation work precisely?
 game modelling ideas:
 the complexity of the entity data structure.
 there are quite a lot of considerations that play into the design of the entitiy data structure:
-- evented access - that is, views can bind to changes for one specific entity (like a fleet)
+- permanent interfaces for evented access - that is, views can bind to changes for one specific entity (like a fleet)
 - computed attributes - 'pure' computations that only involve the state should be easily accesible for the views
 - server/client synchronisation - we don't want client and server to ever disagree about the state
+- access to the state both from a selected 'view' role (single attributes) and from an internal 'networking' role (bulk updates)
 - temporary client autonomy - in order to apply extrapolation and (possibly later) client side prediction, clients need to be able to mutate the world state temporarily, in order to update the view. however, those changes have to be easily discardable (when the authoritative update arrives).
 
 two fairly obvious solutions fail at one of these requirements:
@@ -116,7 +117,7 @@ aside: an initial approach consisted of augmenting the pure-data-gamestate with 
 
 the final implementation cuts loose more connections between entities and Backbone.Model, as @get and @set are overridden. However, the burden of having to write @get for accessing attributes now pays off, as we can easily override that method.
 
-Up next: rework entity state preservation so no instance variables are used, but all state is passed explicitely
+Up next: rework entity state preservation so no instance variables are used, but all state is stored centrally
 
 
 

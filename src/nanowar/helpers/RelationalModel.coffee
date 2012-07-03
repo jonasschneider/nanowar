@@ -24,21 +24,20 @@ define (require) ->
         _(@relationSpecs).each (options, name) =>
           options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(/)[1]
           
-          if(options.directory)
-            # traverse path to directory
-            segments = options.directory.split '.'
-            options.directoryObject = this
-            options.directoryObject = options.directoryObject[segments.shift()] until segments.length == 0
+          options.directoryObject = @collection # FIXME: this only works for entities
       
       super
       @_previousAttributes = _.clone(@attributes)
 
-    set: (attrs, options) ->
+    _dereferenceRelations: (attrs) ->
       thisType = @get('type') || attrs.type # for initial set
       
       _(@relationSpecs).each (options, name) =>
         attrs[name] = @_fetchRelation(name, attrs[name], thisType) if typeof attrs[name] != 'undefined'
+      attrs
 
+    set: (attrs, options) ->
+      attrs = @_dereferenceRelations(attrs)
       super
 
     _fetchRelation: (name, value, thisType) ->

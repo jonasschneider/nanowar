@@ -38,6 +38,7 @@ require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/mo
         
         expect(spy).toHaveBeenCalled()
         callArg = spy.mostRecentCall.args[0]
+        throw JSON.stringify(callArg)
         expect(callArg.changedEntityId).toBe myEntity.id
         expect(JSON.stringify callArg.changeDelta).toBe '{"someProperty":"hi"}'
 
