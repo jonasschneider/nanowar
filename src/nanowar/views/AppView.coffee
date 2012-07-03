@@ -20,8 +20,8 @@ define (require) ->
         socket.on 'ping', (timestamp) =>
           socket.emit 'pong', timestamp
 
-        socket.on 'runTellQueue', =>
-          @model.game.runTellQueue()
+        socket.on 'applySnapshot', (snapshot) =>
+          @model.game.entities.applySnapshot(snapshot)
         
         socket.on 'setLocalPlayerId',  (player) =>
           @localPlayerId = player

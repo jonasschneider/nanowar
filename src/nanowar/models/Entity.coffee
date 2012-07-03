@@ -10,9 +10,10 @@ define (require) ->
 
       @collection = collection
       @id = id
+      @attributeSpecs.dead = false
 
     _initialize: ->
-      @set @attributeSpecs, silent: true
+      @set @attributeSpecs
       @initialize() if @initialize
 
     ticks: ->
@@ -26,10 +27,6 @@ define (require) ->
       @collection.getEntityAttribute(@id, attr)
 
     set: (attrs, options) ->
-      # FIXME: this is from RelationalModel
-      #attrs = @_dereferenceRelations(attrs)
-
-
       options or (options = {})
       return this  unless attrs
 
@@ -41,7 +38,7 @@ define (require) ->
         throw "attempted to set undeclared attribute #{attr}" unless attr in _(@attributeSpecs).keys()
         val = attrs[attr]
         unless _.isEqual(@get(attr), val)
-          @collection.setEntityAttribute(@id, attr, val, options.silent)
+          @collection.setEntityAttribute(@id, attr, val)
 
           @_changed = true
           @trigger "change:" + attr, this, val, options  unless options.silent

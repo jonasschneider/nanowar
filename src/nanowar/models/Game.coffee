@@ -73,8 +73,8 @@ define (require) ->
     getWinner: ->
       owners = []
       _(@getCells()).each (cell) =>
-        cellOwner = cell.get 'owner'
-        owners.push cellOwner if cellOwner? && owners.indexOf(cellOwner) == -1
+        cellOwner = cell.getRelation 'owner'
+        owners.push cellOwner if cellOwner && owners.indexOf(cellOwner) == -1
       
       if owners.length == 1
         owners[0]
@@ -82,15 +82,12 @@ define (require) ->
         null
 
     loadMap: ->
-      cells = [
-        c1 = new Cell {x: 350, y: 100, size: 50, game: this}
-        new Cell {x: 350, y: 300, size: 30, game: this, owner: @getPlayers()[0]}
-        new Cell {x: 100, y: 200, size: 50, game: this}
-        new Cell {x: 500, y: 200, size: 50, game: this}
-        new Cell {x: 550, y: 100, size: 30, game: this, owner: @getPlayers()[1]}
-        new EnhancerNode x: 440, y: 120, game: this, owner: @getPlayers()[1]
-      ]
-      @entities.add cells
+      c1 = @entities.spawn 'Cell', x: 350, y: 100, size: 50
+      @entities.spawn 'Cell', x: 350, y: 300, size: 30, owner_id: @getPlayers()[0].id
+      @entities.spawn 'Cell', x: 100, y: 200, size: 50
+      @entities.spawn 'Cell', x: 500, y: 200, size: 50
+      @entities.spawn 'Cell', x: 550, y: 100, size: 30, owner_id: @getPlayers()[1].id
+      #new EnhancerNode x: 440, y: 120, game: this, owner: @getPlayers()[1]
     
     tellSelf: (what, args...) ->
       tell = to: '$self', what: what, with: args
@@ -105,9 +102,6 @@ define (require) ->
       console.log("running:", tell)
       #if tell.to == '$self' # TODO: ONLY WORKS FOR TELLS TO GAME AT THIS TIME!
       this[tell.what].call(this, tell.with...)
-
-    addPlayer: (player) ->
-      @entities.add player
 
     sendFleet: (from, to) ->
       fleet = new Fleet 
@@ -245,7 +239,7 @@ define (require) ->
         entityChanges.push change
 
       @runTellQueue()
-      (ent.update && ent.update()) for ent in @entities.models
+      @entities.each (ent) -> ent.update && ent.update()
 
       if winner = @getWinner()
         @trigger 'end', winner: winner

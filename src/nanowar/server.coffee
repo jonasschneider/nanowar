@@ -6,20 +6,18 @@ define (require) ->
   util    = require 'util'
   _       = require 'underscore'
 
-  class NetworkedPlayer extends Player
-    anonymousSubclass: true
-    
-    initialize: ->
-      @socket = @get('socket')
-      @unset 'socket'
+  class NetworkedPlayer
+    constructor: (socket, playerent) ->
+      @socket = socket
+      @playerent = playerent
       
-      @socket.emit 'log', 'You are: ' + JSON.stringify(this)
+      @socket.emit 'log', 'You are: ' + @name()
       
       pingSentAt = new Date().getTime()
       @socket.on 'pong', (pingSentAt) => 
         @latency = new Date().getTime() - pingSentAt
         @socket.emit 'log', "Your RTT is #{@latency}"
-        console.log @get('name')+' is ready'
+        console.log @name()+' is ready'
         @trigger 'ready', this
       @socket.emit 'ping', pingSentAt
       
@@ -32,9 +30,12 @@ define (require) ->
         clean.push arg
       
       @socket.emit.apply(@socket, clean)
-      
+    name: ->
+      @playerent.get('name')
     updateLocalPlayerId: ->
-      @socket.emit 'setLocalPlayerId', this.id
+      @socket.emit 'setLocalPlayerId', @playerent.id
+  
+  _.extend(NetworkedPlayer.prototype, Backbone.Events)
 
   class Match
     constructor: ->
@@ -43,10 +44,12 @@ define (require) ->
       @app = new App onServer: true
       @game = @app.game
       @app.bind 'publish', @distributeUpdate, this
-      
+    
     addPlayer: (clientSocket) ->
       console.log clientSocket.id + " connected"
-      player = new NetworkedPlayer socket: clientSocket, name: ("Player " + (@players.length + 1)), game: @game
+      playerent = @game.entities.spawn 'Player', name: ("Player " + (@players.length + 1))
+      console.log "made player ent"
+      player = new NetworkedPlayer clientSocket, playerent
       
       player.bind 'update', (e) =>
         #player.socket.broadcast.emit 'update', e # security?
@@ -54,7 +57,7 @@ define (require) ->
       
       player.bind 'ready', (player) =>
         @players.push player
-        console.log("now #{JSON.stringify(@players)} ready")
+        console.log("now #{@players.length} players ready")
         
         if @players.length == 2
           @start()
@@ -76,15 +79,20 @@ define (require) ->
       
       console.log 'starting. players:'
       _(@players).each (player) =>
-        @game.tellSelf 'addPlayer', player
-        console.log "- #{player.get('name')} (#{player.socket.id})"
+        console.log "- #{player.name()} (socket id #{player.socket.id})"
         
       
-      @game.tellSelf 'loadMap'
+      @game.loadMap()
+      snapshot = @game.entities.snapshotFull()
+
+      _(@players).each (player) =>
+        player.send 'applySnapshot', snapshot
 
       #@game.runTellQueue()
+      #@game.updateAndPublish()
 
-      @game.updateAndPublish()
+
+      #console.log JSON.stringify(@game.entities.snapshotAttributes())
 
       p.updateLocalPlayerId() for p in @players
       
@@ -114,8 +122,7 @@ define (require) ->
 
   return {
     start: (io) ->
-      match = new Match
-      
+      match = null
       fn = =>
         match = new Match
         match.onStart = fn
