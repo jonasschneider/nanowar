@@ -1,5 +1,3 @@
-Up next: rework entity state preservation so no instance variables are used, but all state is passed explicitely
-
 Retained mode  ^= DOM
 Immediate mode ^= <canvas>
 
@@ -11,6 +9,7 @@ see extrapolation below
 Evented web model is inappropriate for parts of this task, because it makes certain aspects nondeterministic.
 have to work around them in queues. for example, as server processes commands, entity updates have to be captured
 in order to slice them up into discrete updates (ticks).
+-> policy: bind() only in views. so no game state ever depends on events.
 on the other hand, it saves work for independent messages (for example, although not entirely, user input), to be sent
 to the server very timely on HTML events (button press)
 
@@ -90,7 +89,38 @@ so how does the extrapolation work precisely?
 
 
 
+
 game modelling ideas:
+the complexity of the entity data structure.
+there are quite a lot of considerations that play into the design of the entitiy data structure:
+- evented access - that is, views can bind to changes for one specific entity (like a fleet)
+- computed attributes - 'pure' computations that only involve the state should be easily accesible for the views
+- server/client synchronisation - we don't want client and server to ever disagree about the state
+- temporary client autonomy - in order to apply extrapolation and (possibly later) client side prediction, clients need to be able to mutate the world state temporarily, in order to update the view. however, those changes have to be easily discardable (when the authoritative update arrives).
+
+two fairly obvious solutions fail at one of these requirements:
+- the classic object-oriented Backbone.js-powered model with persistent objects that keep state in instance variables. this works great for views that can simply bind to changes within observed models. however, this approach fails at client autonomy & synchronisation; it is very tedious to keep track of changes that are made, and what has to be undone when reverting the client-made changes. intial implementations used this approach.
+- storing the entire purely in a single & simple javascript object ("POJO"). this approach provides easy synchronisation, and after screwing around with the game the client can just 'hammer-reset' the entire world by overwriting the one state variable. while probably the holy grail of functional purists, a lot of overhead is needed for evented access and computed attributes, as the attributes have to be copied around on demand in order to have both attributes and computed values at hand.
+also, since the state is essentially discarded every time the state is updated, event-based subscriptions have to be made at a much higher level, which in turn is more error-prone when updating the state object. for example, the game has to keep track of coming and going entities, in order to create DOM elements accordingly (assuming 'retained mode' DOM). even in immediate graphics mode, if the drawing only depends on a single state (making it pure), all client-side-only information is essentially a hack. all character animations, particles etc. have to be stored inside the object, leading to infeasibly high bandwidth.
+
+(aside: (un-)surprisingly, these two approaches can be compared to the immediate and retained graphics modes)
+
+
+to come to an agreeable solution, an additional constraint is imposed: all client autonomy (prediction, extrapolation, possibly interpolation) is restricted to the data of an existing entity. (source engine: player positioning)
+
+with this constraint, a possible solution becomes obvious: store all the entity data centrally, but also keep the dedicated entity objects, the entity collection etc., and redirect all access to entity attributes to the central collection. the collection notifies the entity when its data has changed, and the entity in turn notifies bound views.
+
+this is not perfect, as it by definition forbids the spawning of new entities autonomously (case in point: sending fleets in nanowar, creating bullet entity when shooting in FPS games). these concerns will have to be addressed later, probably by keeping an seprate collection of temporary entities that have to be matched up when later server updates arrive.
+
+aside: an initial approach consisted of augmenting the pure-data-gamestate with the functions an entity has. this had to be repeated every time the game state was updated. besides being brittle, this turned out to just be upside-down to the real conditions; the dynamic data was stored in a static position, and the static functions were added dynamically.
+
+the final implementation cuts loose more connections between entities and Backbone.Model, as @get and @set are overridden. However, the burden of having to write @get for accessing attributes now pays off, as we can easily override that method.
+
+Up next: rework entity state preservation so no instance variables are used, but all state is passed explicitely
+
+
+
+
 'Evented Gaming' = don't update attributes in every update step, instead, set parameters that allow inferring of the updated attributes
     i.e. position of fleet vs start/end time of flight
   pro: lower update bandwith, con: possible sync issues
