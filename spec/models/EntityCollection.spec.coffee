@@ -22,6 +22,14 @@ require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/mo
         expect(@coll.get('Fleet_1') instanceof MyEntity).toBe true
         expect(@coll.get('Fleet_1').get 'strength').toBe 1337
 
+    describe '#attributesChangedByMutation', ->
+      it "returns only changes", ->
+        mut = [["spawned","MyEntity",{id: "Fleet_3"}],["changed","Fleet_1","strength",1337]]
+
+        a = @coll.attributesChangedByMutation(mut)
+
+        expect(JSON.stringify(a)).toBe JSON.stringify([["Fleet_1", "strength", 1337]])
+
     describe '#remove', ->
       it "works", ->
         e = @coll.spawn 'MyEntity'

@@ -119,6 +119,13 @@ define (require) ->
         else
           throw "unkown change type #{change[0]}"
 
+    attributesChangedByMutation: (mutation) ->
+      changed = []
+      for change in mutation
+        if change[0] == "changed"
+          changed.push [change[1], change[2], change[3]]
+      changed
+
     snapshotFull: ->
       entities = []
       for ent in @entities

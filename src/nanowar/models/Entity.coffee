@@ -1,5 +1,4 @@
 define (require) ->
-  RelationalModel = require('nanowar/helpers/RelationalModel')
   _ = require('underscore')
   Backbone = require('backbone')
 
