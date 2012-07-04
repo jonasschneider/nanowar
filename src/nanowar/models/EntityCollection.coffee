@@ -21,36 +21,6 @@ define (require) ->
       unless @game = options.game
         throw "Need game" 
 
-      @bind 'update', (data) =>
-        if data.add?
-          @add data.add
-          
-        if data.changedEntityId?
-          unless ent = @get(data.changedEntityId)
-            throw "Could not find entity with id #{data.changedEntityId}"
-          ent.trigger 'update', data.changeDelta
-          @lastDelta = data.changeDelta
-          @lastDelta.id = data.changedEntityId
-        else
-          @lastDelta = null
-
-
-        if data.destroyedEntityId?
-          unless ent = @get(data.destroyedEntityId)
-            throw "Could not find entity with id #{data.destroyedEntityId}"
-          @remove ent
-
-      #if @game.get('onServer')
-        #@bind 'add', (entity) =>
-          #@trigger 'publish', { add: entity }
-          
-        #@bind 'change', (entity) =>
-        #  if delta = entity.changedAttributes()
-            #@trigger 'publish', changedEntityId: entity.id, changeDelta: delta
-
-        #@bind 'remove', (entity) =>
-          #@trigger 'publish', destroyedEntityId: entity.id
-
     spawn: (type, attributes) ->
       klass = @types[type]
       attributes or (attributes = {})

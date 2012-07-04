@@ -22,8 +22,6 @@ define (require) ->
       @serverUpdates = {}
 
       @bind 'update', (e) =>
-        #console.log 'game got update', e
-
         if e.tells
           @tellQueue.push(tell) for tell in e.tells
 
@@ -31,20 +29,8 @@ define (require) ->
           @serverUpdates[e.tick] = { entityChanges: e.entityChanges }
           @lastServerUpdate = e.tick
 
-
-        
-        #@entities.trigger 'update', e.entities if e.entities?
-        
-        #if e.sendFleetCommand?
-        #  e.sendFleetCommand.game = this
-        #  cmd = new SendFleetCommand e.sendFleetCommand
-        #  cmd.run()
-        #  #@trigger 'publish', {sendFleet: e.sendFleet} if onServer?
-        #
         @run() if e.run
       
-      
-
       @ticks = 0
 
       # client vars
@@ -143,12 +129,11 @@ define (require) ->
       , @get 'tickLength'
 
     executeServerUpdatesForTick: (tick) ->
-      deltas = []
       if upd = @serverUpdates[tick]
         @entities.applyMutation(upd.entityChanges)
 
         delete @serverUpdates[tick]
-        deltas
+        true
       else
         false
     
@@ -166,7 +151,7 @@ define (require) ->
         @ticks++
         @clientLag = 0
         @secondLastDeltas = @lastDeltas
-        @lastDeltas = @executeServerUpdatesForTick(@ticks)
+        @executeServerUpdatesForTick(@ticks)
 
         # TODO: interpolate
         #console.log "=== CLIENT TICK DONE (now at tick #{@ticks}, total lag #{@clientLagTotal})"
@@ -177,8 +162,6 @@ define (require) ->
 
       else
         console.log "did not yet receive update for tick #{@ticks}, extrapolating!"
-
-        console.log JSON.stringify(@lastDeltas)
 
         throw 'not enough data for extrapolate' unless @lastDeltas && @secondLastDeltas
 
