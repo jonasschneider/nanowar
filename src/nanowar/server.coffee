@@ -81,7 +81,6 @@ define (require) ->
       _(@players).each (player) =>
         console.log "- #{player.name()} (socket id #{player.socket.id})"
         
-      
       @game.loadMap()
       snapshot = @game.entities.snapshotFull()
 
@@ -89,6 +88,8 @@ define (require) ->
         player.send 'applySnapshot', snapshot
 
       p.updateLocalPlayerId() for p in @players
+      
+      @game.entities.enableStrictMode()
       
       @game.bind 'end', (result) =>
         console.log 'Game is over, disconnecting clients'
