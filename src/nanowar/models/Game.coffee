@@ -22,13 +22,10 @@ define (require) ->
       @serverUpdates = {}
 
       @bind 'update', (e) =>
-        console.log 'game got update', e
+        #console.log 'game got update', e
 
         if e.tells
           @tellQueue.push(tell) for tell in e.tells
-
-        #if e.ticks?
-        # @ticks = e.ticks
 
         if e.entityChanges
           @serverUpdates[e.tick] = { entityChanges: e.entityChanges }
@@ -165,14 +162,14 @@ define (require) ->
       @sendClientTells()
       @trigger 'clientTick', @serverUpdates[@ticks+1]
       if @serverUpdates[@ticks+1]?
-        console.log "=== CLIENT TICKING"
+        #console.log "=== CLIENT TICKING"
         @ticks++
         @clientLag = 0
         @secondLastDeltas = @lastDeltas
         @lastDeltas = @executeServerUpdatesForTick(@ticks)
 
         # TODO: interpolate
-        console.log "=== CLIENT TICK DONE (now at tick #{@ticks}, total lag #{@clientLagTotal})"
+        #console.log "=== CLIENT TICK DONE (now at tick #{@ticks}, total lag #{@clientLagTotal})"
 
         if @lastServerUpdate - @ticks > 1 # we are lagging behind, tick again
           @tickClient()
@@ -245,5 +242,5 @@ define (require) ->
 
     ticksToTime: (ticks) ->
       ticks * @get 'tickLength'
-  Game.tickLength = 1000 / 10
+  Game.tickLength = 1000 / 5
   return Game

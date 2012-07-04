@@ -21,8 +21,11 @@ define (require) ->
       @model.bind 'clientTick', @recordTick, this
 
       @width = @dataPoints
-      @height = 150
-      @el = @make 'canvas', height: @width, width: @width
+      @graphHeight = 150
+      @height = 160
+      @el = @make 'canvas'
+      @el.setAttribute 'height', @height
+      @el.setAttribute 'width', @width
 
 
     recordTick: (serverUpdate) ->
@@ -32,7 +35,6 @@ define (require) ->
       else
         totalSize = 0
       @dataz.push totalUpdateSize: totalSize
-      console.warn JSON.stringify(@dataz)
       @render()
 
     render: ->
@@ -40,25 +42,21 @@ define (require) ->
       ctx.clearRect 0, 0, @width, @height
       
       max = 1700
-      #for datapoint in @dataz
-      #  continue unless datapoint
-      #  max = Math.max(0, datapoint.totalUpdateSize)
+      scale = @graphHeight / max
 
-      scale = @height / max
-      #scale = 0.5
-      
       i = 0
       for datapoint in @dataz
         i++
         continue unless datapoint
         barHeight = datapoint.totalUpdateSize * scale
-        console.log barHeight
-        #ctx.fillRect 0,0,100,100
 
         if datapoint.totalUpdateSize > max
           ctx.fillStyle = 'red'
         else
-          ctx.fillStyle = '#33b'
-        ctx.fillRect i, 0, 1, barHeight
+          ctx.fillStyle = '#88f'
+        ctx.fillRect i, @graphHeight-barHeight, 1, barHeight
+
+      ctx.fillStyle = '#fff'
+      ctx.fillText("tick "+@model.ticks, 10, @graphHeight+10);
 
       this

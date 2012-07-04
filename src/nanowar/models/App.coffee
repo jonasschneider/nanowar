@@ -16,7 +16,7 @@ define (require) ->
         console.log("app sending update: "+JSON.stringify e)
       
       @bind 'update', (e) => 
-        console.log("app getting update: "+JSON.stringify e)
+        #console.log("app getting update: "+JSON.stringify e)
         
         #@is_publishing = false
         @game.trigger 'update', e.game if e.game?
