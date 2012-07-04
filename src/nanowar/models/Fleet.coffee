@@ -11,28 +11,24 @@ define (require) ->
 
     attributeSpecs:
       strength: 0
-      launched_at: null
+      launchedAt: null
       speedPerTick: 6
 
-    relationSpecs:
-      from:
-        relatedModel: Cell
-        directory: 'game.entities'
-      to:
-        relatedModel: Cell
-        directory: 'game.entities'
-      owner:
-        relatedModel: Player
-        directory: 'game.entities'
+      posx: 0
+      posy: 0
+
+      owner_id: 0
+      from_id: 0
+      to_id: 0
 
     startPosition: ->
-      util.nearestBorder @get('from').position(), @get('from').get('size'), @get('to').position()
+      util.nearestBorder @getRelation('from').position(), @getRelation('from').get('size'), @getRelation('to').position()
     
     endPosition: ->
-      util.nearestBorder @get('to').position(), @get('to').get('size'), @get('from').position()
+      util.nearestBorder @getRelation('to').position(), @getRelation('to').get('size'), @getRelation('from').position()
     
     eta: ->
-      @arrivalTime() - @game.ticks
+      @arrivalTime() - @ticks()
 
     fractionDone: ->
       1 - (@eta() / @flightTime())
@@ -41,43 +37,47 @@ define (require) ->
       Math.round @distance() / @get('speedPerTick')
     
     arrivalTime: ->
-      @get('launched_at') + @flightTime()
+      @get('launchedAt') + @flightTime()
     
     distance: ->
       util.distance(@startPosition(), @endPosition())
       
     canLaunch: ->
-      @get('from') && @get('to') && @get('from') != @get('to') && @get('strength') > 0
+      @getRelation('from') && @getRelation('to') && @getRelation('from') != @getRelation('to') && @get('strength') > 0
     
+    arrived: ->
+      @arrivalTime() < @ticks()
+
+    ###
+    # MUTATORS
+    ###
+
     launch: ->
-      @set owner: @get('from').get('owner')
+      @setRelation 'owner', @getRelation('from').getRelation('owner')
 
       if !@get('strength')
-        @set strength: Math.floor(@get('from').getCurrentStrength() / 2)
+        @set strength: Math.floor(@getRelation('from').getCurrentStrength() / 2)
 
       if @canLaunch()
-        console.log "[Tick#{@game.ticks}] [Fleet #{@id}] Fleet of #{@get('strength')} launching #{@get('from').id}->#{@get('to').id}; arrival in #{@flightTime()} ticks"
+        console.log "[Tick#{@ticks()}] [Fleet #{@id}] Fleet of #{@get('strength')} launching #{@getRelation('from').id}->#{@getRelation('to').id}; arrival in #{@flightTime()} ticks"
         @set
           posx: Math.round(@startPosition().x)
           posy: Math.round(@startPosition().y)
-        @get('from').changeCurrentStrengthBy -@get('strength')
-        @set launched_at: @game.ticks
+        @getRelation('from').changeCurrentStrengthBy -@get('strength')
+        @set launchedAt: @ticks()
         true
       else false
     
-    arrived: ->
-      @arrivalTime() < @game.ticks
-
     update: ->
       sp = @startPosition()
       ep = @endPosition()
       dx = ep.x - sp.x
       dy = ep.y - sp.y
       @set
-        posx: Math.round(sp.x + dx * @fractionDone())
-        posy: Math.round(sp.y + dy * @fractionDone())
+        posx: sp.x + dx * @fractionDone()
+        posy: sp.y + dy * @fractionDone()
       
       if @arrived()
-        console.log "[Tick#{@game.ticks}] [Fleet #{@id}] Arrived from route #{@get('from').id}->#{@get('to').id}"
-        @get('to').handle_incoming_fleet this
+        console.log "[Tick#{@ticks()}] [Fleet #{@id}] Arrived from route #{@getRelation('from').id}->#{@getRelation('to').id}"
+        @getRelation('to').handle_incoming_fleet this
         @set dead: true

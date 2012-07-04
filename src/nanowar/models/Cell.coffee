@@ -35,11 +35,11 @@ define (require) ->
       @get('size') * @get 'productionMultiplier'
     
     ###
-    # MUTATORS
+    MUTATORS
     ###
     
     handle_incoming_fleet: (fleet) ->
-      if fleet.get('owner') == @get('owner') # friendly fleet
+      if fleet.getRelation('owner') == @getRelation('owner') # friendly fleet
         console.log "Friendly fleet of #{fleet.get('strength')} arrived at #{@cid}"
         @changeCurrentStrengthBy fleet.get('strength')
       else # hostile fleet
@@ -47,19 +47,15 @@ define (require) ->
         newStrength = @getCurrentStrength() - fleet.get('strength')
         
         if newStrength == 0
-          @set
-            owner: null
-          , silent: true
-          
+          @setRelation 'owner', null
+
           console.log "#{@cid} changed to neutral"
         else if newStrength < 0
-          @set
-            owner: fleet.get('owner')
-          , silent: true
+          @setRelation 'owner', fleet.getRelation('owner')
           
           newStrength = -newStrength
           
-          console.log "#{@cid} overtaken by #{fleet.get('owner').get('name')}"
+          console.log "#{@cid} overtaken by #{fleet.getRelation('owner').get('name')}"
         
         @setCurrentStrength newStrength
     
@@ -74,7 +70,7 @@ define (require) ->
     
     setCurrentStrength: (newStrength, options) ->
       @set
-        knownStrengthAtTick : @game.ticks
+        knownStrengthAtTick : @ticks()
         knownStrength       : newStrength
       , options
     

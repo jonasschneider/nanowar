@@ -1,28 +1,37 @@
 define (require) ->
   Backbone = require 'backbone'
+  Game = require '../models/Game'
 
   return class FleetView extends Backbone.View
     initialize: (opts) ->
       @gameView = opts.gameView
       
       @model.bind 'change', @render, this
+      @model.bind 'change', @checkStart, this
       @model.bind 'remove', @remove, this
       
       @el = @gameView.paper.circle()
-      
-      
+
       @strengthText = @gameView.paper.text -100, -100, @model.get('strength')
+
+      @checkStart()
       
+      
+    checkStart: ->
+      return unless @model.get('launchedAt') > 0
+      return if @started
       @start()
+      @started = true
     
     render: ->
+      return unless @model.get('launchedAt') > 0
+
       @strengthText.attr text: @model.get('strength')
 
-      # FIXME: We're immediately screwed when packets go missing
-      #@el.animate
-      #  cx: @model.get('posx')
-      #  cy: @model.get('posy')
-      #, @model.game.get('tickLength')
+      @el.animate
+        cx: @model.get('posx')
+        cy: @model.get('posy')
+      , Game.tickLength
 
       #@x ||= 0
       #@x += 2
@@ -33,7 +42,7 @@ define (require) ->
       @strengthText.animate
         x: @model.get('posx')
         y: @model.get('posy') - 10
-      , @model.game.get('tickLength')
+      , Game.tickLength
 
     size: ->
       rad = (size) ->
@@ -55,21 +64,19 @@ define (require) ->
         x: Math.round @model.startPosition().x
         y: Math.round @model.startPosition().y - 10
       
-      diff = new Date().getTime() - @model.game.fleetclicktime
-
       @el.attr
         r: @size()
-        fill: @model.get('owner').get('color')
-        cx: @model.get('from').get('x')
-        cy: @model.get('from').get('y') # hackish, should use fleet pos
+        fill: @model.getRelation('owner').get('color')
+        cx: @model.getRelation('from').get('x')
+        cy: @model.getRelation('from').get('y') # hackish, should use fleet pos
 
       #@el.animate
       #  cx: Math.round @model.endPosition().x
       #  cy: Math.round @model.endPosition().y
       #, @timeInFlight()
 
-      prevx = newx = @model.get('from').get('x')
-      prevy = newy = @model.get('from').get('y')
+      prevx = newx = @model.getRelation('from').get('x')
+      prevy = newy = @model.getRelation('from').get('y')
 
       console.log "posx: #{@model.get('posx')}"
 

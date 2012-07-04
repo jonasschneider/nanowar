@@ -54,7 +54,12 @@ define (require) ->
     setRelation: (relationName, entity) ->
       idKey = relationName+'_id'
       data = {}
-      data[idKey] = entity.id
+      if !entity?
+        data[idKey] = null
+      else if entity.entId? #serialized entity
+        data[idKey] = entity.entId
+      else
+        data[idKey] = entity.id
       @set data
 
     getRelation: (relationName) ->
@@ -66,6 +71,9 @@ define (require) ->
 
     toString: ->
       @id || super
+
+    toJSON: ->
+      {entId: @id}
 
   _.extend(Entity.prototype, Backbone.Events)
   return Entity

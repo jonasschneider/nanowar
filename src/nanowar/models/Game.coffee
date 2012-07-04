@@ -9,7 +9,7 @@ define (require) ->
   Backbone          = require 'backbone'
   $          = require 'jquery'
 
-  return class Game extends Backbone.Model
+  class Game extends Backbone.Model
     defaults:
       # client actions can take at worst 2*tickLength to propagate (command on server, results on client),
       # not even counting for processing and network latency!
@@ -104,16 +104,15 @@ define (require) ->
       this[tell.what].call(this, tell.with...)
 
     sendFleet: (from, to) ->
-      fleet = new Fleet 
-        from: from
-        to: to
-        game: this
+      fleet = @entities.spawn 'Fleet'
+      fleet.setRelation('from', from)
+      fleet.setRelation('to', to)
       
       if fleet.launch()
         console.log "launched a fleet"
-        @entities.add fleet
       else
         console.log "fleet failed to launch"
+        fleet.set dead: true
 
     moveCell: ->
       c = @getCells()[0]
@@ -149,9 +148,7 @@ define (require) ->
     executeServerUpdatesForTick: (tick) ->
       deltas = []
       if upd = @serverUpdates[tick]
-        for change in upd.entityChanges
-          @entities.trigger 'update', change
-          deltas.push d if d = @entities.lastDelta
+        @entities.applyMutation(upd.entityChanges)
 
         delete @serverUpdates[tick]
         deltas
@@ -229,23 +226,23 @@ define (require) ->
       else
         @tickClient()
 
-      @entities.each (e) =>
-        @entities.remove(e) if e.get('dead')
+
 
     updateAndPublish: ->
-      entityChanges = []
+      entityChanges = @entities.mutate =>
+        @runTellQueue()
+        @entities.each (ent) =>
+          ent.update && ent.update()
+          @entities.remove(ent) if ent.get('dead')
 
-      @entities.bind 'publish', (change) ->
-        entityChanges.push change
-
-      @runTellQueue()
-      @entities.each (ent) -> ent.update && ent.update()
+      @trigger 'publish', tick: @ticks, entityChanges: entityChanges
 
       if winner = @getWinner()
         @trigger 'end', winner: winner
         @halt()
 
-      @trigger 'publish', tick: @ticks, entityChanges: entityChanges
 
     ticksToTime: (ticks) ->
       ticks * @get 'tickLength'
+  Game.tickLength = 1000 / 10
+  return Game

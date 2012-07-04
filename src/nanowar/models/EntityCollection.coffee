@@ -62,7 +62,7 @@ define (require) ->
         num = @nextEntityIds[type]++
         newId = type + '_' + num
 
-      @_recordMutation ["spawned", type, newId]
+      @_recordMutation ["spawned", type, {id: newId}]
 
       ent = new klass this, newId
       
@@ -80,6 +80,21 @@ define (require) ->
 
     get: (id) ->
       @entitiesById[id]
+
+    remove: (entOrId) ->
+      if entOrId.id?
+        ent = entOrId
+      else
+        ent = @get(entOrId)
+
+      ent.trigger 'remove'
+
+      idx = @entities.indexOf(ent)
+      @entities.splice(idx, 1)
+      delete @entitiesById[ent.id]
+
+      @_recordMutation ["removed", ent.id]
+      null
 
     getAllOfType: (type) ->
       results = []
@@ -109,18 +124,30 @@ define (require) ->
         storedAttr[2] = value
       else
         @entityAttributes.push [entId, attr, value]
+      @get(entId).trigger 'change'
       @_recordMutation ["changed", entId, attr, value]
       value
 
     mutate: (mutator) ->
       throw 'already mutating' if @currentMutations
-      @currentMutations = []
+      @currentMutationChanges = []
 
       mutator()
 
-      d = @currentMutations
-      @currentMutations = undefined
+      d = @currentMutationChanges
+      @currentMutationChanges = undefined
       d
+
+    applyMutation: (mutation) ->
+      for change in mutation
+        if change[0] == "changed"
+          @setEntityAttribute change[1], change[2], change[3]
+        else if change[0] == "spawned"
+          @spawn change[1], change[2]
+        else if change[0] == "removed"
+          @remove change[1]
+        else
+          throw "unkown change type #{change[0]}"
 
     snapshotFull: ->
       entities = []
@@ -146,8 +173,8 @@ define (require) ->
       @entityAttributes = snapshot
 
     _recordMutation: (mutation) ->
-      if @currentMutations
-        @currentMutations.push mutation
+      if @currentMutationChanges
+        @currentMutationChanges.push mutation
       else
         throw 'mutation outside mutate() in strict mode' if @strictMode
 

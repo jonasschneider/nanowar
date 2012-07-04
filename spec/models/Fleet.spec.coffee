@@ -15,7 +15,6 @@ require ['nanowar/models/Fleet', 'nanowar/models/Game', 'nanowar/models/Cell'], 
       expect(game.entities.getEntityAttribute(fleet.id, 'lol')).toBe 3
 
       expect(fleet.get('strength')).toBe 5
-      expect(fleet.get('lol')).toBe 3
 
       fleet.set strength: 10
       expect(game.entities.getEntityAttribute(fleet.id, 'strength')).toBe 10
@@ -70,7 +69,10 @@ require ['nanowar/models/Fleet', 'nanowar/models/Game', 'nanowar/models/Cell'], 
       fleet = game.entities.spawn 'Fleet', strength: 2
       fleet2 = game.entities.spawn 'Fleet', strength: 10
 
-      fleet.setRelation('neighbour', fleet2)
+      fleet.setRelation('owner', fleet2)
 
-      expect(fleet.get 'neighbour_id').toBe fleet2.id
-      expect(fleet.getRelation('neighbour')).toBe fleet2
+      expect(fleet.get 'owner_id').toBe fleet2.id
+      expect(fleet.getRelation('owner')).toBe fleet2
+
+      fleet.setRelation('owner', entId: fleet.id)
+      expect(fleet.getRelation('owner')).toBe fleet

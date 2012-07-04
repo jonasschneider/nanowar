@@ -88,16 +88,8 @@ define (require) ->
       _(@players).each (player) =>
         player.send 'applySnapshot', snapshot
 
-      #@game.runTellQueue()
-      #@game.updateAndPublish()
-
-
-      #console.log JSON.stringify(@game.entities.snapshotAttributes())
-
       p.updateLocalPlayerId() for p in @players
       
-      #@sendToAll 'runTellQueue' # hackish, to get the player entities to the clients so we can updateLocalPlayer()
-
       @game.bind 'end', (result) =>
         console.log 'Game is over, disconnecting clients'
         result.winner.send 'log', 'You win!'
