@@ -163,6 +163,7 @@ define (require) ->
       @executeServerUpdatesForTick(0)
 
       @sendClientTells()
+      @trigger 'clientTick', @serverUpdates[@ticks+1]
       if @serverUpdates[@ticks+1]?
         console.log "=== CLIENT TICKING"
         @ticks++

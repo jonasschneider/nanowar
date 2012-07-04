@@ -4,6 +4,7 @@ define (require) ->
   FleetView = require './FleetView'
   Fleet = require '../models/Fleet'
   EnhancerNodeView = require './EnhancerNodeView'
+  GameNetGraphView = require './GameNetGraphView'
   SendFleetCommand = require '../commands/SendFleetCommand'
   Raphael = require 'raphael'
   _                 = require 'underscore'
@@ -44,6 +45,8 @@ define (require) ->
       #  v.render() for v in @fleetvs
       #, 1000/30
 
+      ng = new GameNetGraphView model: @model, gameView: this
+      @container.appendChild(ng.render().el)
 
     updateObjects: ->
       console.log 'update call'
