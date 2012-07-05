@@ -22,11 +22,13 @@ define (require) ->
       @serverUpdates = {}
 
       @bind 'update', (e) =>
+        console.log "game got update ", JSON.stringify(e)
+
         if e.tells
           @tellQueue.push(tell) for tell in e.tells
 
-        if e.entityChanges
-          @serverUpdates[e.tick] = { entityChanges: e.entityChanges }
+        if e.entityMutation
+          @serverUpdates[e.tick] = { entityMutation: e.entityMutation }
           @lastServerUpdate = e.tick
 
         @run() if e.run
@@ -128,42 +130,80 @@ define (require) ->
         @tick()
       , @get 'tickLength'
 
-    executeServerUpdatesForTick: (tick) ->
-      if upd = @serverUpdates[tick]
-        @entities.applyMutation(upd.entityChanges)
-
-        delete @serverUpdates[tick]
-        true
-      else
-        false
-    
     halt: ->
       @stopping = true
     
     tickClient: ->
       #@halt() if @ticks > 10
-      @executeServerUpdatesForTick(0)
+      @ticks++
 
       @sendClientTells()
       @trigger 'clientTick', @serverUpdates[@ticks+1]
-      if @serverUpdates[@ticks+1]?
+      if update = @serverUpdates[@ticks]
         #console.log "=== CLIENT TICKING"
-        @ticks++
-        @clientLag = 0
-        @secondLastDeltas = @lastDeltas
-        @executeServerUpdatesForTick(@ticks)
+        if @lagging # we have recovered from a lag
+          @lagging = false
+          @entities.restoreAttributeSnapshot(@lagLastGoodAttributeSnapshot)
 
-        # TODO: interpolate
+        if @ticks-2 > 0
+          delete @serverUpdates[@ticks-2] # keep the mutation that led to the current tick and the one before that
+
+        @clientLag = 0
+
+        @entities.applyMutation(update.entityMutation)
+
         #console.log "=== CLIENT TICK DONE (now at tick #{@ticks}, total lag #{@clientLagTotal})"
 
-        if @lastServerUpdate - @ticks > 1 # we are lagging behind, tick again
-          @tickClient()
+        #if @lastServerUpdate - @ticks > 1 # we are lagging behind, tick again
+        #  @tickClient()
 
 
       else
         console.log "did not yet receive update for tick #{@ticks}, extrapolating!"
 
-        throw 'not enough data for extrapolate' unless @lastDeltas && @secondLastDeltas
+        if !@lagging # we started to lag
+          @lagging = true
+          @lagLastGoodAttributeSnapshot = @entities.snapshotAttributes()
+          @lagStartedAt = @ticks
+          @lagExtrapolatedAttributes = []
+
+          throw 'not enough data for extrapolate' if @lagStartedAt < 2
+
+
+          # the changed attributes of the mutations that led to the two last good ticks
+          attr1 = @entities.attributesChangedByMutation(@serverUpdates[@ticks-2].entityMutation)
+          attr2 = @entities.attributesChangedByMutation(@serverUpdates[@ticks-1].entityMutation)
+
+
+          for changeInfo1 in attr1
+            [ent, attribute, olderValue] = changeInfo1
+            changeInfo2 = _(attr2).detect (x) => x[0] == changeInfo1[0] and x[1] == changeInfo1[1]
+            continue unless changeInfo2
+            newerValue = changeInfo2[2]
+            console.log "extrapolating #{ent}'s #{attribute}, was last changed from #{olderValue} to #{newerValue}"
+            d = newerValue - olderValue
+            @lagExtrapolatedAttributes.push [ent, attribute, newerValue, d]
+
+        @clientLagTotal++
+        lagDuration = @ticks - @lagStartedAt
+
+        if lagDuration > 10 # todo: constant
+          console.log "lost more than 10 ticks, connection lost :("
+          @halt()
+          return
+
+        # extrapolate here
+        m = @entities.mutate =>
+          for data in @lagExtrapolatedAttributes
+            [entId, attr, lastKnownValue, delta] = data
+            thisValue = lastKnownValue + lagDuration * delta
+            @entities.setEntityAttribute(entId, attr, thisValue)
+
+        console.log m
+
+
+        return
+
 
         for changedEnt in @lastDeltas
           oldEnt = _(@secondLastDeltas).detect (delta) =>
@@ -184,12 +224,6 @@ define (require) ->
           # FIXME: unbreak encapsulation
           @entities.trigger 'update', changedEntityId: changedEnt.id, changeDelta: entDelta
 
-        @clientLag++
-        @clientLagTotal++
-
-        if @clientLag > 10
-          console.log "lost more than 10 ticks, connection lost :("
-          @halt()
 
     
     tickServer: ->
@@ -210,13 +244,13 @@ define (require) ->
 
 
     updateAndPublish: ->
-      entityChanges = @entities.mutate =>
+      entityMutation = @entities.mutate =>
         @runTellQueue()
         @entities.each (ent) =>
           ent.update && ent.update()
           @entities.remove(ent) if ent.get('dead')
 
-      @trigger 'publish', tick: @ticks, entityChanges: entityChanges
+      @trigger 'publish', tick: @ticks, entityMutation: entityMutation
 
       if winner = @getWinner()
         @trigger 'end', winner: winner

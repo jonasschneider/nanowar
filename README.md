@@ -124,7 +124,7 @@ the current entity implementation:
   3. Mutations
     These are proprietary delta formats that can transform one snapshot into another. What sets them apart from a snapshot delta is that in addition to changing entity attribute values, they can also contain messages passed between entities, giving them a procedural and temporal dimension. They can basically replay a slice of game time.
 
-    They are the only state representation ever sent over the network, as they contain a form of delta compression.
+    This is the only state representation ever sent over the network, as it is the only one using a form of delta compression.
 
 
 implementation details:
@@ -142,5 +142,5 @@ implementation details:
 TODO:
   - reduce mutations so multiple changes to a single attribute during a mutate() call do not produce redundant data
   - notify an entity if its attributes are changed behind the scenes
-  - separate the spawning/persistentobject system from the raw attribute/mutation storage
+  - completely separate the spawning/persistentobject system from the raw attribute/mutation storage
   - try out how drawing fleets in a canvas affects performance

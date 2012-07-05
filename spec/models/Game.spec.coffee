@@ -3,21 +3,19 @@ require ['nanowar/models/Game', 'nanowar/models/Cell', 'nanowar/models/Player'],
     describe '#getCells', ->
       it 'works', ->
         game = new Game
-        cell = new Cell game: game
-
-        game.entities.add cell
-        game.entities.add new Player game: game
+        cell =  game.entities.spawn 'Cell'
+        game.entities.spawn 'Player'
 
         expect(game.getCells().length).toBe 1
         expect(game.getCells()[0]).toBe cell
 
     describe '#tellSelf', ->
       it 'can tick without tells', ->
-        game = new Game
+        game = new Game onServer: true
         game.tick()
 
       it 'runs a tell when ticking', ->
-        game = new Game
+        game = new Game onServer: true
         ran = false
 
         game.ahoy = ->
@@ -30,7 +28,7 @@ require ['nanowar/models/Game', 'nanowar/models/Cell', 'nanowar/models/Player'],
         expect(ran).toBe true
 
       it 'runs tells in order', ->
-        game = new Game
+        game = new Game onServer: true
         first = null
         hissed = false
         ahoy = false
@@ -53,7 +51,7 @@ require ['nanowar/models/Game', 'nanowar/models/Cell', 'nanowar/models/Player'],
         expect(first).toBe 'hiss'
 
       it 'runs a tell with an argument', ->
-        game = new Game
+        game = new Game onServer: true
         got = null
 
         game.ahoy = (arg)->
@@ -65,35 +63,30 @@ require ['nanowar/models/Game', 'nanowar/models/Cell', 'nanowar/models/Player'],
         expect(got).toBe 'set sails'
 
     describe '#tick', ->
-      it 'publishes the tells', ->
-        game = new Game
+      it 'publishes entity mutations', ->
+        game = new Game onServer: true
         output = false
 
         game.bind 'publish', (arg) ->
           output = arg
 
+        p = game.entities.spawn 'Player'
+
         game.ahoy = ->
+          p.set color: 'yell'
 
         game.tellSelf 'ahoy'
         game.tick()
 
-        game2 = new Game
-        called = false
-        game2.ahoy = ->
-          called = true
-        
-        game2.trigger 'update', output
-
-        expect(called).toBe true
+        expect(JSON.stringify(output)).toBe '{"tick":1,"entityMutation":[["changed","Player_1","color","yell"]]}'
        
 
     describe '#getPlayers', ->
       it 'works', ->
         game = new Game
-        player = new Player game: game, name: 'ohai'
+        player = game.entities.spawn 'Player', name: 'ohai'
 
-        game.entities.add new Cell game: game
-        game.entities.add player
+        game.entities.spawn 'Cell'
 
         expect(game.getPlayers().length).toBe 1
         expect(game.getPlayers()[0]).toBe player
@@ -102,18 +95,24 @@ require ['nanowar/models/Game', 'nanowar/models/Cell', 'nanowar/models/Player'],
     describe '#getWinner', ->
       it 'returns 0 when there are multiple players remaining', ->
         game = new Game
-        game.entities.add p1 = new Player game: game
-        game.entities.add p2 = new Player game: game
-        game.entities.add new Cell game: game, owner: p1
-        game.entities.add new Cell game: game, owner: p2
+        p1 = game.entities.spawn 'Player'
+        p2 = game.entities.spawn 'Player'
+        c1 = game.entities.spawn 'Cell'
+        c1.setRelation 'owner', p1
+        
+        c2 = game.entities.spawn 'Cell'
+        c2.setRelation 'owner', p2
 
         expect(game.getWinner()).toBe null
 
       it 'returns the winner when there is only one player remaining', ->
         game = new Game
-        game.entities.add p1 = new Player game: game
-        game.entities.add p2 = new Player game: game
-        game.entities.add new Cell game: game, owner: p2
-        game.entities.add new Cell game: game, owner: p2
+        p1 = game.entities.spawn 'Player'
+        p2 = game.entities.spawn 'Player'
+        c1 = game.entities.spawn 'Cell'
+        c1.setRelation 'owner', p2
+        
+        c2 = game.entities.spawn 'Cell'
+        c2.setRelation 'owner', p2
 
         expect(game.getWinner()).toBe p2
