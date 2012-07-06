@@ -14,7 +14,7 @@ define (require) ->
       @appView = options.appView
       throw "need app view" unless @appView
       
-      @model.entities.bind 'add', @addEntity,  this
+      @model.world.bind 'add', @addEntity,  this
       
       @selectedCell = null
       

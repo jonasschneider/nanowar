@@ -3,8 +3,8 @@ require ['nanowar/models/Game', 'nanowar/models/Cell', 'nanowar/models/Player'],
     describe '#getCells', ->
       it 'works', ->
         game = new Game
-        cell =  game.entities.spawn 'Cell'
-        game.entities.spawn 'Player'
+        cell =  game.world.spawn 'Cell'
+        game.world.spawn 'Player'
 
         expect(game.getCells().length).toBe 1
         expect(game.getCells()[0]).toBe cell
@@ -70,7 +70,7 @@ require ['nanowar/models/Game', 'nanowar/models/Cell', 'nanowar/models/Player'],
         game.bind 'publish', (arg) ->
           output = arg
 
-        p = game.entities.spawn 'Player'
+        p = game.world.spawn 'Player'
 
         game.ahoy = ->
           p.set color: 'yell'
@@ -84,9 +84,9 @@ require ['nanowar/models/Game', 'nanowar/models/Cell', 'nanowar/models/Player'],
     describe '#getPlayers', ->
       it 'works', ->
         game = new Game
-        player = game.entities.spawn 'Player', name: 'ohai'
+        player = game.world.spawn 'Player', name: 'ohai'
 
-        game.entities.spawn 'Cell'
+        game.world.spawn 'Cell'
 
         expect(game.getPlayers().length).toBe 1
         expect(game.getPlayers()[0]).toBe player
@@ -95,24 +95,24 @@ require ['nanowar/models/Game', 'nanowar/models/Cell', 'nanowar/models/Player'],
     describe '#getWinner', ->
       it 'returns 0 when there are multiple players remaining', ->
         game = new Game
-        p1 = game.entities.spawn 'Player'
-        p2 = game.entities.spawn 'Player'
-        c1 = game.entities.spawn 'Cell'
+        p1 = game.world.spawn 'Player'
+        p2 = game.world.spawn 'Player'
+        c1 = game.world.spawn 'Cell'
         c1.setRelation 'owner', p1
         
-        c2 = game.entities.spawn 'Cell'
+        c2 = game.world.spawn 'Cell'
         c2.setRelation 'owner', p2
 
         expect(game.getWinner()).toBe null
 
       it 'returns the winner when there is only one player remaining', ->
         game = new Game
-        p1 = game.entities.spawn 'Player'
-        p2 = game.entities.spawn 'Player'
-        c1 = game.entities.spawn 'Cell'
+        p1 = game.world.spawn 'Player'
+        p2 = game.world.spawn 'Player'
+        c1 = game.world.spawn 'Cell'
         c1.setRelation 'owner', p2
         
-        c2 = game.entities.spawn 'Cell'
+        c2 = game.world.spawn 'Cell'
         c2.setRelation 'owner', p2
 
         expect(game.getWinner()).toBe p2

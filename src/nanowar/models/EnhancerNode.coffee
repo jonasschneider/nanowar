@@ -12,14 +12,14 @@ define (require) ->
     relationSpecs:
       owner:
         relatedModel: Player
-        directory: 'game.entities'
+        directory: 'game.world'
     
     initialize: ->
       @_previousAffectedCells = @affectedCells()
       
-      @game.entities.bind 'add',    @update, this
-      @game.entities.bind 'change', @update, this
-      @game.entities.bind 'remove', @update, this
+      @game.world.bind 'add',    @update, this
+      @game.world.bind 'change', @update, this
+      @game.world.bind 'remove', @update, this
     
     update: ->
       newly = @affectedCells()

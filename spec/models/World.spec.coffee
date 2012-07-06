@@ -1,4 +1,4 @@
-require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/models/Game'], (EntityCollection, Entity, Game) ->
+require ['nanowar/models/World', 'nanowar/models/Entity', 'nanowar/models/Game'], (World, Entity, Game) ->
   class MyEntity extends Entity
     attributeSpecs:
       strength: 0
@@ -8,10 +8,10 @@ require ['nanowar/models/EntityCollection', 'nanowar/models/Entity', 'nanowar/mo
 
   class MyOtherEntity extends Entity
 
-  describe 'EntityCollection', ->
+  describe 'World', ->
     beforeEach ->
       @game = new Game
-      @coll = new EntityCollection [], types: {'MyEntity': MyEntity}, game: @game
+      @coll = new World [], types: {'MyEntity': MyEntity}, game: @game
 
     describe 'applying mutations', ->
       it "works", ->

@@ -47,7 +47,7 @@ define (require) ->
     
     addPlayer: (clientSocket) ->
       console.log clientSocket.id + " connected"
-      playerent = @game.entities.spawn 'Player', name: ("Player " + (@players.length + 1))
+      playerent = @game.world.spawn 'Player', name: ("Player " + (@players.length + 1))
       console.log "made player ent"
       player = new NetworkedPlayer clientSocket, playerent
       
@@ -82,14 +82,14 @@ define (require) ->
         console.log "- #{player.name()} (socket id #{player.socket.id})"
         
       @game.loadMap()
-      snapshot = @game.entities.snapshotFull()
+      snapshot = @game.world.snapshotFull()
 
       _(@players).each (player) =>
         player.send 'applySnapshot', snapshot
 
       p.updateLocalPlayerId() for p in @players
       
-      @game.entities.enableStrictMode()
+      @game.world.enableStrictMode()
       
       @game.bind 'end', (result) =>
         console.log 'Game is over, disconnecting clients'

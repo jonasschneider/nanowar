@@ -7,10 +7,10 @@ define (require) ->
     relationSpecs:
       from:
         relatedModel: Cell
-        directory: 'game.entities'
+        directory: 'game.world'
       to:
         relatedModel: Cell
-        directory: 'game.entities'
+        directory: 'game.world'
         
     initialize: ->
       
@@ -21,4 +21,4 @@ define (require) ->
         game: @game
       
       if fleet.launch()
-        @game.entities.add fleet
+        @game.world.add fleet

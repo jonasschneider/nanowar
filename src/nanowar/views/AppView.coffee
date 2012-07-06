@@ -21,7 +21,7 @@ define (require) ->
           socket.emit 'pong', timestamp
 
         socket.on 'applySnapshot', (snapshot) =>
-          @model.game.entities.applySnapshot(snapshot)
+          @model.game.world.applySnapshot(snapshot)
         
         socket.on 'setLocalPlayerId',  (player) =>
           @localPlayerId = player

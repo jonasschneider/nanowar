@@ -4,7 +4,7 @@ define (require) ->
   Fleet             = require('./Fleet')
   EnhancerNode      = require('./EnhancerNode')
   SendFleetCommand  = require('../commands/SendFleetCommand')
-  EntityCollection  = require('./EntityCollection')
+  World  = require('./World')
   _                 = require 'underscore'
   Backbone          = require 'backbone'
   $          = require 'jquery'
@@ -17,7 +17,7 @@ define (require) ->
     
     initialize: ->
       etypes = Cell: Cell, Player: Player, Fleet: Fleet, EnhancerNode: EnhancerNode
-      @entities = new EntityCollection [], game: this, types: etypes
+      @world = new World [], game: this, types: etypes
 
       @serverUpdates = {}
 
@@ -47,7 +47,7 @@ define (require) ->
       @sendQueue = []
     
     getEntities: (type) ->
-      @entities.select (entity) -> entity instanceof type
+      @world.select (entity) -> entity instanceof type
     
     getCells: ->
       @getEntities Cell
@@ -67,11 +67,11 @@ define (require) ->
         null
 
     loadMap: ->
-      c1 = @entities.spawn 'Cell', x: 350, y: 100, size: 50
-      @entities.spawn 'Cell', x: 350, y: 300, size: 30, owner_id: @getPlayers()[0].id
-      @entities.spawn 'Cell', x: 100, y: 200, size: 50
-      @entities.spawn 'Cell', x: 500, y: 200, size: 50
-      @entities.spawn 'Cell', x: 550, y: 100, size: 30, owner_id: @getPlayers()[1].id
+      c1 = @world.spawn 'Cell', x: 350, y: 100, size: 50
+      @world.spawn 'Cell', x: 350, y: 300, size: 30, owner_id: @getPlayers()[0].id
+      @world.spawn 'Cell', x: 100, y: 200, size: 50
+      @world.spawn 'Cell', x: 500, y: 200, size: 50
+      @world.spawn 'Cell', x: 550, y: 100, size: 30, owner_id: @getPlayers()[1].id
       #new EnhancerNode x: 440, y: 120, game: this, owner: @getPlayers()[1]
     
     tellSelf: (what, args...) ->
@@ -89,7 +89,7 @@ define (require) ->
       this[tell.what].call(this, tell.with...)
 
     sendFleet: (from, to) ->
-      fleet = @entities.spawn 'Fleet'
+      fleet = @world.spawn 'Fleet'
       fleet.setRelation('from', from)
       fleet.setRelation('to', to)
       
@@ -145,14 +145,14 @@ define (require) ->
         #console.log "=== CLIENT TICKING"
         if @lagging # we have recovered from a lag
           @lagging = false
-          @entities.restoreAttributeSnapshot(@lagLastGoodAttributeSnapshot)
+          @world.restoreAttributeSnapshot(@lagLastGoodAttributeSnapshot)
 
         if @ticks-2 > 0
           delete @serverUpdates[@ticks-2] # keep the mutation that led to the current tick and the one before that
 
         @clientLag = 0
 
-        @entities.applyMutation(update.entityMutation)
+        @world.applyMutation(update.entityMutation)
 
         #console.log "=== CLIENT TICK DONE (now at tick #{@ticks}, total lag #{@clientLagTotal})"
 
@@ -165,7 +165,7 @@ define (require) ->
 
         if !@lagging # we started to lag
           @lagging = true
-          @lagLastGoodAttributeSnapshot = @entities.snapshotAttributes()
+          @lagLastGoodAttributeSnapshot = @world.snapshotAttributes()
           @lagStartedAt = @ticks
           @lagExtrapolatedAttributes = []
 
@@ -173,8 +173,8 @@ define (require) ->
 
 
           # the changed attributes of the mutations that led to the two last good ticks
-          attr1 = @entities.attributesChangedByMutation(@serverUpdates[@ticks-2].entityMutation)
-          attr2 = @entities.attributesChangedByMutation(@serverUpdates[@ticks-1].entityMutation)
+          attr1 = @world.attributesChangedByMutation(@serverUpdates[@ticks-2].entityMutation)
+          attr2 = @world.attributesChangedByMutation(@serverUpdates[@ticks-1].entityMutation)
 
 
           for changeInfo1 in attr1
@@ -195,11 +195,11 @@ define (require) ->
           return
 
         # extrapolate here
-        m = @entities.mutate =>
+        m = @world.mutate =>
           for data in @lagExtrapolatedAttributes
             [entId, attr, lastKnownValue, delta] = data
             thisValue = lastKnownValue + lagDuration * delta
-            @entities.setEntityAttribute(entId, attr, thisValue)
+            @world.setEntityAttribute(entId, attr, thisValue)
 
         console.log m
 
@@ -214,11 +214,11 @@ define (require) ->
       console.log "=== TICKING"
       startTime = new Date().getTime()
 
-      entityMutation = @entities.mutate =>
+      entityMutation = @world.mutate =>
         @runTellQueue()
-        @entities.each (ent) =>
+        @world.each (ent) =>
           ent.update && ent.update()
-          @entities.remove(ent) if ent.get('dead')
+          @world.remove(ent) if ent.get('dead')
 
       if winner = @getWinner()
         @trigger 'end', winner: winner

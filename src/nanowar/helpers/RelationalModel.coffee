@@ -24,7 +24,7 @@ define (require) ->
         _(@relationSpecs).each (options, name) =>
           options.relatedModelName ||= options.relatedModel.toString().match(/function (.+)\(/)[1]
           
-          options.directoryObject = @collection # FIXME: this only works for entities
+          options.directoryObject = @collection # FIXME: this only works for world
       
       super
       @_previousAttributes = _.clone(@attributes)

@@ -2,7 +2,7 @@ define (require) ->
   Backbone = require('backbone')
   _                     = require 'underscore'
 
-  class EntityCollection
+  class World
     constructor: (models, options) ->
       unless options && options.types?
         throw "Need types"
@@ -11,8 +11,8 @@ define (require) ->
       @nextEntityIds = {}
       @entityAttributes = []
 
-      @entities = []
-      @entitiesById = {}
+      @world = []
+      @worldById = {}
 
       _(options.types).each (klass, name) =>
         @types[name] = klass
@@ -36,9 +36,9 @@ define (require) ->
 
       ent = new klass this, newId
       
-      throw "id #{model.id} is in use" if @entitiesById[newId]
-      @entities.push ent
-      @entitiesById[newId] = ent
+      throw "id #{model.id} is in use" if @worldById[newId]
+      @world.push ent
+      @worldById[newId] = ent
       
 
       ent._initialize()
@@ -49,7 +49,7 @@ define (require) ->
       ent
 
     get: (id) ->
-      @entitiesById[id]
+      @worldById[id]
 
     remove: (entOrId) ->
       if entOrId.id?
@@ -59,16 +59,16 @@ define (require) ->
 
       ent.trigger 'remove'
 
-      idx = @entities.indexOf(ent)
-      @entities.splice(idx, 1)
-      delete @entitiesById[ent.id]
+      idx = @world.indexOf(ent)
+      @world.splice(idx, 1)
+      delete @worldById[ent.id]
 
       @_recordMutation ["removed", ent.id]
       null
 
     getAllOfType: (type) ->
       results = []
-      for ent in @entities
+      for ent in @world
         results.push ent if ent.type == type
       results
 
@@ -127,16 +127,16 @@ define (require) ->
       changed
 
     snapshotFull: ->
-      entities = []
-      for ent in @entities
+      world = []
+      for ent in @world
         spawn_attributes = { id: ent.id }
         attributes = _(@entityAttributes).select (a) ->
           a[0] == ent.id
         for attr in attributes
           spawn_attributes[attr[1]] = attr[2]
 
-        entities.push [ent.type, spawn_attributes]
-      entities
+        world.push [ent.type, spawn_attributes]
+      world
 
     applySnapshot: (snapshot) ->
       for args in snapshot
@@ -146,7 +146,7 @@ define (require) ->
       _.clone(attr) for attr in @entityAttributes
 
     restoreAttributeSnapshot: (snapshot) ->
-      # TODO: notify changed entities
+      # TODO: notify changed world
       @entityAttributes = snapshot
 
     _recordMutation: (mutation) ->
@@ -155,7 +155,7 @@ define (require) ->
       else
         throw 'mutation outside mutate() in strict mode' if @strictMode
 
-  _.extend(EntityCollection.prototype, Backbone.Events)
+  _.extend(World.prototype, Backbone.Events)
 
   methods = ['forEach', 'each', 'map', 'reduce', 'reduceRight', 'find', 'detect',
     'filter', 'select', 'reject', 'every', 'all', 'some', 'any', 'include',
@@ -164,7 +164,7 @@ define (require) ->
 
   # Mix in each Underscore method as a proxy
   _.each methods, (method) ->
-    EntityCollection.prototype[method] = ->
-      _[method].apply(_, [this.entities].concat(_.toArray(arguments)))
+    World.prototype[method] = ->
+      _[method].apply(_, [this.world].concat(_.toArray(arguments)))
 
-  return EntityCollection
+  return World
