@@ -52,11 +52,6 @@ define (require) ->
           ctx.fillStyle = '#88f'
         ctx.fillRect i, @graphHeight-barHeight, 1, barHeight
 
-      ctx.fillStyle = '#fff'
-      ctx.fillText("tick "+@model.ticks, 10, @graphHeight+10);
-
-
-
       max = Game.tickLength
       scale = 20 / max
       i = 0
@@ -84,5 +79,17 @@ define (require) ->
         else
           ctx.fillStyle = 'blue'
           ctx.fillRect i, @graphHeight+60-barHeight, 1, 2
+
+      ticksPerSecond = 1000 / Game.tickLength
+      updateSizeSum = 0
+      i = @dataPoints-ticksPerSecond
+      while i < @dataPoints
+        datapoint = @dataz[i++]
+        continue unless datapoint
+        updateSizeSum += datapoint.totalUpdateSize
+      kbpsIn = (updateSizeSum/1024).toFixed(1)
+
+      ctx.fillStyle = '#fff'
+      ctx.fillText("tick #{@model.ticks} - #{kbpsIn}kb/s in", 10, @graphHeight+10);
 
       this
