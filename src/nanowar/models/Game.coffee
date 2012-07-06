@@ -28,7 +28,7 @@ define (require) ->
           @tellQueue.push(tell) for tell in e.tells
 
         if e.entityMutation
-          @serverUpdates[e.tick] = { entityMutation: e.entityMutation }
+          @serverUpdates[e.tick] = e
           @lastServerUpdate = e.tick
 
         @run() if e.run
@@ -137,10 +137,10 @@ define (require) ->
     
     tickClient: ->
       #@halt() if @ticks > 10
+      startTime = new Date().getTime()
       @ticks++
 
       @sendClientTells()
-      @trigger 'clientTick', @serverUpdates[@ticks+1]
       if update = @serverUpdates[@ticks]
         #console.log "=== CLIENT TICKING"
         if @lagging # we have recovered from a lag
@@ -203,36 +203,30 @@ define (require) ->
 
         console.log m
 
-
-        return
-
-
-        for changedEnt in @lastDeltas
-          oldEnt = _(@secondLastDeltas).detect (delta) =>
-            delta.id == changedEnt.id
-          continue unless oldEnt
-          entDelta = {}
-
-          for own prop of changedEnt 
-            continue if prop == 'id'
-            newerValue = changedEnt[prop]
-            olderValue = oldEnt[prop]
-
-            extrapValue = newerValue + (newerValue - olderValue)
-
-            console.log("#{changedEnt.id}'s #{prop} changed from #{olderValue} to #{newerValue} -> extrapolated to #{extrapValue}")
-            entDelta[prop] = extrapValue
-
-          # FIXME: unbreak encapsulation
-          @entities.trigger 'update', changedEntityId: changedEnt.id, changeDelta: entDelta
-
-
+      endTime = new Date().getTime()
+      @trigger 'instrument:client-tick', 
+        totalUpdateSize: JSON.stringify(@serverUpdates[@ticks] || {}).length # FIXME: handle lagging etc correctly
+        clientProcessingTime: (endTime-startTime)
+        serverProcessingTime: (@serverUpdates[@ticks] || {serverProcessingTime: 0}).serverProcessingTime # FIXME: same
     
     tickServer: ->
       @ticks++
       console.log "=== TICKING"
-    
-      @updateAndPublish()
+      startTime = new Date().getTime()
+
+      entityMutation = @entities.mutate =>
+        @runTellQueue()
+        @entities.each (ent) =>
+          ent.update && ent.update()
+          @entities.remove(ent) if ent.get('dead')
+
+      if winner = @getWinner()
+        @trigger 'end', winner: winner
+        @halt()
+
+      endTime = new Date().getTime()
+      @trigger 'publish', tick: @ticks, entityMutation: entityMutation, serverProcessingTime: (endTime-startTime)
+
       console.log "=== SERVER TICK DONE (now at tick #{@ticks})"
 
     tick: ->
@@ -242,22 +236,6 @@ define (require) ->
         @tickServer()
       else
         @tickClient()
-
-
-
-    updateAndPublish: ->
-      entityMutation = @entities.mutate =>
-        @runTellQueue()
-        @entities.each (ent) =>
-          ent.update && ent.update()
-          @entities.remove(ent) if ent.get('dead')
-
-      @trigger 'publish', tick: @ticks, entityMutation: entityMutation
-
-      if winner = @getWinner()
-        @trigger 'end', winner: winner
-        @halt()
-
 
     ticksToTime: (ticks) ->
       ticks * @get 'tickLength'

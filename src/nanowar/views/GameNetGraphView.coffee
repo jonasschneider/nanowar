@@ -18,23 +18,19 @@ define (require) ->
       @gameView = opts.gameView
       @dataz = new Array(@dataPoints)
 
-      @model.bind 'clientTick', @recordTick, this
+      @model.bind 'instrument:client-tick', @recordTick, this
 
       @width = @dataPoints
       @graphHeight = 150
-      @height = 160
+      @height = 230
       @el = @make 'canvas'
       @el.setAttribute 'height', @height
       @el.setAttribute 'width', @width
 
 
-    recordTick: (serverUpdate) ->
+    recordTick: (instrumentationData) ->
       @dataz.shift()
-      if serverUpdate
-        totalSize = JSON.stringify(serverUpdate).length
-      else
-        totalSize = 0
-      @dataz.push totalUpdateSize: totalSize
+      @dataz.push instrumentationData
       @render()
 
     render: ->
@@ -58,5 +54,35 @@ define (require) ->
 
       ctx.fillStyle = '#fff'
       ctx.fillText("tick "+@model.ticks, 10, @graphHeight+10);
+
+
+
+      max = Game.tickLength
+      scale = 20 / max
+      i = 0
+      for datapoint in @dataz
+        i++
+        continue unless datapoint
+        barHeight = datapoint.clientProcessingTime * scale + 2
+
+        if datapoint.clientProcessingTime > max
+          ctx.fillStyle = 'red'
+          ctx.fillRect i, @graphHeight+40-barHeight, 1, barHeight
+        else
+          ctx.fillStyle = 'green'
+          ctx.fillRect i, @graphHeight+40-barHeight, 1, 2
+      
+      i = 0
+      for datapoint in @dataz
+        i++
+        continue unless datapoint
+        barHeight = datapoint.serverProcessingTime * scale + 2
+
+        if datapoint.serverProcessingTime > max
+          ctx.fillStyle = 'red'
+          ctx.fillRect i, @graphHeight+40-barHeight, 1, barHeight
+        else
+          ctx.fillStyle = 'blue'
+          ctx.fillRect i, @graphHeight+60-barHeight, 1, 2
 
       this

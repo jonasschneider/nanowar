@@ -144,3 +144,5 @@ TODO:
   - notify an entity if its attributes are changed behind the scenes
   - completely separate the spawning/persistentobject system from the raw attribute/mutation storage
   - try out how drawing fleets in a canvas affects performance
+  - rename EntityCollection to World
+  - do not tick by setting a timeout, infer current tick from the time (both client and server)
