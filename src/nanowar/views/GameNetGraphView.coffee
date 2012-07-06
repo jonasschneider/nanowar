@@ -19,14 +19,17 @@ define (require) ->
       @dataz = new Array(@dataPoints)
 
       @model.bind 'instrument:client-tick', @recordTick, this
+      @model.bind 'run', @recordRunTime, this
 
-      @width = @dataPoints
+      @width = @dataPoints + 40
       @graphHeight = 150
       @height = 230
       @el = @make 'canvas'
       @el.setAttribute 'height', @height
       @el.setAttribute 'width', @width
 
+    recordRunTime: ->
+      @timeAtRun = new Date().getTime()
 
     recordTick: (instrumentationData) ->
       @dataz.shift()
@@ -67,6 +70,10 @@ define (require) ->
           ctx.fillStyle = 'green'
           ctx.fillRect i, @graphHeight+40-barHeight, 1, 2
       
+      ctx.fillStyle = '#aaa'
+      ctx.fillRect 0, @graphHeight+40, @dataPoints, 1
+      ctx.fillText ((@dataz[@dataPoints-1] || {}).clientProcessingTime or '0')+'ms', @dataPoints, @graphHeight+40
+      
       i = 0
       for datapoint in @dataz
         i++
@@ -80,6 +87,10 @@ define (require) ->
           ctx.fillStyle = 'blue'
           ctx.fillRect i, @graphHeight+60-barHeight, 1, 2
 
+      ctx.fillStyle = '#aaa'
+      ctx.fillRect 0, @graphHeight+60, @dataPoints, 1
+      ctx.fillText ((@dataz[@dataPoints-1] || {}).serverProcessingTime or '0')+'ms', @dataPoints, @graphHeight+60
+
       ticksPerSecond = 1000 / Game.tickLength
       updateSizeSum = 0
       i = @dataPoints-ticksPerSecond
@@ -91,5 +102,9 @@ define (require) ->
 
       ctx.fillStyle = '#fff'
       ctx.fillText("tick #{@model.ticks} - #{kbpsIn}kb/s in", 10, @graphHeight+10);
+
+      expectedPassedTicks = (new Date().getTime() - @timeAtRun) / 100
+      syncError = (@model.ticks - expectedPassedTicks).toFixed(1)
+      ctx.fillText("#{@model.world.entities.length} ents, sync error #{syncError} ticks", 10, @graphHeight+20);
 
       this

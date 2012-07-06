@@ -11,8 +11,8 @@ define (require) ->
       @nextEntityIds = {}
       @entityAttributes = []
 
-      @world = []
-      @worldById = {}
+      @entities = []
+      @entitiesById = {}
 
       _(options.types).each (klass, name) =>
         @types[name] = klass
@@ -36,9 +36,9 @@ define (require) ->
 
       ent = new klass this, newId
       
-      throw "id #{model.id} is in use" if @worldById[newId]
-      @world.push ent
-      @worldById[newId] = ent
+      throw "id #{model.id} is in use" if @entitiesById[newId]
+      @entities.push ent
+      @entitiesById[newId] = ent
       
 
       ent._initialize()
@@ -49,7 +49,7 @@ define (require) ->
       ent
 
     get: (id) ->
-      @worldById[id]
+      @entitiesById[id]
 
     remove: (entOrId) ->
       if entOrId.id?
@@ -59,16 +59,16 @@ define (require) ->
 
       ent.trigger 'remove'
 
-      idx = @world.indexOf(ent)
-      @world.splice(idx, 1)
-      delete @worldById[ent.id]
+      idx = @entities.indexOf(ent)
+      @entities.splice(idx, 1)
+      delete @entitiesById[ent.id]
 
       @_recordMutation ["removed", ent.id]
       null
 
     getAllOfType: (type) ->
       results = []
-      for ent in @world
+      for ent in @entities
         results.push ent if ent.type == type
       results
 
@@ -128,7 +128,7 @@ define (require) ->
 
     snapshotFull: ->
       world = []
-      for ent in @world
+      for ent in @entities
         spawn_attributes = { id: ent.id }
         attributes = _(@entityAttributes).select (a) ->
           a[0] == ent.id
