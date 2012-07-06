@@ -121,7 +121,9 @@ define (require) ->
       console.log "GOGOGOG"
       @trigger 'run'
       if @get('onServer')
-        @trigger 'publish', run: true
+        setTimeout =>
+          @trigger 'publish', run: true
+        , 30
 
       @schedule()
     
