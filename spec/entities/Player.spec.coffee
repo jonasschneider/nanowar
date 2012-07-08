@@ -1,4 +1,4 @@
-require ['nanowar/models/World', 'nanowar/models/Player'], (World, Player) ->
+require ['nanowar/World', 'nanowar/entities/Player'], (World, Player) ->
   describe 'Player', ->
     beforeEach ->
       @world = new World { Player: Player }

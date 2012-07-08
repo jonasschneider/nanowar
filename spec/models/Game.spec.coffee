@@ -1,4 +1,4 @@
-require ['nanowar/models/Game', 'nanowar/models/Cell', 'nanowar/models/Player'], (Game, Cell, Player) ->
+require ['nanowar/models/Game', 'nanowar/entities/Cell', 'nanowar/entities/Player'], (Game, Cell, Player) ->
   describe 'Game', ->
     describe '#tellSelf', ->
       it 'can tick without tells', ->

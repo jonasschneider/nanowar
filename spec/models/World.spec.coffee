@@ -1,4 +1,4 @@
-require ['nanowar/models/World', 'nanowar/models/Entity'], (World, Entity) ->
+require ['nanowar/World', 'nanowar/Entity'], (World, Entity) ->
   class MyEntity extends Entity
     attributeSpecs:
       strength: 0

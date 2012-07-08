@@ -1,4 +1,4 @@
-require ['nanowar/models/EnhancerNode', 'nanowar/models/Cell', 'nanowar/models/Game', 'nanowar/models/Player'], (EnhancerNode, Cell, Game, Player) ->
+require ['nanowar/entities/EnhancerNode', 'nanowar/entities/Cell', 'nanowar/models/Game', 'nanowar/entities/Player'], (EnhancerNode, Cell, Game, Player) ->
   describe 'EnhancerNode', ->
     it 'has an owner', ->
       node = new EnhancerNode game: new Game

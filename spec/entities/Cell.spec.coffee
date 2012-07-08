@@ -1,4 +1,4 @@
-require ['nanowar/models/Player', 'nanowar/models/World', 'nanowar/models/Cell'], (Player, World, Cell) ->
+require ['nanowar/entities/Player', 'nanowar/World', 'nanowar/entities/Cell'], (Player, World, Cell) ->
   describe 'Cell', ->
     it 'tracks the current cell value', ->
       world = new World Cell: Cell, Player: Player

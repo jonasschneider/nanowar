@@ -1,4 +1,4 @@
-require ['nanowar/models/Fleet', 'nanowar/models/Game', 'nanowar/models/Cell'], (Fleet, Game, Cell) ->
+require ['nanowar/entities/Fleet', 'nanowar/models/Game', 'nanowar/entities/Cell'], (Fleet, Game, Cell) ->
   describe 'Fleet', ->
     it 'stores attributes in collection', ->
       game = new Game

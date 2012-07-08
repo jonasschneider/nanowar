@@ -1,6 +1,6 @@
 define (require) ->
   Player = require('./Player')
-  Entity = require('./Entity')
+  Entity = require('nanowar/Entity')
   Cell = require('./Cell')
   
   _      = require('underscore')

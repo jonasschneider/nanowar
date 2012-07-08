@@ -1,20 +1,14 @@
 define (require) ->
-  Cell              = require('./Cell')
-  Player            = require('./Player')
-  Fleet             = require('./Fleet')
-  EnhancerNode      = require('./EnhancerNode')
-  SendFleetCommand  = require('../commands/SendFleetCommand')
-  World  = require('./World')
+  Cell              = require('../entities/Cell')
+  Player            = require('../entities/Player')
+  Fleet             = require('../entities/Fleet')
+  EnhancerNode      = require('../entities/EnhancerNode')
+  World  = require('nanowar/World')
   _                 = require 'underscore'
   Backbone          = require 'backbone'
   $          = require 'jquery'
 
   class Game extends Backbone.Model
-    defaults:
-      # client actions can take at worst 2*tickLength to propagate (command on server, results on client),
-      # not even counting for processing and network latency!
-      tickLength: 1000 / 10
-    
     initialize: ->
       etypes = Cell: Cell, Player: Player, Fleet: Fleet, EnhancerNode: EnhancerNode
       @world = new World etypes
@@ -121,7 +115,7 @@ define (require) ->
     schedule: ->
       setTimeout =>
         @tick()
-      , @get 'tickLength'
+      , Game.tickLength
 
     halt: ->
       @stopping = true
@@ -230,6 +224,8 @@ define (require) ->
         @tickClient()
 
     ticksToTime: (ticks) ->
-      ticks * @get 'tickLength'
+      ticks * Game.tickLength
+  
   Game.tickLength = 1000 / 5
+
   return Game

@@ -1,5 +1,5 @@
 define (require) ->
-  Entity = require('./Entity')
+  Entity = require('nanowar/Entity')
   Player = require('./Player')
 
   return class Cell extends Entity

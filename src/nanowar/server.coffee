@@ -1,8 +1,6 @@
 define (require) ->
   App     = require('./models/App')
-  Player  = require('./models/Player')
-  Cell    = require('./models/Cell')
-  EnhancerNode    = require('./models/EnhancerNode')
+  Player  = require('nanowar/entities/Player')
   util    = require 'util'
   _       = require 'underscore'
 
