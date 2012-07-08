@@ -144,5 +144,5 @@ TODO:
   - notify an entity if its attributes are changed behind the scenes
   - completely separate the spawning/persistentobject system from the raw attribute/mutation storage
   - try out how drawing fleets in a canvas affects performance
-  - rename World to World
   - do not tick by setting a timeout, infer current tick from the time (both client and server)
+  - add entity messages -> and then get EnhancerNode affectedCells:add etc. up to date
