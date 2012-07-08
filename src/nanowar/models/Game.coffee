@@ -106,6 +106,7 @@ define (require) ->
     run: -> # probably blows up synchronisation
       console.log "GOGOGOG"
       @trigger 'run'
+      @timeAtRun = new Date().getTime()
       if @get('onServer')
         setTimeout =>
           @trigger 'publish', run: true
@@ -114,9 +115,15 @@ define (require) ->
       @schedule()
     
     schedule: ->
+      @tick()
+
+      realtimeForNextTick = @timeAtRun + (@ticks * Game.tickLength)
+      timeout = realtimeForNextTick - new Date().getTime()
+
+      throw 'desynced!' if timeout < 0
       setTimeout =>
-        @tick()
-      , Game.tickLength
+        @schedule()
+      , timeout
 
     halt: ->
       @stopping = true
@@ -208,14 +215,20 @@ define (require) ->
         @trigger 'end', winner: winner
         @halt()
 
-      endTime = new Date().getTime()
-      @trigger 'publish', tick: @ticks, entityMutation: entityMutation, serverProcessingTime: (endTime-startTime)
+      expectedPassedTicks = (new Date().getTime() - @timeAtRun) / 1000 * Game.ticksPerSecond
+      syncError = (@ticks - expectedPassedTicks).toFixed(1)
 
-      console.log "=== SERVER TICK DONE (now at tick #{@ticks})"
+      endTime = new Date().getTime()
+
+      @trigger 'publish', 
+        tick: @ticks
+        entityMutation: entityMutation
+        serverProcessingTime: (endTime-startTime)
+        syncError: syncError
+
+      console.log "=== SERVER TICKED TO #{@ticks}"
 
     tick: ->
-      @schedule() unless @stopping # FIXME: detect if tick is taking too long
-
       @ticks++
       @world.ticks = @ticks
 
@@ -228,5 +241,6 @@ define (require) ->
       ticks * Game.tickLength
   
   Game.tickLength = 1000 / 5
+  Game.ticksPerSecond = 1000 / Game.tickLength
 
   return Game

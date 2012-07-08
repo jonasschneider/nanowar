@@ -84,13 +84,15 @@ define (require) ->
         undefined
 
     setEntityAttribute: (entId, attr, value) ->
+      ent = @get(entId)
+      throw "unknown ent #{endId}" unless ent
       storedAttr = _(@entityAttributes).detect (storedAttr) ->
         storedAttr[0] == entId and storedAttr[1] == attr
       if storedAttr
         storedAttr[2] = value
       else
         @entityAttributes.push [entId, attr, value]
-      @get(entId).trigger 'change'
+      ent.trigger 'change'
       @_recordMutation ["changed", entId, attr, value]
       value
 

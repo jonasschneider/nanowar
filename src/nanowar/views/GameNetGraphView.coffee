@@ -72,7 +72,7 @@ define (require) ->
       
       ctx.fillStyle = '#aaa'
       ctx.fillRect 0, @graphHeight+40, @dataPoints, 1
-      ctx.fillText ((@dataz[@dataPoints-1] || {}).clientProcessingTime or '0')+'ms', @dataPoints, @graphHeight+40
+      ctx.fillText ((@dataz[@dataPoints-1] || {}).clientProcessingTime or '0')+'ms c', @dataPoints, @graphHeight+40
       
       i = 0
       for datapoint in @dataz
@@ -89,7 +89,7 @@ define (require) ->
 
       ctx.fillStyle = '#aaa'
       ctx.fillRect 0, @graphHeight+60, @dataPoints, 1
-      ctx.fillText ((@dataz[@dataPoints-1] || {}).serverProcessingTime or '0')+'ms', @dataPoints, @graphHeight+60
+      ctx.fillText ((@dataz[@dataPoints-1] || {}).serverProcessingTime or '0')+'ms s', @dataPoints, @graphHeight+60
 
       ticksPerSecond = 1000 / Game.tickLength
       updateSizeSum = 0
@@ -103,7 +103,7 @@ define (require) ->
       ctx.fillStyle = '#fff'
       ctx.fillText("tick #{@model.ticks} - #{kbpsIn}kb/s in", 10, @graphHeight+10);
 
-      expectedPassedTicks = (new Date().getTime() - @timeAtRun) / 100
+      expectedPassedTicks = (new Date().getTime() - @timeAtRun) / 1000 * Game.ticksPerSecond + 1
       syncError = (@model.ticks - expectedPassedTicks).toFixed(1)
       ctx.fillText("#{@model.world.entities.length} ents, sync error #{syncError} ticks", 10, @graphHeight+20);
 

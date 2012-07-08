@@ -1,6 +1,5 @@
 define (require) ->
   App     = require('./models/App')
-  Player  = require('nanowar/entities/Player')
   util    = require 'util'
   _       = require 'underscore'
 
@@ -82,10 +81,9 @@ define (require) ->
       @game.loadMap()
       snapshot = @game.world.snapshotFull()
 
-      _(@players).each (player) =>
+      _(@players).each (player) ->
         player.send 'applySnapshot', snapshot
-
-      p.updateLocalPlayerId() for p in @players
+        player.updateLocalPlayerId()
       
       @game.world.enableStrictMode()
       
