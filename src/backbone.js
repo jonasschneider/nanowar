@@ -1,9 +1,12 @@
 if(typeof window == "undefined")
+{
+
   define('jquery', [], function() {
     return undefined;
   });
+}
 
-define(function(require){
+define('backbone', function(require){
 
 (function(){
 
