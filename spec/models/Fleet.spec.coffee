@@ -35,7 +35,7 @@ require ['nanowar/models/Fleet', 'nanowar/models/Game', 'nanowar/models/Cell'], 
       result = game.world.mutate ->
         game.world.spawn 'Fleet', strength: 2
 
-      expect(JSON.stringify(result)).toBe JSON.stringify([["spawned","Fleet","Fleet_1"],["changed","Fleet_1","strength",2]])
+      expect(JSON.stringify(result[0])).toBe JSON.stringify(["spawned","Fleet",{id: 'Fleet_1'}])
 
     it 'allows to store and restore snapshots', ->
       game = new Game

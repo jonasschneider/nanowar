@@ -17,7 +17,7 @@ define (require) ->
     
     initialize: ->
       etypes = Cell: Cell, Player: Player, Fleet: Fleet, EnhancerNode: EnhancerNode
-      @world = new World [], game: this, types: etypes
+      @world = new World etypes
 
       @serverUpdates = {}
 
@@ -46,18 +46,9 @@ define (require) ->
       @tellQueue = []
       @sendQueue = []
     
-    getEntities: (type) ->
-      @world.select (entity) -> entity instanceof type
-    
-    getCells: ->
-      @getEntities Cell
-
-    getPlayers: ->
-      @getEntities Player
-    
     getWinner: ->
       owners = []
-      _(@getCells()).each (cell) =>
+      for cell in @world.getEntitiesOfType('Cell')
         cellOwner = cell.getRelation 'owner'
         owners.push cellOwner if cellOwner && owners.indexOf(cellOwner) == -1
       
@@ -138,7 +129,6 @@ define (require) ->
     tickClient: ->
       #@halt() if @ticks > 10
       startTime = new Date().getTime()
-      @ticks++
 
       @sendClientTells()
       if update = @serverUpdates[@ticks]
@@ -210,7 +200,6 @@ define (require) ->
         serverProcessingTime: (@serverUpdates[@ticks] || {serverProcessingTime: 0}).serverProcessingTime # FIXME: same
     
     tickServer: ->
-      @ticks++
       console.log "=== TICKING"
       startTime = new Date().getTime()
 
@@ -231,6 +220,9 @@ define (require) ->
 
     tick: ->
       @schedule() unless @stopping # FIXME: detect if tick is taking too long
+
+      @ticks++
+      @world.ticks = @ticks
 
       if @get('onServer')
         @tickServer()

@@ -1,4 +1,4 @@
-require ['nanowar/models/World', 'nanowar/models/Entity', 'nanowar/models/Game'], (World, Entity, Game) ->
+require ['nanowar/models/World', 'nanowar/models/Entity'], (World, Entity) ->
   class MyEntity extends Entity
     attributeSpecs:
       strength: 0
@@ -10,10 +10,28 @@ require ['nanowar/models/World', 'nanowar/models/Entity', 'nanowar/models/Game']
 
   describe 'World', ->
     beforeEach ->
-      @game = new Game
-      @coll = new World [], types: {'MyEntity': MyEntity}, game: @game
+      @coll = new World { MyEntity: MyEntity, MyOtherEntity: MyOtherEntity }
 
-    describe 'applying mutations', ->
+    describe '#getEntitiesOfType', ->
+      it 'works', ->
+        ent =  @coll.spawn 'MyEntity'
+        @coll.spawn 'MyOtherEntity'
+
+        expect(@coll.getEntitiesOfType('MyEntity').length).toBe 1
+        expect(@coll.getEntitiesOfType('MyEntity')[0]).toBe ent
+
+    describe '#constructor', ->
+      it 'infers the entity types from their classes', ->
+        #coll = new World [MyEntity]
+        expect(@coll.types['MyEntity']).toBe MyEntity
+
+    describe '#spawn', ->
+      it 'throws on unknown entity type', ->
+        expect =>
+          @coll.spawn 'Trolol'
+        .toThrow 'unknown entity type Trolol'
+
+    describe '#applyMutation', ->
       it "works", ->
         mut = [["spawned","MyEntity",{id: "Fleet_1"}],["changed","Fleet_1","strength",1337]]
 
@@ -35,9 +53,7 @@ require ['nanowar/models/World', 'nanowar/models/Entity', 'nanowar/models/Game']
         e = @coll.spawn 'MyEntity'
 
         expect(@coll.get(e.id)).toBe e
-
         @coll.remove(e)
-
         expect(@coll.get(e.id)).toBe undefined
 
 

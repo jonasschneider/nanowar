@@ -1,24 +1,24 @@
-require ['nanowar/models/Game', 'nanowar/models/Player'], (Game, Player) ->
+require ['nanowar/models/World', 'nanowar/models/Player'], (World, Player) ->
   describe 'Player', ->
     beforeEach ->
-      @game = new Game
+      @world = new World { Player: Player }
     
     it 'gets assigned a color', ->
-      p1 = @game.world.spawn 'Player'
-      p2 = @game.world.spawn 'Player'
+      p1 = @world.spawn 'Player'
+      p2 = @world.spawn 'Player'
       
       expect(p1.get 'color').toNotBe p2.get 'color'
       
     it 'does not overwrite the color', ->
-      p1 = @game.world.spawn 'Player', color: 'lila-blassblau-kariert'
+      p1 = @world.spawn 'Player', color: 'lila-blassblau-kariert'
       
       expect(p1.get 'color').toBe 'lila-blassblau-kariert'
       
     describe '#toString()', ->
       it 'returns name', ->
-        p = @game.world.spawn 'Player', name: 'ohai'
+        p = @world.spawn 'Player', name: 'ohai'
         expect(p.toString()).toBe "[object Player 'ohai']"
 
       it 'returns default when the player has no name', ->  
-        p = @game.world.spawn 'Player'
+        p = @world.spawn 'Player'
         expect(p.toString()).toBe "[object Player 'anonymous coward']"

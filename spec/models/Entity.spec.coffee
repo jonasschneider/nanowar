@@ -1,11 +1,25 @@
-require ['nanowar/models/Game'], (Game) ->
-  describe 'Entity', ->
-    it 'throws when setting undeclared attributes', ->
-      game = new Game
-      fleet = game.world.spawn 'Fleet', strength: 10
+require ['nanowar/models/World', 'nanowar/models/Entity'], (World, Entity) ->
+  class EntWithAttrs extends Entity
+    attributeSpecs:
+      strength: 0
 
-      fleet.set strength: 5
+  class EntWithoutAttrs extends Entity
+  
+  describe 'Entity', ->
+    beforeEach ->
+      @world = new World EntWithAttrs: EntWithAttrs, EntWithoutAttrs: EntWithoutAttrs
+    
+    it 'throws when setting undeclared attributes', ->
+      ent = @world.spawn 'EntWithAttrs', strength: 10
+      ent.set strength: 5
 
       expect ->
-        fleet.set lolz: 'ohai'
+        ent.set lolz: 'ohai'
+      .toThrow()
+
+    it 'allows entities without attributes', ->
+      fleet = @world.spawn 'EntWithoutAttrs'
+      
+      expect ->
+        fleet.set strength: 5
       .toThrow()

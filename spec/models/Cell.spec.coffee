@@ -1,11 +1,12 @@
-require ['nanowar/models/Player', 'nanowar/models/Game', 'nanowar/models/Cell'], (Player, Game, Cell) ->
+require ['nanowar/models/Player', 'nanowar/models/World', 'nanowar/models/Cell'], (Player, World, Cell) ->
   describe 'Cell', ->
     it 'tracks the current cell value', ->
-      game = new Game
-      owner = game.world.spawn 'Player'
-      cell = game.world.spawn 'Cell', size: 50
+      world = new World Cell: Cell, Player: Player
+
+      owner = world.spawn 'Player'
+      cell = world.spawn 'Cell', size: 50
       cell.setRelation('owner', owner)
 
       expect(cell.getCurrentStrength()).toBe 0
-      game.ticks = 10
+      world.ticks = 10
       expect(cell.getCurrentStrength()).toBe 5

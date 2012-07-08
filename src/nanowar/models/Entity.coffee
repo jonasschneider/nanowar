@@ -9,6 +9,8 @@ define (require) ->
 
       @collection = collection
       @id = id
+
+      @attributeSpecs ||= {}
       @attributeSpecs.dead = false
 
     _initialize: ->
@@ -16,7 +18,7 @@ define (require) ->
       @initialize() if @initialize
 
     ticks: ->
-      @collection.ticks()
+      @collection.ticks
 
     get: (attr) ->
       unless attr in _(@attributeSpecs).keys()

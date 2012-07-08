@@ -1,14 +1,5 @@
 require ['nanowar/models/Game', 'nanowar/models/Cell', 'nanowar/models/Player'], (Game, Cell, Player) ->
   describe 'Game', ->
-    describe '#getCells', ->
-      it 'works', ->
-        game = new Game
-        cell =  game.world.spawn 'Cell'
-        game.world.spawn 'Player'
-
-        expect(game.getCells().length).toBe 1
-        expect(game.getCells()[0]).toBe cell
-
     describe '#tellSelf', ->
       it 'can tick without tells', ->
         game = new Game onServer: true
@@ -78,22 +69,11 @@ require ['nanowar/models/Game', 'nanowar/models/Cell', 'nanowar/models/Player'],
         game.tellSelf 'ahoy'
         game.tick()
 
-        expect(JSON.stringify(output)).toBe '{"tick":1,"entityMutation":[["changed","Player_1","color","yell"]]}'
-       
-
-    describe '#getPlayers', ->
-      it 'works', ->
-        game = new Game
-        player = game.world.spawn 'Player', name: 'ohai'
-
-        game.world.spawn 'Cell'
-
-        expect(game.getPlayers().length).toBe 1
-        expect(game.getPlayers()[0]).toBe player
-
+        expect(output.tick).toBe 1
+        expect(JSON.stringify(output.entityMutation)).toBe '[["changed","Player_1","color","yell"]]'
 
     describe '#getWinner', ->
-      it 'returns 0 when there are multiple players remaining', ->
+      it 'returns null when there are multiple players remaining', ->
         game = new Game
         p1 = game.world.spawn 'Player'
         p2 = game.world.spawn 'Player'

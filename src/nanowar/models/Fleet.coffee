@@ -7,8 +7,6 @@ define (require) ->
   util = require('../helpers/util')
 
   return class Fleet extends Entity
-    type: 'Fleet'
-
     attributeSpecs:
       strength: 0
       launchedAt: null

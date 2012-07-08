@@ -3,10 +3,11 @@ define (require) ->
   _                     = require 'underscore'
 
   class World
-    constructor: (models, options) ->
-      unless options && options.types?
-        throw "Need types"
+    constructor: (types) ->
+      throw "Need types" unless types
       
+      @ticks = 0
+
       @types = {}
       @nextEntityIds = {}
       @entityAttributes = []
@@ -14,15 +15,12 @@ define (require) ->
       @entities = []
       @entitiesById = {}
 
-      _(options.types).each (klass, name) =>
+      _(types).each (klass, name) =>
         @types[name] = klass
         @nextEntityIds[name] = 1
-        
-      unless @game = options.game
-        throw "Need game" 
 
     spawn: (type, attributes) ->
-      klass = @types[type]
+      klass = @types[type] or throw "unknown entity type #{type}"
       attributes or (attributes = {})
 
       if attributes.id
@@ -66,10 +64,11 @@ define (require) ->
       @_recordMutation ["removed", ent.id]
       null
 
-    getAllOfType: (type) ->
+    getEntitiesOfType: (typename) ->
+      klass = @types[typename]
       results = []
       for ent in @entities
-        results.push ent if ent.type == type
+        results.push ent if ent instanceof klass
       results
 
     enableStrictMode: ->
@@ -83,9 +82,6 @@ define (require) ->
         storedAttr[2]
       else
         undefined
-
-    ticks: ->
-      @game.ticks
 
     setEntityAttribute: (entId, attr, value) ->
       storedAttr = _(@entityAttributes).detect (storedAttr) ->
@@ -165,6 +161,6 @@ define (require) ->
   # Mix in each Underscore method as a proxy
   _.each methods, (method) ->
     World.prototype[method] = ->
-      _[method].apply(_, [this.world].concat(_.toArray(arguments)))
+      _[method].apply(_, [this.entities].concat(_.toArray(arguments)))
 
   return World

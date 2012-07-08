@@ -12,7 +12,7 @@ define (require) ->
     
     initialize: ->
       unless @get 'color'
-        @set { color: @colors[@collection.getAllOfType('Player').length-1] }, silent: true
+        @set { color: @colors[@collection.getEntitiesOfType('Player').length-1] }, silent: true
 
     toString: ->
       if @get('name')

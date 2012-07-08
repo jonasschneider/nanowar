@@ -3,8 +3,6 @@ define (require) ->
   Player = require('./Player')
 
   return class Cell extends Entity
-    type: 'Cell'
-
     attributeSpecs:
       x:      0
       y:      0
