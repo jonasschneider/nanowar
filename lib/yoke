@@ -1,4 +1,0 @@
-#!/usr/bin/env node
-var yoke = require('./yoke.js')
-
-process.stdout.write(yoke.processFile(process.argv.pop()));
