@@ -2,8 +2,6 @@ define (require) ->
   Entity = require('nanowar/Entity')
 
   return class Player extends Entity
-    type: 'Player'
-
     attributeSpecs:
       color: ''
       name: 'anonymous coward'

@@ -33,12 +33,12 @@ define (require) ->
       @_recordMutation ["spawned", type, {id: newId}]
 
       ent = new klass this, newId
+      ent.entityTypeName = type
       
       throw "id #{model.id} is in use" if @entitiesById[newId]
       @entities.push ent
       @entitiesById[newId] = ent
       
-
       ent._initialize()
       ent.set attributes
 
@@ -131,7 +131,7 @@ define (require) ->
         for attr in attributes
           spawn_attributes[attr[1]] = attr[2]
 
-        world.push [ent.type, spawn_attributes]
+        world.push [ent.entityTypeName, spawn_attributes]
       world
 
     applySnapshot: (snapshot) ->

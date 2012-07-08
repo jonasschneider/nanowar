@@ -52,11 +52,12 @@ define (require) ->
         null
 
     loadMap: ->
+      players = @world.getEntitiesOfType('Player')
       c1 = @world.spawn 'Cell', x: 350, y: 100, size: 50
-      @world.spawn 'Cell', x: 350, y: 300, size: 30, owner_id: @getPlayers()[0].id
+      @world.spawn 'Cell', x: 350, y: 300, size: 30, owner_id: players[0].id
       @world.spawn 'Cell', x: 100, y: 200, size: 50
       @world.spawn 'Cell', x: 500, y: 200, size: 50
-      @world.spawn 'Cell', x: 550, y: 100, size: 30, owner_id: @getPlayers()[1].id
+      @world.spawn 'Cell', x: 550, y: 100, size: 30, owner_id: players[1].id
       #new EnhancerNode x: 440, y: 120, game: this, owner: @getPlayers()[1]
     
     tellSelf: (what, args...) ->
@@ -85,7 +86,7 @@ define (require) ->
         fleet.set dead: true
 
     moveCell: ->
-      c = @getCells()[0]
+      c = @world.getEntitiesOfType('Cell')[0]
       c.set x: c.get('x')+50
 
     runTells: (tells) ->

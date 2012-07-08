@@ -2,10 +2,9 @@ define (require) ->
   Backbone = require 'backbone'
   CellView = require './CellView'
   FleetView = require './FleetView'
-  Fleet = require '../models/Fleet'
+  Fleet = require 'nanowar/entities/Fleet'
   EnhancerNodeView = require './EnhancerNodeView'
   GameNetGraphView = require './GameNetGraphView'
-  SendFleetCommand = require '../commands/SendFleetCommand'
   Raphael = require 'raphael'
   _                 = require 'underscore'
   
@@ -53,7 +52,7 @@ define (require) ->
       console.log(arguments)
     
     addEntity: (e) ->
-      switch e.type
+      switch e.entityTypeName
         when 'Cell'
           cellView = new CellView model: e, gameView: this
           cellView.render()
@@ -71,7 +70,7 @@ define (require) ->
           new EnhancerNodeView model: e, gameView: this
         
         else
-          console.error "wtf is a #{e.type}? - #{JSON.stringify e}"
+          console.error "wtf is a #{e.type}?", e
 
     handleClickInGameArea: ->
       unless @currentClickIsInCell
