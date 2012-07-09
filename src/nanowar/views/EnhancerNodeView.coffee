@@ -21,8 +21,8 @@ define (require) ->
       
       @connections = {}
       
-      _(@model.affectedCells()).each (cell) =>
-        @addConnectionTo cell
+      #_(@model.affectedCells()).each (cell) =>
+      #  @addConnectionTo cell
       
       $(@el).click =>
         @trigger 'click'
@@ -32,8 +32,8 @@ define (require) ->
       
     addConnectionTo: (cell) ->
       me = @model.position()
-      cpos = cell.position()
-      @connections[cell.id] = @gameView.paper.path "M#{me.x} #{me.y}L#{cpos.x} #{cpos.y}"
+      console.log JSON.stringify(cell)
+      @connections[cell.id] = @gameView.paper.path "M#{me.x} #{me.y}L#{cell.get('x')} #{cell.get('y')}"
       console.log "enlarging #{cell.id}"
     
     removeConnectionTo: (cell) ->

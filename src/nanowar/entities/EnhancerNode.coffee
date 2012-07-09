@@ -19,10 +19,10 @@ define (require) ->
       previously = @_previousAffectedCells
       
       _(newly).chain().difference(previously).each (c) =>
-        @trigger 'affectedCells:add', c
+        @message 'affectedCells:add', c
       
       _(previously).chain().difference(newly).each (c) =>
-        @trigger 'affectedCells:remove', c
+        @message 'affectedCells:remove', c
       
       @_previousAffectedCells = newly
       

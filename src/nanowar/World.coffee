@@ -61,6 +61,11 @@ define (require) ->
       @entities.splice(idx, 1)
       delete @entitiesById[ent.id]
 
+      for k, v of @state
+        [entId, attr] = @_parseAttrKey(k)
+        if entId == ent.id
+          delete @state[k]
+
       @_recordMutation ["removed", ent.id]
       null
 
@@ -95,6 +100,13 @@ define (require) ->
     _parseAttrKey: (key) ->
       key.split('$')
 
+    recordEntityMessage: (entId, name, data) ->
+      if data.toJSON
+        payload = data.toJSON()
+      else
+        payload = data
+      @_recordMutation ["entmsg", entId, name, payload]
+
     mutate: (mutator) ->
       throw 'already mutating' if @currentMutations
       @currentMutationChanges = []
@@ -115,6 +127,12 @@ define (require) ->
           @spawn change[1], change[2]
         else if change[0] == "removed"
           @remove change[1]
+        else if change[0] == "entmsg"
+          if change[3].entId
+            payload = @get(change[3].entId) 
+          else
+            payload = change[3]
+          @get(change[1]).trigger change[2], payload
         else
           throw "unkown change type #{change[0]}"
 

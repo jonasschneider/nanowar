@@ -77,5 +77,10 @@ define (require) ->
     toJSON: ->
       {entId: @id}
 
+    message: (name, data) ->
+      @collection.recordEntityMessage(@id, name, data)
+      @trigger name, data
+
+
   _.extend(Entity.prototype, Backbone.Events)
   return Entity

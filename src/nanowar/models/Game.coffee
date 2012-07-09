@@ -60,7 +60,7 @@ define (require) ->
       @world.spawn 'Cell', x: 100, y: 200, size: 50
       @world.spawn 'Cell', x: 500, y: 200, size: 50
       @world.spawn 'Cell', x: 550, y: 100, size: 30, owner_id: players[1].id
-      #new EnhancerNode x: 440, y: 120, game: this, owner: @getPlayers()[1]
+      @world.spawn 'EnhancerNode', x: 440, y: 120, owner_id: players[1].id
     
     tellSelf: (what, args...) ->
       tell = to: '$self', what: what, with: args
@@ -122,7 +122,7 @@ define (require) ->
         next = ++@lastAppliedUpdateTicks
 
         lastAppliedUpdate = @serverUpdates[next]
-        lastMutation = @world.applyMutation(lastAppliedUpdate.entityMutation)
+        @world.applyMutation(lastAppliedUpdate.entityMutation)
 
         if next-2 > 0
           delete @serverUpdates[next-2] # keep the mutation that led to the recent tick and the one before that
@@ -138,23 +138,24 @@ define (require) ->
           @halt()
           return
 
-        # these are the changed attributes of the mutations that led to the two last good ticks
-        delta1 = @world.attributesChangedByMutation(@serverUpdates[startingPoint-1].entityMutation)
-        delta2 = @world.attributesChangedByMutation(@serverUpdates[startingPoint].entityMutation)
+        if @lastAppliedUpdateTicks > 2
+          # these are the changed attributes of the mutations that led to the two last good ticks
+          delta1 = @world.attributesChangedByMutation(@serverUpdates[startingPoint-1].entityMutation)
+          delta2 = @world.attributesChangedByMutation(@serverUpdates[startingPoint].entityMutation)
 
-        console.log delta1, delta2
+          console.log delta1, delta2
 
-        @dirtyWorldResetSnapshot = @world.snapshotAttributes()
+          @dirtyWorldResetSnapshot = @world.snapshotAttributes()
 
-        lastMutation = @world.mutate =>
-          for own attr, olderValue of delta1
-            if newerValue = delta2[attr]
-              extrapolatedValue = newerValue + (newerValue - olderValue) * ticksToExtrapolate
-              console.log attr, olderValue, newerValue, extrapolatedValue
-
-              # FIXME: hax
-              [entId, entAttr] = @world._parseAttrKey(attr)
-              @world.setEntityAttribute(entId, entAttr, extrapolatedValue)
+          @world.mutate =>
+            for own attr, olderValue of delta1
+              continue unless @world.state[attr]
+              if newerValue = delta2[attr]
+                extrapolatedValue = newerValue + (newerValue - olderValue) * ticksToExtrapolate
+  
+                # FIXME: hax
+                [entId, entAttr] = @world._parseAttrKey(attr)
+                @world.setEntityAttribute(entId, entAttr, extrapolatedValue)
 
       endTime = new Date().getTime()
 
@@ -227,7 +228,10 @@ define (require) ->
         realtimeForNextTick = @timeAtRun + (@ticks * Game.tickLength)
         timeout = realtimeForNextTick - new Date().getTime()
 
-        throw 'desynced!' if timeout < 0
+        if timeout < 0
+          console.warn "WARNING: desynched, scheduling next tick immediately"
+          timeout = 0
+        
         setTimeout =>
           @scheduleTick()
         , timeout
