@@ -70,7 +70,7 @@ require ['nanowar/models/Game', 'nanowar/entities/Cell', 'nanowar/entities/Playe
         game.tick()
 
         expect(output.tick).toBe 1
-        expect(JSON.stringify(output.entityMutation)).toBe '[["changed","Player_1","color","yell"]]'
+        expect(JSON.stringify(output.entityMutation)).toBe '[["changed","Player_1$color","yell"]]'
 
     describe '#getWinner', ->
       it 'returns null when there are multiple players remaining', ->

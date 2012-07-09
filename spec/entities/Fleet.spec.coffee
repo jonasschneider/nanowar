@@ -27,7 +27,7 @@ require ['nanowar/entities/Fleet', 'nanowar/models/Game', 'nanowar/entities/Cell
         fleet.set strength: 5
 
       expect(fleet.get('strength')).toBe 5
-      expect(JSON.stringify(result)).toBe JSON.stringify([["changed", "Fleet_1","strength",5]])
+      expect(JSON.stringify(result)).toBe JSON.stringify([["changed", "Fleet_1$strength",5]])
 
     it 'records the spawning of new world', ->
       game = new Game

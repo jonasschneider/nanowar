@@ -21,11 +21,12 @@ define (require) ->
       @collection.ticks
 
     get: (attr) ->
-      unless attr in _(@attributeSpecs).keys()
-        console.trace()
-        throw "attempted to get undeclared attribute #{attr}" 
-
-      @collection.getEntityAttribute(@id, attr)
+      v = @collection.getEntityAttribute(@id, attr)
+      if v?
+        v
+      else
+        unless attr in _(@attributeSpecs).keys()
+          throw "attempted to get undeclared attribute #{attr}" 
 
     set: (attrs, options) ->
       options or (options = {})

@@ -33,7 +33,7 @@ require ['nanowar/World', 'nanowar/Entity'], (World, Entity) ->
 
     describe '#applyMutation', ->
       it "works", ->
-        mut = [["spawned","MyEntity",{id: "Fleet_1"}],["changed","Fleet_1","strength",1337]]
+        mut = [["spawned","MyEntity",{id: "Fleet_1"}],["changed","Fleet_1$strength",1337]]
 
         @coll.applyMutation(mut)
 

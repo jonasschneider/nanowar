@@ -138,11 +138,13 @@ implementation details:
 # client actions can take at worst 2*tickLength to propagate (command on server, results on client),
 # not even counting for processing and network latency!
 
+the world state is kept as a flat key-value dict
+-> quantitative changes (extrapolation) are easy
+
 
 TODO:
   - reduce mutations so multiple changes to a single attribute during a mutate() call do not produce redundant data
-  - notify an entity if its attributes are changed behind the scenes
+  - notify an entity if its attributes are changed behind the scenes (applying snapshots)
   - completely separate the spawning/persistentobject system from the raw attribute/mutation storage
   - try out how drawing fleets in a canvas affects performance
-  - do not tick by setting a timeout, infer current tick from the time (both client and server)
   - add entity messages -> and then get EnhancerNode affectedCells:add etc. up to date

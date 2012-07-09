@@ -36,7 +36,6 @@ define (require) ->
 
       # common vars
       @running = false
-      @stopping = false
       @tellQueue = []
       @sendQueue = []
     
@@ -101,32 +100,8 @@ define (require) ->
       @runTells(@tellQueue)
       @tellQueue = []
       
-
-    # UNSPECCED
-    run: -> # probably blows up synchronisation
-      console.log "GOGOGOG"
-      @trigger 'run'
-      @timeAtRun = new Date().getTime()
-      if @get('onServer')
-        setTimeout =>
-          @trigger 'publish', run: true
-        , 30
-
-      @schedule()
-    
-    schedule: ->
-      @tick()
-
-      realtimeForNextTick = @timeAtRun + (@ticks * Game.tickLength)
-      timeout = realtimeForNextTick - new Date().getTime()
-
-      throw 'desynced!' if timeout < 0
-      setTimeout =>
-        @schedule()
-      , timeout
-
     halt: ->
-      @stopping = true
+      @running = false
     
     tickClient: ->
       #@halt() if @ticks > 10
@@ -239,6 +214,33 @@ define (require) ->
 
     ticksToTime: (ticks) ->
       ticks * Game.tickLength
+
+
+    # TIME-CRITICAL STUFF
+    run: -> # probably blows up synchronisation
+      console.log "GOGOGOG"
+      @trigger 'run'
+      @timeAtRun = new Date().getTime()
+      if @get('onServer')
+        setTimeout =>
+          @trigger 'publish', run: true
+        , 30
+
+      @running = true
+      @scheduleTick()
+    
+    scheduleTick: ->
+      @tick()
+
+      if @running
+        realtimeForNextTick = @timeAtRun + (@ticks * Game.tickLength)
+        timeout = realtimeForNextTick - new Date().getTime()
+
+        throw 'desynced!' if timeout < 0
+        setTimeout =>
+          @scheduleTick()
+        , timeout
+
   
   Game.tickLength = 1000 / 5
   Game.ticksPerSecond = 1000 / Game.tickLength

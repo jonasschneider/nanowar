@@ -1,5 +1,5 @@
 require ['nanowar/entities/EnhancerNode', 'nanowar/entities/Cell', 'nanowar/models/Game', 'nanowar/entities/Player'], (EnhancerNode, Cell, Game, Player) ->
-  describe 'EnhancerNode', ->
+  xdescribe 'EnhancerNode', ->
     it 'has an owner', ->
       node = new EnhancerNode game: new Game
       expect(node.relationSpecs.owner).not.toBe undefined

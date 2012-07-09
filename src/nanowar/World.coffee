@@ -10,7 +10,7 @@ define (require) ->
 
       @types = {}
       @nextEntityIds = {}
-      @entityAttributes = []
+      @state = {}
 
       @entities = []
       @entitiesById = {}
@@ -76,25 +76,24 @@ define (require) ->
 
     getEntityAttribute: (entId, attr) ->
       throw "unknown ent #{entId}" unless @get(entId)
-      storedAttr = _(@entityAttributes).detect (storedAttr) ->
-        storedAttr[0] == entId and storedAttr[1] == attr
-      if storedAttr
-        storedAttr[2]
-      else
-        undefined
+      key = @_generateAttrKey(entId, attr)
+      @state[key]
 
     setEntityAttribute: (entId, attr, value) ->
       ent = @get(entId)
-      throw "unknown ent #{endId}" unless ent
-      storedAttr = _(@entityAttributes).detect (storedAttr) ->
-        storedAttr[0] == entId and storedAttr[1] == attr
-      if storedAttr
-        storedAttr[2] = value
-      else
-        @entityAttributes.push [entId, attr, value]
+      throw "unknown ent #{entId}" unless ent
+      key = @_generateAttrKey(entId, attr)
+      @state[key] = value
       ent.trigger 'change'
-      @_recordMutation ["changed", entId, attr, value]
+      @_recordMutation ["changed", key, value]
       value
+
+    _generateAttrKey: (entId, attr) ->
+      # TODO: here we can enum
+      entId+'$'+attr
+
+    _parseAttrKey: (key) ->
+      key.split('$')
 
     mutate: (mutator) ->
       throw 'already mutating' if @currentMutations
@@ -109,7 +108,9 @@ define (require) ->
     applyMutation: (mutation) ->
       for change in mutation
         if change[0] == "changed"
-          @setEntityAttribute change[1], change[2], change[3]
+          # TODO: refactor this so we can also modify state that is not an entity attribute
+          parsed = @_parseAttrKey(change[1])
+          @setEntityAttribute parsed[0], parsed[1], change[2]
         else if change[0] == "spawned"
           @spawn change[1], change[2]
         else if change[0] == "removed"
@@ -128,12 +129,13 @@ define (require) ->
       world = []
       for ent in @entities
         spawn_attributes = { id: ent.id }
-        attributes = _(@entityAttributes).select (a) ->
-          a[0] == ent.id
-        for attr in attributes
-          spawn_attributes[attr[1]] = attr[2]
+        for own k, v of @state # TODO: performance?
+          parsed = @_parseAttrKey(k)
+          if parsed[0] == ent.id
+            spawn_attributes[parsed[1]] = v
 
         world.push [ent.entityTypeName, spawn_attributes]
+      console.log @state
       world
 
     applySnapshot: (snapshot) ->
@@ -141,11 +143,11 @@ define (require) ->
         @spawn.apply(this, args)
 
     snapshotAttributes: ->
-      _.clone(attr) for attr in @entityAttributes
+      _.clone(@state)
 
     restoreAttributeSnapshot: (snapshot) ->
       # TODO: notify changed world
-      @entityAttributes = snapshot
+      @state = snapshot
 
     _recordMutation: (mutation) ->
       if @currentMutationChanges
