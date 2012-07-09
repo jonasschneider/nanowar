@@ -42,11 +42,11 @@ require ['nanowar/World', 'nanowar/Entity'], (World, Entity) ->
 
     describe '#attributesChangedByMutation', ->
       it "returns only changes", ->
-        mut = [["spawned","MyEntity",{id: "Fleet_3"}],["changed","Fleet_1","strength",1337]]
+        mut = [["spawned","MyEntity",{id: "Fleet_1"}],["changed","Fleet_1$strength",1337]]
 
         a = @coll.attributesChangedByMutation(mut)
 
-        expect(JSON.stringify(a)).toBe JSON.stringify([["Fleet_1", "strength", 1337]])
+        expect(JSON.stringify(a)).toBe JSON.stringify({"Fleet_1$strength": 1337})
 
     describe '#remove', ->
       it "works", ->

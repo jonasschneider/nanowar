@@ -23,7 +23,7 @@ define (require) ->
 
         if e.entityMutation
           @serverUpdates[e.tick] = e
-          @lastServerUpdate = e.tick
+          @lastReceivedUpdateTicks = e.tick
 
         @run() if e.run
       
@@ -32,7 +32,8 @@ define (require) ->
       # client vars
       @clientLag = 0
       @clientLagTotal = 0
-      @lastServerUpdate = 0
+      @lastReceivedUpdateTicks = 0
+      @lastAppliedUpdateTicks = 0
 
       # common vars
       @running = false
@@ -104,80 +105,72 @@ define (require) ->
       @running = false
     
     tickClient: ->
-      #@halt() if @ticks > 10
+      console.log "=== CLIENT TICKING #{@ticks}"
       startTime = new Date().getTime()
 
       @sendClientTells()
-      if update = @serverUpdates[@ticks]
-        #console.log "=== CLIENT TICKING"
-        if @lagging # we have recovered from a lag
-          @lagging = false
-          @world.restoreAttributeSnapshot(@lagLastGoodAttributeSnapshot)
 
-        if @ticks-2 > 0
-          delete @serverUpdates[@ticks-2] # keep the mutation that led to the current tick and the one before that
+      if @lastAppliedUpdateTicks == @ticks - 1
+        console.log "game was up to speed"
 
-        @clientLag = 0
+      if @dirtyWorldResetSnapshot
+        @world.restoreAttributeSnapshot(@dirtyWorldResetSnapshot)
+        delete @dirtyWorldResetSnapshot
 
-        @world.applyMutation(update.entityMutation)
+      reachableTicks = Math.min(@ticks, @lastReceivedUpdateTicks)
+      console.log "can reach tick #{reachableTicks}"
 
-        #console.log "=== CLIENT TICK DONE (now at tick #{@ticks}, total lag #{@clientLagTotal})"
+      while reachableTicks > @lastAppliedUpdateTicks
+        next = ++@lastAppliedUpdateTicks
 
-        #if @lastServerUpdate - @ticks > 1 # we are lagging behind, tick again
-        #  @tickClient()
+        lastAppliedUpdate = @serverUpdates[next]
+        lastMutation = @world.applyMutation(lastAppliedUpdate.entityMutation)
 
+        console.log "applying #{next}"
 
-      else
-        console.log "did not yet receive update for tick #{@ticks}, extrapolating!"
-
-        if !@lagging # we started to lag
-          @lagging = true
-          @lagLastGoodAttributeSnapshot = @world.snapshotAttributes()
-          @lagStartedAt = @ticks
-          @lagExtrapolatedAttributes = []
-
-          throw 'not enough data for extrapolate' if @lagStartedAt < 2
+        if next-2 > 0
+          delete @serverUpdates[next-2] # keep the mutation that led to the recent tick and the one before that
 
 
-          # the changed attributes of the mutations that led to the two last good ticks
-          attr1 = @world.attributesChangedByMutation(@serverUpdates[@ticks-2].entityMutation)
-          attr2 = @world.attributesChangedByMutation(@serverUpdates[@ticks-1].entityMutation)
+      if reachableTicks < @ticks
+        ticksToExtrapolate = @ticks - reachableTicks
+        startingPoint = reachableTicks
+        console.log "client is lagging behind, going to extrapolate for #{ticksToExtrapolate} ticks from tick #{startingPoint}"
 
-
-          for changeInfo1 in attr1
-            [ent, attribute, olderValue] = changeInfo1
-            changeInfo2 = _(attr2).detect (x) => x[0] == changeInfo1[0] and x[1] == changeInfo1[1]
-            continue unless changeInfo2
-            newerValue = changeInfo2[2]
-            console.log "extrapolating #{ent}'s #{attribute}, was last changed from #{olderValue} to #{newerValue}"
-            d = newerValue - olderValue
-            @lagExtrapolatedAttributes.push [ent, attribute, newerValue, d]
-
-        @clientLagTotal++
-        lagDuration = @ticks - @lagStartedAt
-
-        if lagDuration > 10 # todo: constant
+        if ticksToExtrapolate > 10 # todo: constant
           console.log "lost more than 10 ticks, connection lost :("
           @halt()
           return
 
-        # extrapolate here
-        m = @world.mutate =>
-          for data in @lagExtrapolatedAttributes
-            [entId, attr, lastKnownValue, delta] = data
-            thisValue = lastKnownValue + lagDuration * delta
-            @world.setEntityAttribute(entId, attr, thisValue)
+        # these are the changed attributes of the mutations that led to the two last good ticks
+        delta1 = @world.attributesChangedByMutation(@serverUpdates[startingPoint-1].entityMutation)
+        delta2 = @world.attributesChangedByMutation(@serverUpdates[startingPoint].entityMutation)
 
-        console.log m
+        console.log delta1, delta2
+
+        @dirtyWorldResetSnapshot = @world.snapshotAttributes()
+
+        lastMutation = @world.mutate =>
+          for own attr, olderValue of delta1
+            if newerValue = delta2[attr]
+              extrapolatedValue = newerValue + (newerValue - olderValue) * ticksToExtrapolate
+              console.log attr, olderValue, newerValue, extrapolatedValue
+
+              # FIXME: hax
+              [entId, entAttr] = @world._parseAttrKey(attr)
+              @world.setEntityAttribute(entId, entAttr, extrapolatedValue)
 
       endTime = new Date().getTime()
+
       @trigger 'instrument:client-tick', 
-        totalUpdateSize: JSON.stringify(@serverUpdates[@ticks] || {}).length # FIXME: handle lagging etc correctly
+        totalUpdateSize: JSON.stringify(lastMutation).length
         clientProcessingTime: (endTime-startTime)
-        serverProcessingTime: (@serverUpdates[@ticks] || {serverProcessingTime: 0}).serverProcessingTime # FIXME: same
+        serverProcessingTime: (lastAppliedUpdate || {serverProcessingTime: 0}).serverProcessingTime
+
+      console.log "=== CLIENT TICK DONE"
     
     tickServer: ->
-      console.log "=== TICKING"
+      console.log "=== SERVER TICKING #{@ticks}"
       startTime = new Date().getTime()
 
       entityMutation = @world.mutate =>

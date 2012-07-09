@@ -96,3 +96,136 @@ require ['nanowar/models/Game', 'nanowar/entities/Cell', 'nanowar/entities/Playe
         c2.setRelation 'owner', p2
 
         expect(game.getWinner()).toBe p2
+
+    describe 'lagging', ->
+      it 'extrapolates', ->
+        server = new Game onServer: true
+        client = new Game onServer: false
+
+        cell = null
+
+        server.bind 'publish', (what) ->
+          client.trigger 'update', what
+          console.log what
+
+        server.spawnIt = ->
+          cell = server.world.spawn 'Cell', x: 0
+
+        server.moveIt = ->
+          curX = cell.get('x')
+          cell.set x: curX+10
+
+        server.moveItSlow = ->
+          curX = cell.get('x')
+          cell.set x: curX+5
+
+        # first, spawn the cell
+        server.tellSelf 'spawnIt'
+        server.tick() # 1
+        client.tick() # 1
+
+        expect(client.lastAppliedUpdateTicks).toBe 1
+
+        # start to move it
+        server.tellSelf 'moveIt'
+        server.tick() # 2
+        client.tick() # 2
+
+        expect(client.lastAppliedUpdateTicks).toBe 2
+
+        # move it again, todo: test that one-time moves dont extrapolate
+        server.tellSelf 'moveIt'
+        server.tick() # 3 
+        client.tick() # 3
+
+        expect(client.lastAppliedUpdateTicks).toBe 3
+        expect(client.world.get(cell.id).get('x')).toBe 20
+
+        # now we lag.
+        client.tick() # 4
+        expect(client.lastAppliedUpdateTicks).toBe 3
+        expect(client.world.get(cell.id).get('x')).toBe 30
+
+        # lag again
+        client.tick() # 5
+        expect(client.world.get(cell.id).get('x')).toBe 40
+
+        expect(client.lastAppliedUpdateTicks).toBe 3
+
+        # here we produce a prediction error
+        server.tellSelf 'moveItSlow'
+        server.tick() # 4
+        client.tick() # 6
+
+        # correct result now: 25 (known server value at tick 4) + 2 (tick diff) * 5 (last known delta) = 35
+        expect(client.world.get(cell.id).get('x')).toBe 35
+
+        # now the 2 late updates arrive
+        server.tellSelf 'moveItSlow'
+        server.tick() # 5
+        server.tellSelf 'moveItSlow'
+        server.tick() # 6
+
+        # and we are up to speed again, but the movement actually stopped now
+        server.tick() # 6
+
+        client.tick()
+
+        expect(client.world.get(cell.id).get('x')).toBe cell.get('x')
+
+
+      it 'resets attributes back to the server value when the lag ends', ->
+        server = new Game onServer: true
+        client = new Game onServer: false
+
+        cell = null
+
+        server.bind 'publish', (what) ->
+          client.trigger 'update', what
+          console.log what
+
+        server.spawnIt = ->
+          cell = server.world.spawn 'Cell', x: 0
+
+        server.moveIt = ->
+          curX = cell.get('x')
+          cell.set x: curX+10
+
+        server.moveItSlow = ->
+          curX = cell.get('x')
+          cell.set x: curX+5
+
+        # first, spawn the cell
+        server.tellSelf 'spawnIt'
+        server.tick() # 1
+        client.tick() # 1
+
+        expect(client.lastAppliedUpdateTicks).toBe 1
+
+        # start to move it
+        server.tellSelf 'moveIt'
+        server.tick() # 2
+        client.tick() # 2
+
+        expect(client.lastAppliedUpdateTicks).toBe 2
+
+        # move it again, todo: test that one-time moves dont extrapolate
+        server.tellSelf 'moveIt'
+        server.tick() # 3 
+        client.tick() # 3
+
+        expect(client.lastAppliedUpdateTicks).toBe 3
+        expect(client.world.get(cell.id).get('x')).toBe 20
+
+        # now we lag.
+        client.tick() # 4
+        expect(client.lastAppliedUpdateTicks).toBe 3
+        expect(client.world.get(cell.id).get('x')).toBe 30
+
+        # we recover from the lag
+        server.tick() # 4
+        server.tick() # 5
+        client.tick() # 5
+
+        expect(client.world.get(cell.id).get('x')).toBe cell.get('x')
+

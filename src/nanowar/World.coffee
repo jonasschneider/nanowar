@@ -35,7 +35,7 @@ define (require) ->
       ent = new klass this, newId
       ent.entityTypeName = type
       
-      throw "id #{model.id} is in use" if @entitiesById[newId]
+      throw "id #{newId} is in use" if @entitiesById[newId]
       @entities.push ent
       @entitiesById[newId] = ent
       
@@ -119,10 +119,10 @@ define (require) ->
           throw "unkown change type #{change[0]}"
 
     attributesChangedByMutation: (mutation) ->
-      changed = []
+      changed = {}
       for change in mutation
         if change[0] == "changed"
-          changed.push [change[1], change[2], change[3]]
+          changed[change[1]] = change[2]
       changed
 
     snapshotFull: ->
