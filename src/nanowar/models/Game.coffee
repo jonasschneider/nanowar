@@ -22,6 +22,7 @@ define (require) ->
           @tellQueue.push(tell) for tell in e.tells
 
         if e.entityMutation
+          @dataReceivedSinceTick += JSON.stringify(e).length
           @serverUpdates[e.tick] = e
           @lastReceivedUpdateTicks = e.tick
 
@@ -34,6 +35,7 @@ define (require) ->
       @clientLagTotal = 0
       @lastReceivedUpdateTicks = 0
       @lastAppliedUpdateTicks = 0
+      @dataReceivedSinceTick
 
       # common vars
       @running = false
@@ -105,28 +107,22 @@ define (require) ->
       @running = false
     
     tickClient: ->
-      console.log "=== CLIENT TICKING #{@ticks}"
+      #console.log "=== CLIENT TICKING #{@ticks}"
       startTime = new Date().getTime()
 
       @sendClientTells()
-
-      if @lastAppliedUpdateTicks == @ticks - 1
-        console.log "game was up to speed"
 
       if @dirtyWorldResetSnapshot
         @world.restoreAttributeSnapshot(@dirtyWorldResetSnapshot)
         delete @dirtyWorldResetSnapshot
 
       reachableTicks = Math.min(@ticks, @lastReceivedUpdateTicks)
-      console.log "can reach tick #{reachableTicks}"
 
       while reachableTicks > @lastAppliedUpdateTicks
         next = ++@lastAppliedUpdateTicks
 
         lastAppliedUpdate = @serverUpdates[next]
         lastMutation = @world.applyMutation(lastAppliedUpdate.entityMutation)
-
-        console.log "applying #{next}"
 
         if next-2 > 0
           delete @serverUpdates[next-2] # keep the mutation that led to the recent tick and the one before that
@@ -162,12 +158,14 @@ define (require) ->
 
       endTime = new Date().getTime()
 
+
       @trigger 'instrument:client-tick', 
-        totalUpdateSize: JSON.stringify(lastMutation).length
+        totalUpdateSize: @dataReceivedSinceTick
         clientProcessingTime: (endTime-startTime)
         serverProcessingTime: (lastAppliedUpdate || {serverProcessingTime: 0}).serverProcessingTime
+      @dataReceivedSinceTick = 0
 
-      console.log "=== CLIENT TICK DONE"
+      #console.log "=== CLIENT TICK DONE"
     
     tickServer: ->
       console.log "=== SERVER TICKING #{@ticks}"
