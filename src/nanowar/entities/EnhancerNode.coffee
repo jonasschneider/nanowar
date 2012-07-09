@@ -5,22 +5,15 @@ define (require) ->
   util = require('../helpers/util')
 
   return class EnhancerNode extends Entity
-    defaults:
+    attributeSpecs:
       x: 0
       y: 0
-    
-    relationSpecs:
-      owner:
-        relatedModel: Player
-        directory: 'game.world'
+
+      owner_id: 0
     
     initialize: ->
       @_previousAffectedCells = @affectedCells()
-      
-      @game.world.bind 'add',    @update, this
-      @game.world.bind 'change', @update, this
-      @game.world.bind 'remove', @update, this
-    
+
     update: ->
       newly = @affectedCells()
       previously = @_previousAffectedCells
@@ -38,9 +31,9 @@ define (require) ->
       y: @get 'y'
     
     affectedCells: ->
-      _(@game.getCells()).chain()
+      _(@collection.getEntitiesOfType('Cell')).chain()
       .select (cell) =>
-        cell.get('owner') == @get('owner')
+        cell.getRelation('owner') == @getRelation('owner')
       .sortBy (cell) =>
         util.distance(@position(), cell.position())
       .first(2).value()
