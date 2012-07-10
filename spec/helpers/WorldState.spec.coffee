@@ -16,7 +16,26 @@ require ['nanowar/helpers/WorldState'], (WorldState) ->
 
         @anotherState.applyMutation(m)
         expect(@anotherState.get('a')).toBe undefined
+    
+    describe '#interpolate', ->
+      it 'returns values in between the last set ones', -> 
+        @state.set 'a', 4
+        @state.set 'a', 5
+        
+        expect(@state.interpolate('a', 0)).toBe 4
+        expect(@state.interpolate('a', 0.5)).toBe 4.5
+        expect(@state.interpolate('a', 1)).toBe 5
 
+        @state.set 'a', 10
+
+        expect(@state.interpolate('a', 0.5)).toBe 7.5
+
+      it 'does not interpolate when there is only one value', -> 
+        @state.set 'a', 5
+        
+        expect(@state.interpolate('a', 0)).toBe 5
+        expect(@state.interpolate('a', 0.5)).toBe 5
+        expect(@state.interpolate('a', 1)).toBe 5
 
     describe '#mutate', ->
       it 'works', -> 

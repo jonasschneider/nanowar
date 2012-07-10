@@ -5,6 +5,7 @@ define (require) ->
   class WorldState
     constructor: ->
       @internalState = {}
+      @previousValues = {}
       @events = {}
       @strictMode = false
 
@@ -12,6 +13,7 @@ define (require) ->
       @events[name] = cb
 
     set: (k, v) ->
+      @previousValues[k] = @internalState[k]
       @internalState[k] = v
       @_recordMutation ['changed', k, v]
       @onChange(k) if @onChange
@@ -74,6 +76,13 @@ define (require) ->
 
     applySnapshot: (snapshot) ->
       @internalState = snapshot
+
+    interpolate: (key, fraction) ->
+      v1 = @previousValues[key]
+      v2 = @get(key)
+      return v2 unless v1
+
+      v1 + (v2 - v1) * fraction
 
     extrapolate: (mut1, mut2, n) ->
       delta1 = @_attributesChangedByMutation(mut1)

@@ -80,6 +80,13 @@ define (require) ->
     message: (name, data) ->
       @collection.sendEntityMessage(@id, name, data)
 
+    interpolate: (attr, time) ->
+      #console.log time, @collection.tickStartedAt, @collection.tickLength
+      fraction = (time - @collection.tickStartedAt) / @collection.tickLength
+      key = @collection._generateAttrKey(@id, attr)
+      @collection.state.interpolate key, fraction
+      #console.log(fraction)
+
     attributes: ->
       x = {}
       for own attr of @attributeSpecs

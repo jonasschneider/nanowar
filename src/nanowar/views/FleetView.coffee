@@ -15,7 +15,7 @@ define (require) ->
 
       @strengthText = @gameView.paper.text -100, -100, @model.get('strength')
 
-    render: ->
+    render: (time) ->
       return unless @model.get('launchedAt') > 0
 
       #@strengthText.attr text: @model.get('strength')
@@ -26,9 +26,13 @@ define (require) ->
       #, Game.tickLength
 
       ctx = @gameView.canvas.getContext("2d")
-
+      
       ctx.beginPath()
-      ctx.arc(@model.get('posx'), @model.get('posy'), @radius, 0, Math.PI*2, true)
+
+      x = @model.interpolate('posx', time)
+      y = @model.interpolate('posy', time)
+      
+      ctx.arc(x, y, @radius, 0, Math.PI*2, true)
       ctx.closePath()
       ctx.fillStyle = 'orange'
       ctx.fill()
@@ -37,7 +41,7 @@ define (require) ->
 
       w = ctx.measureText(text).width
 
-      ctx.fillText(text, @model.get('posx') - w/2, @model.get('posy') - 10)
+      ctx.fillText(text, x - w/2, y - 10)
 
       #@x ||= 0
       #@x += 2

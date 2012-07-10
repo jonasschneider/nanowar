@@ -65,8 +65,8 @@ define (require) ->
     render: (time) ->
       @frames++
       @canvas.getContext("2d").clearRect(0,0,700,500)
-      for i in 1..100
-        f.render() for f in @fleetvs
+      
+      f.render(time) for f in @fleetvs
 
       requestAnimFrame _(@render).bind(this)
 

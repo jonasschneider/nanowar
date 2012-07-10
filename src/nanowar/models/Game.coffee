@@ -188,6 +188,8 @@ define (require) ->
     tick: ->
       @ticks++
       @world.ticks = @ticks
+      @world.tickStartedAt = new Date().getTime()
+      @world.tickLength = Game.tickLength
 
       if @get('onServer')
         @tickServer()
