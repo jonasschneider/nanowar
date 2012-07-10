@@ -138,6 +138,8 @@ implementation details:
 # client actions can take at worst 2*tickLength to propagate (command on server, results on client),
 # not even counting for processing and network latency!
 
+http://en.wikipedia.org/wiki/Entity-attribute-value_model
+
 the world state is kept as a flat key-value dict
 -> quantitative changes (extrapolation) are easy
 

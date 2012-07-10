@@ -20,9 +20,11 @@ define (require) ->
       
       _(newly).chain().difference(previously).each (c) =>
         @message 'affectedCells:add', c
+        c.set size: c.get('size')+10
       
       _(previously).chain().difference(newly).each (c) =>
         @message 'affectedCells:remove', c
+        c.set size: c.get('size')-10
       
       @_previousAffectedCells = newly
       
