@@ -113,7 +113,7 @@ define (require) ->
       @sendClientTells()
 
       if @dirtyWorldResetSnapshot
-        @world.restoreAttributeSnapshot(@dirtyWorldResetSnapshot)
+        @world.applyAttributeSnapshot(@dirtyWorldResetSnapshot)
         delete @dirtyWorldResetSnapshot
 
       reachableTicks = Math.min(@ticks, @lastReceivedUpdateTicks)
@@ -139,24 +139,14 @@ define (require) ->
           return
 
         if @lastAppliedUpdateTicks > 2
-          # these are the changed attributes of the mutations that led to the two last good ticks
-          delta1 = @world.attributesChangedByMutation(@serverUpdates[startingPoint-1].entityMutation)
-          delta2 = @world.attributesChangedByMutation(@serverUpdates[startingPoint].entityMutation)
-
-          console.log delta1, delta2
 
           @dirtyWorldResetSnapshot = @world.snapshotAttributes()
+          # these are the mutations that led to the two last good ticks
+          mut1 = @serverUpdates[startingPoint-1].entityMutation
+          mut2 = @serverUpdates[startingPoint].entityMutation
 
-          @world.mutate =>
-            for own attr, olderValue of delta1
-              continue unless @world.state[attr]
-              if newerValue = delta2[attr]
-                extrapolatedValue = newerValue + (newerValue - olderValue) * ticksToExtrapolate
+          @world.state.extrapolate(mut1, mut2, ticksToExtrapolate)
   
-                # FIXME: hax
-                [entId, entAttr] = @world._parseAttrKey(attr)
-                @world.setEntityAttribute(entId, entAttr, extrapolatedValue)
-
       endTime = new Date().getTime()
 
 

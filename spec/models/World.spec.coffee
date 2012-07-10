@@ -32,22 +32,42 @@ require ['nanowar/World', 'nanowar/Entity'], (World, Entity) ->
           @world.spawn 'Trolol'
         .toThrow 'unknown entity type Trolol'
 
-    describe '#applyMutation', ->
+    describe '#mutate', ->
+      it 'records the spawning of new entities', ->
+        result = @world.mutate =>
+          @world.spawn 'MyEntity', strength: 1337
+        
+        expect(@anotherWorld.entities.length).toBe 0
+        @anotherWorld.applyMutation(result)
+        expect(@anotherWorld.entities.length).toBe 1
+        expect(@anotherWorld.entities[0].get 'strength').toBe 1337
+
+      it 'fires a change event for changed attributes', ->
+        e = null
+        spawn = @world.mutate =>
+          e = @world.spawn 'MyEntity', strength: 1337
+
+        change = @world.mutate =>
+          e.set strength: 1338
+        
+        @anotherWorld.applyMutation(spawn)
+
+        console.log(@anotherWorld)
+
+        @anotherWorld.get(e.id).bind 'change', spy = jasmine.createSpy()
+        @anotherWorld.applyMutation(change)
+
+        expect(spy).toHaveBeenCalled()
+
+
+    describe '#snapshotFull', ->
       it "works", ->
-        mut = [["spawned","MyEntity",{id: "Fleet_1"}],["changed","Fleet_1$strength",1337]]
+        @world.spawn 'MyEntity', strength: 1337
 
-        @world.applyMutation(mut)
+        @anotherWorld.applyFullSnapshot @world.snapshotFull()
 
-        expect(@world.get('Fleet_1') instanceof MyEntity).toBe true
-        expect(@world.get('Fleet_1').get 'strength').toBe 1337
-
-    describe '#attributesChangedByMutation', ->
-      it "returns only changes", ->
-        mut = [["spawned","MyEntity",{id: "Fleet_1"}],["changed","Fleet_1$strength",1337]]
-
-        a = @world.attributesChangedByMutation(mut)
-
-        expect(JSON.stringify(a)).toBe JSON.stringify({"Fleet_1$strength": 1337})
+        expect(@anotherWorld.get('MyEntity_1') instanceof MyEntity).toBe true
+        expect(@anotherWorld.get('MyEntity_1').get 'strength').toBe 1337
 
     describe '#remove', ->
       it "works", ->
@@ -61,12 +81,9 @@ require ['nanowar/World', 'nanowar/Entity'], (World, Entity) ->
         e = @world.spawn 'MyEntity', strength: 10
         e2 = @world.spawn 'MyEntity', strength: 15
 
-        k = @world._generateAttrKey(e.id, 'strength')
-        expect(@world.state[k]).toBe 10
-
         @world.remove(e)
-        expect(@world.state[k]).toBe undefined
-        expect(e2.get('strength')).toBe 15
+        @world.remove(e2)
+        expect(JSON.stringify(@world.state.internalState)).toBe '{}'
 
 
     describe '#setEntityAttribute', ->
@@ -88,41 +105,70 @@ require ['nanowar/World', 'nanowar/Entity'], (World, Entity) ->
         expect(called).toBe true
         expect(failed).toBe false
 
-    it 'allows sending entity messages within a mutation', ->
-      ent = null
+    describe '#snapshotAttributes', ->
+      it 'allows to store and restore snapshots', ->
+        fleet = @world.spawn 'MyEntity', strength: 2
 
-      spawn = @world.mutate =>
-        ent = @world.spawn 'MyEntity'
+        stateBefore = @world.snapshotAttributes()
 
-      data = a: 0
+        fleet.set strength: 10
+        expect(fleet.get('strength')).toBe 10
 
-      msg = @world.mutate ->
-        ent.message 'omnom', data
+        @world.applyAttributeSnapshot(stateBefore)
 
-      @anotherWorld.applyMutation spawn
+        expect(fleet.get('strength')).toBe 2
 
-      @anotherWorld.get(ent.id).bind 'omnom', spy = jasmine.createSpy()
+    describe 'entity messages', ->
+      it 'allows sending entity messages within a mutation', ->
+        ent = null
 
-      @anotherWorld.applyMutation msg
+        spawn = @world.mutate =>
+          ent = @world.spawn 'MyEntity'
 
-      expect(spy).toHaveBeenCalledWith(data)
+        data = a: 0
 
-    it 'allows sending serialized entities as an argument for an entity message', ->
-      ent = null
-      ent2 = null
+        msg = @world.mutate ->
+          ent.message 'omnom'
 
-      spawn = @world.mutate =>
-        ent = @world.spawn 'MyEntity'
-        ent2 = @world.spawn 'MyEntity'
+        @anotherWorld.applyMutation spawn
+        @anotherWorld.get(ent.id).bind 'omnom', spy = jasmine.createSpy()
+        @anotherWorld.applyMutation msg
 
-      msg = @world.mutate ->
-        ent.message 'omnom', ent2
+        expect(spy).toHaveBeenCalled()
 
-      @anotherWorld.applyMutation spawn
+      it 'allows sending entity messages with an argument', ->
+        ent = null
 
-      another_ent2 = @anotherWorld.get(ent2.id)
-      @anotherWorld.get(ent.id).bind 'omnom', spy = jasmine.createSpy()
+        spawn = @world.mutate =>
+          ent = @world.spawn 'MyEntity'
 
-      @anotherWorld.applyMutation msg
+        data = a: 0
 
-      expect(spy).toHaveBeenCalledWith(another_ent2)
+        msg = @world.mutate ->
+          ent.message 'omnom', data
+
+        @anotherWorld.applyMutation spawn
+        @anotherWorld.get(ent.id).bind 'omnom', spy = jasmine.createSpy()
+        @anotherWorld.applyMutation msg
+
+        expect(spy).toHaveBeenCalledWith(data)
+
+      it 'allows sending serialized entities as an argument for an entity message', ->
+        ent = null
+        ent2 = null
+
+        spawn = @world.mutate =>
+          ent = @world.spawn 'MyEntity'
+          ent2 = @world.spawn 'MyEntity'
+
+        msg = @world.mutate ->
+          ent.message 'omnom', ent2
+
+        @anotherWorld.applyMutation spawn
+
+        another_ent2 = @anotherWorld.get(ent2.id)
+        @anotherWorld.get(ent.id).bind 'omnom', spy = jasmine.createSpy()
+
+        @anotherWorld.applyMutation msg
+
+        expect(spy).toHaveBeenCalledWith(another_ent2)

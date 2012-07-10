@@ -31,6 +31,8 @@ define (require) ->
       layers.attr
         stroke: 'none'
         r: 0
+
+      console.warn "rendering, r=#{@model.get('size')}"
       
       @animating = true
       @el.animate

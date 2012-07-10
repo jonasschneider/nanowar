@@ -1,6 +1,7 @@
 define (require) ->
   Backbone = require('backbone')
   _                     = require 'underscore'
+  WorldState = require 'nanowar/helpers/WorldState'
 
   class World
     constructor: (types) ->
@@ -10,7 +11,12 @@ define (require) ->
 
       @types = {}
       @nextEntityIds = {}
-      @state = {}
+      @state = new WorldState
+
+      @state.registerEvent 'remove', _(@remove).bind(this)
+      @state.registerEvent 'spawn', _(@spawn).bind(this)
+      @state.registerEvent 'entmsg', _(@sendEntityMessage).bind(this)
+      @state.onChange = _(@_touchChangedEntity).bind(this)
 
       @entities = []
       @entitiesById = {}
@@ -18,6 +24,13 @@ define (require) ->
       _(types).each (klass, name) =>
         @types[name] = klass
         @nextEntityIds[name] = 1
+
+    enableStrictMode: ->
+      @state.strictMode = true
+
+    #
+    # ENTITY HOUSEKEEPING
+    # 
 
     spawn: (type, attributes) ->
       klass = @types[type] or throw "unknown entity type #{type}"
@@ -30,19 +43,19 @@ define (require) ->
         num = @nextEntityIds[type]++
         newId = type + '_' + num
 
-      @_recordMutation ["spawned", type, {id: newId}]
-
       ent = new klass this, newId
       ent.entityTypeName = type
       
       throw "id #{newId} is in use" if @entitiesById[newId]
       @entities.push ent
       @entitiesById[newId] = ent
+
+      @state.recordEvent 'spawn', type, {id: newId}
       
       ent._initialize()
       ent.set attributes
 
-      @trigger 'add', ent
+      @trigger 'spawn', ent
 
       ent
 
@@ -51,22 +64,23 @@ define (require) ->
 
     remove: (entOrId) ->
       if entOrId.id?
-        ent = entOrId
+        id = entOrId.id
       else
-        ent = @get(entOrId)
-
+        id = entOrId
+ 
+      ent = @get(id)
       ent.trigger 'remove'
 
+      @state.recordEvent 'remove', id
+      
       idx = @entities.indexOf(ent)
       @entities.splice(idx, 1)
       delete @entitiesById[ent.id]
 
-      for k, v of @state
-        [entId, attr] = @_parseAttrKey(k)
-        if entId == ent.id
-          delete @state[k]
+      for attr in _(ent.attributeSpecs).keys()
+        k = @_generateAttrKey(id, attr)
+        @state.unset k
 
-      @_recordMutation ["removed", ent.id]
       null
 
     getEntitiesOfType: (typename) ->
@@ -76,21 +90,23 @@ define (require) ->
         results.push ent if ent instanceof klass
       results
 
-    enableStrictMode: ->
-      @strictMode = true
+    #
+    # ENTITY ATTRIBUTES
+    #
 
     getEntityAttribute: (entId, attr) ->
-      throw "unknown ent #{entId}" unless @get(entId)
+      throw "on get: unknown ent #{entId}" unless @get(entId)
       key = @_generateAttrKey(entId, attr)
-      @state[key]
+      @state.get key
 
     setEntityAttribute: (entId, attr, value) ->
       ent = @get(entId)
-      throw "unknown ent #{entId}" unless ent
+      unless ent
+        console.trace()
+        throw "on set: unknown ent #{entId}" 
       key = @_generateAttrKey(entId, attr)
-      @state[key] = value
+      @state.set key, value
       ent.trigger 'change'
-      @_recordMutation ["changed", key, value]
       value
 
     _generateAttrKey: (entId, attr) ->
@@ -98,80 +114,57 @@ define (require) ->
       entId+'$'+attr
 
     _parseAttrKey: (key) ->
-      key.split('$')
+      if key.indexOf('$') > 0
+        key.split('$')
+      else
+        null
 
-    recordEntityMessage: (entId, name, data) ->
-      if data.toJSON
+    _touchChangedEntity: (key) ->
+      if [entId, attr] = @_parseAttrKey(key)
+        @get(entId).trigger 'change'
+
+
+
+    sendEntityMessage: (entId, name, data) ->
+      if data && data.toJSON
         payload = data.toJSON()
       else
         payload = data
-      @_recordMutation ["entmsg", entId, name, payload]
+      @state.recordEvent 'entmsg', entId, name, payload
+      if data && data.entId
+        arg = @get(data.entId)
+      else
+        arg = data
+      @get(entId).trigger name, arg
+
+
+    #
+    # STATE PROXIES, SNAPSHOTS
+    #
 
     mutate: (mutator) ->
-      throw 'already mutating' if @currentMutations
-      @currentMutationChanges = []
-
-      mutator()
-
-      d = @currentMutationChanges
-      @currentMutationChanges = undefined
-      d
+      @state.mutate mutator
 
     applyMutation: (mutation) ->
-      for change in mutation
-        if change[0] == "changed"
-          # TODO: refactor this so we can also modify state that is not an entity attribute
-          parsed = @_parseAttrKey(change[1])
-          @setEntityAttribute parsed[0], parsed[1], change[2]
-        else if change[0] == "spawned"
-          @spawn change[1], change[2]
-        else if change[0] == "removed"
-          @remove change[1]
-        else if change[0] == "entmsg"
-          if change[3].entId
-            payload = @get(change[3].entId) 
-          else
-            payload = change[3]
-          @get(change[1]).trigger change[2], payload
-        else
-          throw "unkown change type #{change[0]}"
-
-    attributesChangedByMutation: (mutation) ->
-      changed = {}
-      for change in mutation
-        if change[0] == "changed"
-          changed[change[1]] = change[2]
-      changed
-
-    snapshotFull: ->
-      world = []
-      for ent in @entities
-        spawn_attributes = { id: ent.id }
-        for own k, v of @state # TODO: performance?
-          parsed = @_parseAttrKey(k)
-          if parsed[0] == ent.id
-            spawn_attributes[parsed[1]] = v
-
-        world.push [ent.entityTypeName, spawn_attributes]
-      console.log @state
-      world
-
-    applySnapshot: (snapshot) ->
-      for args in snapshot
-        @spawn.apply(this, args)
+      @state.applyMutation mutation
 
     snapshotAttributes: ->
-      _.clone(@state)
+      @state.makeSnapshot()
 
-    restoreAttributeSnapshot: (snapshot) ->
+    applyAttributeSnapshot: (snapshot) ->
       # TODO: notify changed world
-      @state = snapshot
+      @state.applySnapshot(snapshot)
 
-    _recordMutation: (mutation) ->
-      if @currentMutationChanges
-        @currentMutationChanges.push mutation
-      else
-        throw 'mutation outside mutate() in strict mode' if @strictMode
+    snapshotFull: ->
+      for ent in @entities
+        attr = ent.attributes()
+        attr.id = ent.id
+        [ent.entityTypeName, attr]
+
+    applyFullSnapshot: (fullSnapshot) ->
+      console.log fullSnapshot
+      for [type, attributes] in fullSnapshot
+        @spawn type, attributes
 
   _.extend(World.prototype, Backbone.Events)
 

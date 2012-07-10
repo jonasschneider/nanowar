@@ -78,9 +78,13 @@ define (require) ->
       {entId: @id}
 
     message: (name, data) ->
-      @collection.recordEntityMessage(@id, name, data)
-      @trigger name, data
+      @collection.sendEntityMessage(@id, name, data)
 
-
+    attributes: ->
+      x = {}
+      for own attr of @attributeSpecs
+        x[attr] = @get attr
+      x
+ 
   _.extend(Entity.prototype, Backbone.Events)
   return Entity

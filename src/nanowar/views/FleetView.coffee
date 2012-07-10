@@ -7,22 +7,14 @@ define (require) ->
       @gameView = opts.gameView
       
       @model.bind 'change', @render, this
-      @model.bind 'change', @checkStart, this
       @model.bind 'remove', @remove, this
+
+      @model.bind 'launch', @start, this
       
       @el = @gameView.paper.circle()
 
       @strengthText = @gameView.paper.text -100, -100, @model.get('strength')
 
-      @checkStart()
-      
-      
-    checkStart: ->
-      return unless @model.get('launchedAt') > 0
-      return if @started
-      @start()
-      @started = true
-    
     render: ->
       return unless @model.get('launchedAt') > 0
 

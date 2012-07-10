@@ -63,6 +63,7 @@ define (require) ->
           posy: Math.round(@startPosition().y)
         @getRelation('from').changeCurrentStrengthBy -@get('strength')
         @set launchedAt: @ticks()
+        @message 'launch'
         true
       else false
     

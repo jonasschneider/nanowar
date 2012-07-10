@@ -23,3 +23,9 @@ require ['nanowar/World', 'nanowar/Entity'], (World, Entity) ->
       expect ->
         fleet.set strength: 5
       .toThrow()
+
+    describe '#attributes', ->
+      it 'collects the attributes and returns them', ->
+        fleet = @world.spawn 'EntWithAttrs'
+        
+        expect(JSON.stringify fleet.attributes()).toBe '{"strength":0,"dead":false}'
