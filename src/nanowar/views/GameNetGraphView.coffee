@@ -22,6 +22,7 @@ define (require) ->
       @model.bind 'run', @recordRunTime, this
 
       @lastFrames = 0
+      @fps = 0
 
       @width = @dataPoints + 40
       @graphHeight = 150
@@ -103,11 +104,12 @@ define (require) ->
         updateSizeSum += datapoint.totalUpdateSize
       kbpsIn = (updateSizeSum/1024).toFixed(1)
 
-      renderedFrames = @gameView.frames - @lastFrames
-      @lastFrames = @gameView.frames
-      fps = renderedFrames * ticksPerSecond
+      if @model.ticks % ticksPerSecond == 0
+        renderedFrames = @gameView.frames - @lastFrames
+        @lastFrames = @gameView.frames
+        @fps = renderedFrames
       ctx.fillStyle = '#fff'
-      ctx.fillText("tick #{@model.ticks} - #{fps} fps - #{kbpsIn}kb/s in", 10, @graphHeight+10);
+      ctx.fillText("tick #{@model.ticks} - #{@fps} fps - #{kbpsIn}kb/s in", 10, @graphHeight+10);
 
       expectedPassedTicks = (new Date().getTime() - @timeAtRun) / 1000 * Game.ticksPerSecond + 1
       syncError = (@model.ticks - expectedPassedTicks).toFixed(1)
