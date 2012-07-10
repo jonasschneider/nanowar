@@ -21,10 +21,13 @@ define (require) ->
       @model.bind 'instrument:client-tick', @recordTick, this
       @model.bind 'run', @recordRunTime, this
 
+      @lastFrames = 0
+
       @width = @dataPoints + 40
       @graphHeight = 150
       @height = 230
       @el = @make 'canvas'
+      $(@el).css position: 'absolute', right: 0, bottom: 0
       @el.setAttribute 'height', @height
       @el.setAttribute 'width', @width
 
@@ -100,8 +103,11 @@ define (require) ->
         updateSizeSum += datapoint.totalUpdateSize
       kbpsIn = (updateSizeSum/1024).toFixed(1)
 
+      renderedFrames = @gameView.frames - @lastFrames
+      @lastFrames = @gameView.frames
+      fps = renderedFrames * ticksPerSecond
       ctx.fillStyle = '#fff'
-      ctx.fillText("tick #{@model.ticks} - #{kbpsIn}kb/s in", 10, @graphHeight+10);
+      ctx.fillText("tick #{@model.ticks} - #{fps} fps - #{kbpsIn}kb/s in", 10, @graphHeight+10);
 
       expectedPassedTicks = (new Date().getTime() - @timeAtRun) / 1000 * Game.ticksPerSecond + 1
       syncError = (@model.ticks - expectedPassedTicks).toFixed(1)

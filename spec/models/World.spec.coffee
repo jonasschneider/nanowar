@@ -84,6 +84,15 @@ require ['nanowar/World', 'nanowar/Entity'], (World, Entity) ->
         @world.remove(e)
         @world.remove(e2)
         expect(JSON.stringify(@world.state.internalState)).toBe '{}'
+      
+      it "fires the entity's remove event", ->
+        e = @world.spawn 'MyEntity', strength: 10
+
+        e.bind 'remove', spy = jasmine.createSpy()
+
+        @world.remove(e)
+
+        expect(spy).toHaveBeenCalled()
 
 
     describe '#setEntityAttribute', ->

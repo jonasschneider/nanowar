@@ -18,12 +18,26 @@ define (require) ->
     render: ->
       return unless @model.get('launchedAt') > 0
 
-      @strengthText.attr text: @model.get('strength')
+      #@strengthText.attr text: @model.get('strength')
 
-      @el.animate
-        cx: @model.get('posx')
-        cy: @model.get('posy')
-      , Game.tickLength
+      #@el.animate
+      #  cx: @model.get('posx')
+      #  cy: @model.get('posy')
+      #, Game.tickLength
+
+      ctx = @gameView.canvas.getContext("2d")
+
+      ctx.beginPath()
+      ctx.arc(@model.get('posx'), @model.get('posy'), @radius, 0, Math.PI*2, true)
+      ctx.closePath()
+      ctx.fillStyle = 'orange'
+      ctx.fill()
+
+      text = @model.get('strength')
+
+      w = ctx.measureText(text).width
+
+      ctx.fillText(text, @model.get('posx') - w/2, @model.get('posy') - 10)
 
       #@x ||= 0
       #@x += 2
@@ -31,10 +45,10 @@ define (require) ->
       #@el.attr
       #  cx: @x
 
-      @strengthText.animate
-        x: @model.get('posx')
-        y: @model.get('posy') - 10
-      , Game.tickLength
+      #@strengthText.animate
+      #  x: @model.get('posx')
+      #  y: @model.get('posy') - 10
+      #, Game.tickLength
 
     size: ->
       rad = (size) ->
@@ -49,6 +63,9 @@ define (require) ->
       @gameView.model.ticksToTime @model.flightTime()
     
     start: ->
+
+      @radius = @size()
+
       @strengthText.attr
         font: '12px Arial'
         stroke:   'none'
@@ -97,3 +114,4 @@ define (require) ->
       @el.remove()
       @strengthText.remove()
       clearInterval @drawInterval
+      @gameView.fleetvs.splice(@gameView.fleetvs.indexOf(this), 1)

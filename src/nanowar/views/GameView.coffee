@@ -7,7 +7,12 @@ define (require) ->
   GameNetGraphView = require './GameNetGraphView'
   Raphael = require 'raphael'
   _                 = require 'underscore'
-  
+
+  requestAnimFrame = (->
+    window.requestAnimationFrame or window.webkitRequestAnimationFrame or window.mozRequestAnimationFrame or window.oRequestAnimationFrame or window.msRequestAnimationFrame or (callback) ->
+      window.setTimeout callback, 1000 / 60
+  )()
+
   return class GameView extends Backbone.View
     initialize: (options)->
       @appView = options.appView
@@ -20,6 +25,7 @@ define (require) ->
       @container = $('#nanowar')[0]
       @paper = Raphael @container, 700, 500
       @svg = $('#nanowar svg')[0]
+      @frames = 0
       @ready = 0
       window.$.get '/images/defs.svg', (defsSVG) =>
         @svg.appendChild defsSVG.getElementById 'nanowarDefs'
@@ -32,6 +38,14 @@ define (require) ->
         @svg.appendChild iconDefs
         @ready += 1
         @trigger 'ready' if @ready == 2
+
+      @canvas = @make 'canvas'
+      p = $(@paper.canvas).position()
+      $(@canvas).css position: 'absolute', top: p.top, left: p.left, zIndex: -3
+      @canvas.width = 700
+      @canvas.height = 500
+
+      @container.appendChild(@canvas)
       
       
       $(@paper.canvas).click =>
@@ -43,9 +57,18 @@ define (require) ->
       #  v.render() for v in @fleetvs
       #  v.render() for v in @fleetvs
       #, 1000/30
+      requestAnimFrame _(@render).bind(this)
 
       ng = new GameNetGraphView model: @model, gameView: this
       @container.appendChild(ng.render().el)
+
+    render: (time) ->
+      @frames++
+      @canvas.getContext("2d").clearRect(0,0,700,500)
+      for i in 1..100
+        f.render() for f in @fleetvs
+
+      requestAnimFrame _(@render).bind(this)
 
     updateObjects: ->
       console.log 'update call'
