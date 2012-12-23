@@ -1,4 +1,8 @@
-server: build
+go: test serve
+test:
+	cd src; ../node_modules/jasmine-node/bin/jasmine-node --coffee ../spec
+
+serve: build
 	# directly run it like this so we don't get the RequireJS-wrapped version
 	node_modules/coffee-script/bin/coffee src/server.coffee
 

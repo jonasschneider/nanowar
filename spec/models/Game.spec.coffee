@@ -1,231 +1,234 @@
-require ['nanowar/models/Game', 'nanowar/entities/Cell', 'nanowar/entities/Player'], (Game, Cell, Player) ->
-  describe 'Game', ->
-    describe '#tellSelf', ->
-      it 'can tick without tells', ->
-        game = new Game onServer: true
-        game.tick()
+Game = require('dyz/Game')
+Player = require('nanowar/entities/Player')
+Player = require('nanowar/entities/Cell')
 
-      it 'runs a tell when ticking', ->
-        game = new Game onServer: true
-        ran = false
+describe 'Game', ->
+  describe '#tellSelf', ->
+    it 'can tick without tells', ->
+      game = new Game onServer: true
+      game.tick()
 
-        game.ahoy = ->
-            ran = true
+    it 'runs a tell when ticking', ->
+      game = new Game onServer: true
+      ran = false
 
-        game.tellSelf 'ahoy'
-        expect(ran).toBe false
+      game.ahoy = ->
+          ran = true
 
-        game.tick()
-        expect(ran).toBe true
+      game.tellSelf 'ahoy'
+      expect(ran).toBe false
 
-      it 'runs tells in order', ->
-        game = new Game onServer: true
-        first = null
-        hissed = false
-        ahoy = false
+      game.tick()
+      expect(ran).toBe true
 
-        game.hiss = ->
-          first = first || 'hiss'
-          hissed = true
+    it 'runs tells in order', ->
+      game = new Game onServer: true
+      first = null
+      hissed = false
+      ahoy = false
 
-        game.ahoy = ->
-          first = first || 'ahoy'
-          ahoy = true
+      game.hiss = ->
+        first = first || 'hiss'
+        hissed = true
 
-        game.tellSelf 'hiss'
-        game.tellSelf 'ahoy'
+      game.ahoy = ->
+        first = first || 'ahoy'
+        ahoy = true
 
-        game.tick()
+      game.tellSelf 'hiss'
+      game.tellSelf 'ahoy'
 
-        expect(hissed).toBe true
-        expect(ahoy).toBe true
-        expect(first).toBe 'hiss'
+      game.tick()
 
-      it 'runs a tell with an argument', ->
-        game = new Game onServer: true
-        got = null
+      expect(hissed).toBe true
+      expect(ahoy).toBe true
+      expect(first).toBe 'hiss'
 
-        game.ahoy = (arg)->
-          got = arg
+    it 'runs a tell with an argument', ->
+      game = new Game onServer: true
+      got = null
 
-        game.tellSelf 'ahoy', 'set sails'
-        game.tick()
+      game.ahoy = (arg)->
+        got = arg
 
-        expect(got).toBe 'set sails'
+      game.tellSelf 'ahoy', 'set sails'
+      game.tick()
 
-    describe '#tick', ->
-      it 'publishes entity mutations', ->
-        game = new Game onServer: true
-        output = false
+      expect(got).toBe 'set sails'
 
-        game.bind 'publish', (arg) ->
-          output = arg
+  describe '#tick', ->
+    it 'publishes entity mutations', ->
+      game = new Game onServer: true
+      output = false
 
-        p = game.world.spawn 'Player'
+      game.bind 'publish', (arg) ->
+        output = arg
 
-        game.ahoy = ->
-          p.set color: 'yell'
+      p = game.world.spawn 'Player'
 
-        game.tellSelf 'ahoy'
-        game.tick()
+      game.ahoy = ->
+        p.set color: 'yell'
 
-        expect(output.tick).toBe 1
-        expect(JSON.stringify(output.entityMutation)).toBe '[["changed","Player_1$color","yell"]]'
+      game.tellSelf 'ahoy'
+      game.tick()
 
-    describe '#getWinner', ->
-      it 'returns null when there are multiple players remaining', ->
-        game = new Game
-        p1 = game.world.spawn 'Player'
-        p2 = game.world.spawn 'Player'
-        c1 = game.world.spawn 'Cell'
-        c1.setRelation 'owner', p1
-        
-        c2 = game.world.spawn 'Cell'
-        c2.setRelation 'owner', p2
+      expect(output.tick).toBe 1
+      expect(JSON.stringify(output.entityMutation)).toBe '[["changed","Player_1$color","yell"]]'
 
-        expect(game.getWinner()).toBe null
+  describe '#getWinner', ->
+    it 'returns null when there are multiple players remaining', ->
+      game = new Game
+      p1 = game.world.spawn 'Player'
+      p2 = game.world.spawn 'Player'
+      c1 = game.world.spawn 'Cell'
+      c1.setRelation 'owner', p1
+      
+      c2 = game.world.spawn 'Cell'
+      c2.setRelation 'owner', p2
 
-      it 'returns the winner when there is only one player remaining', ->
-        game = new Game
-        p1 = game.world.spawn 'Player'
-        p2 = game.world.spawn 'Player'
-        c1 = game.world.spawn 'Cell'
-        c1.setRelation 'owner', p2
-        
-        c2 = game.world.spawn 'Cell'
-        c2.setRelation 'owner', p2
+      expect(game.getWinner()).toBe null
 
-        expect(game.getWinner()).toBe p2
+    it 'returns the winner when there is only one player remaining', ->
+      game = new Game
+      p1 = game.world.spawn 'Player'
+      p2 = game.world.spawn 'Player'
+      c1 = game.world.spawn 'Cell'
+      c1.setRelation 'owner', p2
+      
+      c2 = game.world.spawn 'Cell'
+      c2.setRelation 'owner', p2
 
-    describe 'lagging', ->
-      it 'extrapolates', ->
-        server = new Game onServer: true
-        client = new Game onServer: false
+      expect(game.getWinner()).toBe p2
 
-        cell = null
+  describe 'lagging', ->
+    it 'extrapolates', ->
+      server = new Game onServer: true
+      client = new Game onServer: false
 
-        server.bind 'publish', (what) ->
-          client.trigger 'update', what
-          console.log what
+      cell = null
 
-        server.spawnIt = ->
-          cell = server.world.spawn 'Cell', x: 0
+      server.bind 'publish', (what) ->
+        client.trigger 'update', what
+        console.log what
 
-        server.moveIt = ->
-          curX = cell.get('x')
-          cell.set x: curX+10
+      server.spawnIt = ->
+        cell = server.world.spawn 'Cell', x: 0
 
-        server.moveItSlow = ->
-          curX = cell.get('x')
-          cell.set x: curX+5
+      server.moveIt = ->
+        curX = cell.get('x')
+        cell.set x: curX+10
 
-        # first, spawn the cell
-        server.tellSelf 'spawnIt'
-        server.tick() # 1
-        client.tick() # 1
+      server.moveItSlow = ->
+        curX = cell.get('x')
+        cell.set x: curX+5
 
-        expect(client.lastAppliedUpdateTicks).toBe 1
+      # first, spawn the cell
+      server.tellSelf 'spawnIt'
+      server.tick() # 1
+      client.tick() # 1
 
-        # start to move it
-        server.tellSelf 'moveIt'
-        server.tick() # 2
-        client.tick() # 2
+      expect(client.lastAppliedUpdateTicks).toBe 1
 
-        expect(client.lastAppliedUpdateTicks).toBe 2
+      # start to move it
+      server.tellSelf 'moveIt'
+      server.tick() # 2
+      client.tick() # 2
 
-        # move it again, todo: test that one-time moves dont extrapolate
-        server.tellSelf 'moveIt'
-        server.tick() # 3 
-        client.tick() # 3
+      expect(client.lastAppliedUpdateTicks).toBe 2
 
-        expect(client.lastAppliedUpdateTicks).toBe 3
-        expect(client.world.get(cell.id).get('x')).toBe 20
+      # move it again, todo: test that one-time moves dont extrapolate
+      server.tellSelf 'moveIt'
+      server.tick() # 3 
+      client.tick() # 3
 
-        # now we lag.
-        client.tick() # 4
-        expect(client.lastAppliedUpdateTicks).toBe 3
-        expect(client.world.get(cell.id).get('x')).toBe 30
+      expect(client.lastAppliedUpdateTicks).toBe 3
+      expect(client.world.get(cell.id).get('x')).toBe 20
 
-        # lag again
-        client.tick() # 5
-        expect(client.world.get(cell.id).get('x')).toBe 40
+      # now we lag.
+      client.tick() # 4
+      expect(client.lastAppliedUpdateTicks).toBe 3
+      expect(client.world.get(cell.id).get('x')).toBe 30
 
-        expect(client.lastAppliedUpdateTicks).toBe 3
+      # lag again
+      client.tick() # 5
+      expect(client.world.get(cell.id).get('x')).toBe 40
 
-        # here we produce a prediction error
-        server.tellSelf 'moveItSlow'
-        server.tick() # 4
-        client.tick() # 6
+      expect(client.lastAppliedUpdateTicks).toBe 3
 
-        # correct result now: 25 (known server value at tick 4) + 2 (tick diff) * 5 (last known delta) = 35
-        expect(client.world.get(cell.id).get('x')).toBe 35
+      # here we produce a prediction error
+      server.tellSelf 'moveItSlow'
+      server.tick() # 4
+      client.tick() # 6
 
-        # now the 2 late updates arrive
-        server.tellSelf 'moveItSlow'
-        server.tick() # 5
-        server.tellSelf 'moveItSlow'
-        server.tick() # 6
+      # correct result now: 25 (known server value at tick 4) + 2 (tick diff) * 5 (last known delta) = 35
+      expect(client.world.get(cell.id).get('x')).toBe 35
 
-        # and we are up to speed again, but the movement actually stopped now
-        server.tick() # 6
+      # now the 2 late updates arrive
+      server.tellSelf 'moveItSlow'
+      server.tick() # 5
+      server.tellSelf 'moveItSlow'
+      server.tick() # 6
 
-        client.tick()
+      # and we are up to speed again, but the movement actually stopped now
+      server.tick() # 6
 
-        expect(client.world.get(cell.id).get('x')).toBe cell.get('x')
+      client.tick()
+
+      expect(client.world.get(cell.id).get('x')).toBe cell.get('x')
 
 
-      it 'resets attributes back to the server value when the lag ends', ->
-        server = new Game onServer: true
-        client = new Game onServer: false
+    it 'resets attributes back to the server value when the lag ends', ->
+      server = new Game onServer: true
+      client = new Game onServer: false
 
-        cell = null
+      cell = null
 
-        server.bind 'publish', (what) ->
-          client.trigger 'update', what
-          console.log what
+      server.bind 'publish', (what) ->
+        client.trigger 'update', what
+        console.log what
 
-        server.spawnIt = ->
-          cell = server.world.spawn 'Cell', x: 0
+      server.spawnIt = ->
+        cell = server.world.spawn 'Cell', x: 0
 
-        server.moveIt = ->
-          curX = cell.get('x')
-          cell.set x: curX+10
+      server.moveIt = ->
+        curX = cell.get('x')
+        cell.set x: curX+10
 
-        server.moveItSlow = ->
-          curX = cell.get('x')
-          cell.set x: curX+5
+      server.moveItSlow = ->
+        curX = cell.get('x')
+        cell.set x: curX+5
 
-        # first, spawn the cell
-        server.tellSelf 'spawnIt'
-        server.tick() # 1
-        client.tick() # 1
+      # first, spawn the cell
+      server.tellSelf 'spawnIt'
+      server.tick() # 1
+      client.tick() # 1
 
-        expect(client.lastAppliedUpdateTicks).toBe 1
+      expect(client.lastAppliedUpdateTicks).toBe 1
 
-        # start to move it
-        server.tellSelf 'moveIt'
-        server.tick() # 2
-        client.tick() # 2
+      # start to move it
+      server.tellSelf 'moveIt'
+      server.tick() # 2
+      client.tick() # 2
 
-        expect(client.lastAppliedUpdateTicks).toBe 2
+      expect(client.lastAppliedUpdateTicks).toBe 2
 
-        # move it again, todo: test that one-time moves dont extrapolate
-        server.tellSelf 'moveIt'
-        server.tick() # 3 
-        client.tick() # 3
+      # move it again, todo: test that one-time moves dont extrapolate
+      server.tellSelf 'moveIt'
+      server.tick() # 3 
+      client.tick() # 3
 
-        expect(client.lastAppliedUpdateTicks).toBe 3
-        expect(client.world.get(cell.id).get('x')).toBe 20
+      expect(client.lastAppliedUpdateTicks).toBe 3
+      expect(client.world.get(cell.id).get('x')).toBe 20
 
-        # now we lag.
-        client.tick() # 4
-        expect(client.lastAppliedUpdateTicks).toBe 3
-        expect(client.world.get(cell.id).get('x')).toBe 30
+      # now we lag.
+      client.tick() # 4
+      expect(client.lastAppliedUpdateTicks).toBe 3
+      expect(client.world.get(cell.id).get('x')).toBe 30
 
-        # we recover from the lag
-        server.tick() # 4
-        server.tick() # 5
-        client.tick() # 5
+      # we recover from the lag
+      server.tick() # 4
+      server.tick() # 5
+      client.tick() # 5
 
-        expect(client.world.get(cell.id).get('x')).toBe cell.get('x')
+      expect(client.world.get(cell.id).get('x')).toBe cell.get('x')
 

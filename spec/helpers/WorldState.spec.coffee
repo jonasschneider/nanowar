@@ -1,79 +1,80 @@
-require ['dyz/helpers/WorldState'], (WorldState) ->
-  describe 'WorldState', ->
-    beforeEach ->
-      #@world = new World { MyEntity: MyEntity, MyOtherEntity: MyOtherEntity }
-      #@anotherWorld = new World { MyEntity: MyEntity, MyOtherEntity: MyOtherEntity }
-      @state = new WorldState
-      @anotherState = new WorldState
+WorldState = require('dyz/helpers/WorldState')
 
-    describe '#unset', ->
-      it 'leaves no trace', -> 
-        m = @state.mutate =>
-          @state.set 'a', 'b'
-          @state.unset 'a'
+describe 'WorldState', ->
+  beforeEach ->
+    #@world = new World { MyEntity: MyEntity, MyOtherEntity: MyOtherEntity }
+    #@anotherWorld = new World { MyEntity: MyEntity, MyOtherEntity: MyOtherEntity }
+    @state = new WorldState
+    @anotherState = new WorldState
 
-        expect(@state.get('a')).toBe undefined
+  describe '#unset', ->
+    it 'leaves no trace', -> 
+      m = @state.mutate =>
+        @state.set 'a', 'b'
+        @state.unset 'a'
 
-        @anotherState.applyMutation(m)
-        expect(@anotherState.get('a')).toBe undefined
-    
-    describe '#interpolate', ->
-      it 'returns values in between the last set ones', -> 
-        @state.set 'a', 4
-        @state.set 'a', 5
-        
-        expect(@state.interpolate('a', 0)).toBe 4
-        expect(@state.interpolate('a', 0.5)).toBe 4.5
-        expect(@state.interpolate('a', 1)).toBe 5
+      expect(@state.get('a')).toBe undefined
 
-        @state.set 'a', 10
+      @anotherState.applyMutation(m)
+      expect(@anotherState.get('a')).toBe undefined
+  
+  describe '#interpolate', ->
+    it 'returns values in between the last set ones', -> 
+      @state.set 'a', 4
+      @state.set 'a', 5
+      
+      expect(@state.interpolate('a', 0)).toBe 4
+      expect(@state.interpolate('a', 0.5)).toBe 4.5
+      expect(@state.interpolate('a', 1)).toBe 5
 
-        expect(@state.interpolate('a', 0.5)).toBe 7.5
+      @state.set 'a', 10
 
-      it 'does not interpolate when there is only one value', -> 
-        @state.set 'a', 5
-        
-        expect(@state.interpolate('a', 0)).toBe 5
-        expect(@state.interpolate('a', 0.5)).toBe 5
-        expect(@state.interpolate('a', 1)).toBe 5
+      expect(@state.interpolate('a', 0.5)).toBe 7.5
 
-    describe '#mutate', ->
-      it 'works', -> 
-        m = @state.mutate =>
-          @state.set 'a', 'b'
+    it 'does not interpolate when there is only one value', -> 
+      @state.set 'a', 5
+      
+      expect(@state.interpolate('a', 0)).toBe 5
+      expect(@state.interpolate('a', 0.5)).toBe 5
+      expect(@state.interpolate('a', 1)).toBe 5
 
-        expect(@state.get('a')).toBe 'b'
+  describe '#mutate', ->
+    it 'works', -> 
+      m = @state.mutate =>
+        @state.set 'a', 'b'
 
-        @anotherState.applyMutation(m)
+      expect(@state.get('a')).toBe 'b'
 
-        expect(@anotherState.get('a')).toBe 'b'
+      @anotherState.applyMutation(m)
 
-      it 'also handles events', -> 
-        called = false
+      expect(@anotherState.get('a')).toBe 'b'
 
-        @state.registerEvent 'ohai', ->
-          called = true
+    it 'also handles events', -> 
+      called = false
 
-        m = @state.mutate =>
-          @state.recordEvent 'ohai', {c: 'd'}, 5
+      @state.registerEvent 'ohai', ->
+        called = true
 
-        d1 = null
-        d2 = null
-        expect(called).toBe false
+      m = @state.mutate =>
+        @state.recordEvent 'ohai', {c: 'd'}, 5
 
-        @anotherState.registerEvent 'ohai', (arg1, arg2) ->
-          d1 = arg1
-          d2 = arg2
+      d1 = null
+      d2 = null
+      expect(called).toBe false
 
-        @anotherState.applyMutation(m)
-        expect(d1.c).toBe 'd'
-        expect(d2).toBe 5
+      @anotherState.registerEvent 'ohai', (arg1, arg2) ->
+        d1 = arg1
+        d2 = arg2
 
-    describe '#_attributesChangedByMutation', ->
-      it "returns only changes", ->
-        mut = @state.mutate =>
-          @state.set 'myattr', 1337
+      @anotherState.applyMutation(m)
+      expect(d1.c).toBe 'd'
+      expect(d2).toBe 5
 
-        a = @state._attributesChangedByMutation(mut)
+  describe '#_attributesChangedByMutation', ->
+    it "returns only changes", ->
+      mut = @state.mutate =>
+        @state.set 'myattr', 1337
 
-        expect(JSON.stringify(a)).toBe JSON.stringify({"myattr": 1337})
+      a = @state._attributesChangedByMutation(mut)
+
+      expect(JSON.stringify(a)).toBe JSON.stringify({"myattr": 1337})
