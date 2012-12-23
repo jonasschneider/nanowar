@@ -1,6 +1,6 @@
 define (require) ->
   Backbone = require 'backbone'
-  Game = require '../models/Game'
+  Game = require 'dyz/Game'
 
   Array::rotate = (->
     unshift = Array::unshift

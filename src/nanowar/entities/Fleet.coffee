@@ -1,6 +1,6 @@
 define (require) ->
   Player = require('./Player')
-  Entity = require('nanowar/Entity')
+  Entity = require('dyz/Entity')
   Cell = require('./Cell')
   
   _      = require('underscore')
@@ -23,7 +23,12 @@ define (require) ->
       util.nearestBorder @getRelation('from').position(), @getRelation('from').get('size'), @getRelation('to').position()
     
     endPosition: ->
-      util.nearestBorder @getRelation('to').position(), @getRelation('to').get('size'), @getRelation('from').position()
+      t = @getRelation('to')
+      if t && t.entityTypeName == 'Cell'
+        util.nearestBorder @getRelation('to').position(), @getRelation('to').get('size'), @getRelation('from').position()
+      else
+        x: t.get('x')
+        y: t.get('y')
     
     eta: ->
       @arrivalTime() - @ticks()
@@ -73,8 +78,8 @@ define (require) ->
       dx = ep.x - sp.x
       dy = ep.y - sp.y
       @set
-        posx: sp.x + dx * @fractionDone()
-        posy: sp.y + dy * @fractionDone()
+        posx: parseFloat (sp.x + dx * @fractionDone()).toFixed(2)
+        posy: parseFloat (sp.y + dy * @fractionDone()).toFixed(2)
       
       if @arrived()
         console.log "[Tick#{@ticks()}] [Fleet #{@id}] Arrived from route #{@getRelation('from').id}->#{@getRelation('to').id}"

@@ -1,12 +1,11 @@
 define (require) ->
-  Cell              = require('../entities/Cell')
-  Player            = require('../entities/Player')
-  Fleet             = require('../entities/Fleet')
-  EnhancerNode      = require('../entities/EnhancerNode')
-  World  = require('nanowar/World')
+  Cell              = require('nanowar/entities/Cell')
+  Player            = require('nanowar/entities/Player')
+  Fleet             = require('nanowar/entities/Fleet')
+  EnhancerNode      = require('nanowar/entities/EnhancerNode')
+  World  = require('dyz/World')
   _                 = require 'underscore'
   Backbone          = require 'backbone'
-  $          = require 'jquery'
 
   class Game extends Backbone.Model
     initialize: ->

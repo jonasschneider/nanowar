@@ -90,7 +90,11 @@ define (require) ->
           'asdf'
         
         when 'EnhancerNode'
-          new EnhancerNodeView model: e, gameView: this
+          ev = new EnhancerNodeView model: e, gameView: this
+
+          
+          ev.bind 'click', =>
+            @handleClickOnEnhancerNodeView ev
         
         else
           console.error "wtf is a #{e.type}?", e
@@ -100,6 +104,13 @@ define (require) ->
         @select null
       
       @currentClickIsInCell = false
+
+    handleClickOnEnhancerNodeView: (ev) ->
+      @currentClickIsInCell = true
+      
+      if @selectedCell?
+        @model.tellSelf 'sendFleet', @selectedCell.model, ev.model
+        @model.sendClientTells()
     
     handleClickOnCellView: (cellClickedOn, e) ->
       @currentClickIsInCell = true

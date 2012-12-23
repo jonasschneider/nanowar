@@ -1,4 +1,4 @@
-require ['nanowar/entities/EnhancerNode', 'nanowar/entities/Cell', 'nanowar/World', 'nanowar/entities/Player'], (EnhancerNode, Cell, World, Player) ->
+require ['nanowar/entities/EnhancerNode', 'nanowar/entities/Cell', 'dyz/World', 'nanowar/entities/Player'], (EnhancerNode, Cell, World, Player) ->
   describe 'EnhancerNode', ->
     beforeEach ->
       @world = new World Cell: Cell, Player: Player, EnhancerNode: EnhancerNode
@@ -60,7 +60,7 @@ require ['nanowar/entities/EnhancerNode', 'nanowar/entities/Cell', 'nanowar/Worl
       node.update()
 
       expect(spy).toHaveBeenCalled()
-      expect(spy.mostRecentCall.args[0]).toBe cell1
+      expect(spy.mostRecentCall.args[0]).toBe cell1.id
 
 
     it "triggers affectedCells:remove when an affected cell's owner changes", ->
@@ -78,7 +78,7 @@ require ['nanowar/entities/EnhancerNode', 'nanowar/entities/Cell', 'nanowar/Worl
       cell.setRelation 'owner', fiz
       node.update()
       
-      expect(spy).toHaveBeenCalledWith cell
+      expect(spy).toHaveBeenCalledWith cell.id
 
     it "doesn't trigger when other cell attributes change", ->
       me = @world.spawn 'Player'
@@ -126,7 +126,7 @@ require ['nanowar/entities/EnhancerNode', 'nanowar/entities/Cell', 'nanowar/Worl
       cell.setRelation 'owner', me
       
       node.update()
-      expect(spy).toHaveBeenCalledWith(cell)
+      expect(spy).toHaveBeenCalledWith(cell.id)
 
 
     it "doesn't trigger affectedCells:add when the list is already full", ->
@@ -158,7 +158,7 @@ require ['nanowar/entities/EnhancerNode', 'nanowar/entities/Cell', 'nanowar/Worl
       @world.remove(cell)
 
       node.update()
-      expect(spy).toHaveBeenCalledWith cell
+      expect(spy).toHaveBeenCalledWith cell.id
 
 
     it "does not trigger affectedCells:remove when an unaffected cell is removed", ->

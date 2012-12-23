@@ -1,7 +1,8 @@
 define (require) ->
-  App     = require('./models/App')
+  App     = require('./Peer')
   util    = require 'util'
   _       = require 'underscore'
+  Backbone= require 'backbone'
 
   class NetworkedPlayer
     constructor: (socket, playerent) ->

@@ -2,7 +2,7 @@ define (require) ->
   Game = require('./Game')
   Backbone = require('backbone')
 
-  return class App extends Backbone.Model
+  return class Peer extends Backbone.Model
     urlRoot: '/app'
     
     initialize: ->

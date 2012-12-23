@@ -1,5 +1,5 @@
 define (require) ->
-  Entity = require('nanowar/Entity')
+  Entity = require('dyz/Entity')
 
   return class Player extends Entity
     attributeSpecs:

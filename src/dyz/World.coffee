@@ -1,7 +1,7 @@
 define (require) ->
   Backbone = require('backbone')
   _                     = require 'underscore'
-  WorldState = require 'nanowar/helpers/WorldState'
+  WorldState = require 'dyz/helpers/WorldState'
 
   class World
     constructor: (types) ->

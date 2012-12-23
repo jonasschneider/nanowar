@@ -25,7 +25,7 @@ requirejs.config
   baseUrl: 'compiled'
   nodeRequire: require
 
-requirejs(['nanowar/server'], (server) ->
+requirejs(['dyz/server'], (server) ->
   server.start(io)
 #
   console.log("Server running at port " + port)

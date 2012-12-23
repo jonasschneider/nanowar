@@ -1,4 +1,4 @@
-require ['nanowar/helpers/WorldState'], (WorldState) ->
+require ['dyz/helpers/WorldState'], (WorldState) ->
   describe 'WorldState', ->
     beforeEach ->
       #@world = new World { MyEntity: MyEntity, MyOtherEntity: MyOtherEntity }

@@ -1,6 +1,6 @@
 define (require) ->
   Backbone = require 'backbone'
-  Game = require '../models/Game'
+  Game = require 'dyz/Game'
 
   return class FleetView extends Backbone.View
     initialize: (opts) ->

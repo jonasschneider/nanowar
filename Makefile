@@ -1,4 +1,8 @@
 all:
+	rm -fr compiled/*
+	cp -r lib/* compiled
+	cp -r src/*.js compiled
+	node_modules/coffee-script/bin/coffee -c -o compiled src
 	node compiled/server.js
 
 build:

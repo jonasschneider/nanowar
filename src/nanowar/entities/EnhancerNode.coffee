@@ -1,6 +1,6 @@
 define (require) ->
   Player = require('./Player')
-  Entity = require('nanowar/Entity')
+  Entity = require('dyz/Entity')
   _      = require('underscore')
   util = require('../helpers/util')
 
@@ -10,6 +10,7 @@ define (require) ->
       y: 0
 
       owner_id: 0
+      strength: 0
     
     initialize: ->
       @_previousAffectedCells = @affectedCells()
@@ -19,19 +20,21 @@ define (require) ->
       previously = @_previousAffectedCells
       
       _(newly).chain().difference(previously).each (c) =>
-        @message 'affectedCells:add', c
+        @message 'affectedCells:add', c.id
         c.set size: c.get('size')+10
       
       _(previously).chain().difference(newly).each (c) =>
-        @message 'affectedCells:remove', c
-        c.set size: c.get('size')-10
+        # entity could be stale, be cautious
+        @message 'affectedCells:remove', c.id
+        if c = @collection.get(c.id)
+          c.set size: c.get('size')-10
       
       @_previousAffectedCells = newly
       
     position: ->
       x: @get 'x'
       y: @get 'y'
-    
+
     affectedCells: ->
       _(@collection.getEntitiesOfType('Cell')).chain()
       .select (cell) =>
@@ -39,3 +42,34 @@ define (require) ->
       .sortBy (cell) =>
         util.distance(@position(), cell.position())
       .first(2).value()
+
+    changeCurrentStrengthBy: (d) ->
+      @set strength: @get('strength')+d
+
+    setCurrentStrength: (s) ->
+      @set strength: s
+
+    getCurrentStrength: ->
+      @get('strength')
+
+    handle_incoming_fleet: (fleet) ->
+      if fleet.getRelation('owner') == @getRelation('owner') # friendly fleet
+        console.log "Friendly fleet of #{fleet.get('strength')} arrived"
+        @changeCurrentStrengthBy fleet.get('strength')
+      else # hostile fleet
+        console.log "Hostile fleet of #{fleet.get('strength')} arrived"
+        newStrength = @getCurrentStrength() - fleet.get('strength')
+        
+        if newStrength == 0
+          @setRelation 'owner', null
+
+          console.log "#{@cid} changed to neutral"
+        else if newStrength < 0
+          @setRelation 'owner', fleet.getRelation('owner')
+          
+          newStrength = -newStrength
+          
+          console.log "#{@cid} overtaken by #{fleet.getRelation('owner').get('name')}"
+        
+        @setCurrentStrength newStrength
+    
