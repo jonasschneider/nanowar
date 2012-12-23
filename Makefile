@@ -11,7 +11,7 @@ build:
 	rm -fr compiled/*
 	cp -r vendor/* compiled
 	node_modules/coffee-script/bin/coffee -c -o compiled src
-	node r -convert compiled compiled
+	node vendor/r -convert compiled compiled
 
 shrink:
 	node ~/r.js -o client/buildconfig.js
